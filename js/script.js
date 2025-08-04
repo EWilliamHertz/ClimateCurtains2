@@ -15,7 +15,9 @@ import {
     setDoc,
     getDoc,
     onSnapshot,
-    serverTimestamp
+    serverTimestamp,
+    collection,
+    getDocs
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
 
 // Firebase configuration from the user
@@ -49,7 +51,6 @@ const logoutButton = document.getElementById('logout-button');
 const mainContent = document.getElementById('main-content');
 const investorListTable = document.getElementById('investor-list-table');
 const inquiryListTable = document.getElementById('inquiry-list-table');
-
 
 // Helper function to show messages
 function showMessage(msg, isError = false) {
@@ -90,9 +91,16 @@ function handleAuthForms() {
             const password = loginForm.querySelector('#login-password').value;
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                const docRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles`, 'profile');
+                const docSnap = await getDoc(docRef);
+
+                let userIsAdmin = false;
+                if (docSnap.exists()) {
+                    userIsAdmin = docSnap.data().isAdmin || false;
+                }
+                
                 localStorage.setItem('userLoggedIn', 'true');
-                // Set admin status based on a simple check or a more robust system
-                const userIsAdmin = userCredential.user.email === 'admin@climatecurtains.com';
                 localStorage.setItem('userIsAdmin', userIsAdmin);
                 showMessage("Login successful!");
                 if (userIsAdmin) {
@@ -125,6 +133,9 @@ function handleAuthForms() {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const newUser = userCredential.user;
                 const userProfileRef = doc(db, `/artifacts/${appId}/users/${newUser.uid}/user_profiles`, 'profile');
+                
+                const isAdmin = email === 'ernst@hatake.eu'; // Set admin flag for specific email
+                
                 await setDoc(userProfileRef, {
                     companyName,
                     roleInCompany,
@@ -132,12 +143,17 @@ function handleAuthForms() {
                     squareMeterInFactory: squareMeterInFactory || 'N/A',
                     isInvestor,
                     registeredAt: serverTimestamp(),
-                    isAdmin: false // New field for admin access
+                    isAdmin // Set admin flag
                 });
+                
                 localStorage.setItem('userLoggedIn', 'true');
-                localStorage.setItem('userIsAdmin', false);
+                localStorage.setItem('userIsAdmin', isAdmin);
                 showMessage("Registration successful!");
-                window.location.href = 'dashboard.html';
+                if (isAdmin) {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
             } catch (error) {
                 console.error("Registration failed:", error);
                 showMessage(`Registration failed: ${error.message}`, true);
@@ -152,11 +168,14 @@ function handleAuthForms() {
 function handlePortalPage() {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            // Check if user is anonymous or has a profile
             const docRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles`, 'profile');
             const docSnap = await getDoc(docRef);
             if (docSnap.exists() && !user.isAnonymous) {
-                window.location.href = 'dashboard.html';
+                if (docSnap.data().isAdmin) {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
             } else {
                  if (loadingSpinner) loadingSpinner.classList.add('hidden');
                  if (authView) authView.classList.remove('hidden');
@@ -222,6 +241,83 @@ function handleDashboardPage() {
     });
 }
 
+
+// Admin page specific logic
+async function handleAdminPage() {
+    const userIsLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+    const userIsAdmin = localStorage.getItem('userIsAdmin') === 'true';
+
+    if (!userIsLoggedIn || !userIsAdmin) {
+        window.location.href = 'portal.html';
+        return;
+    }
+
+    // Tab switching logic
+    window.switchTab = (tabName) => {
+        const tabs = document.querySelectorAll('.tabs button');
+        tabs.forEach(tab => tab.classList.remove('active'));
+        document.querySelector(`#tab-button-${tabName}`).classList.add('active');
+
+        document.getElementById('users-tab-content').classList.add('hidden');
+        document.getElementById('investors-tab-content').classList.add('hidden');
+        document.getElementById('inquiries-tab-content').classList.add('hidden');
+        document.getElementById(`${tabName}-tab-content`).classList.remove('hidden');
+    };
+    
+    // Fetch and display all users
+    const usersCollectionRef = collection(db, `/artifacts/${appId}/users`);
+    const usersSnapshot = await getDocs(usersCollectionRef);
+    const usersListBody = document.querySelector('#user-list-table tbody');
+    let totalUsers = 0;
+    let totalCompanies = new Set();
+    
+    usersSnapshot.forEach(userDoc => {
+        const userProfileRef = doc(db, userDoc.ref.path, 'user_profiles/profile');
+        onSnapshot(userProfileRef, (profileSnap) => {
+            if (profileSnap.exists()) {
+                const profile = profileSnap.data();
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${profile.companyName || 'N/A'}</td>
+                    <td>${profile.email || 'N/A'}</td>
+                    <td>${profile.roleInCompany || 'N/A'}</td>
+                    <td>${profile.squareMeterInFactory || 'N/A'}</td>
+                    <td>${profile.isInvestor ? 'Yes' : 'No'}</td>
+                    <td>${userDoc.id}</td>
+                `;
+                usersListBody.appendChild(tr);
+
+                totalUsers++;
+                totalCompanies.add(profile.companyName);
+                if (document.getElementById('total-users')) document.getElementById('total-users').textContent = totalUsers;
+                if (document.getElementById('registered-companies')) document.getElementById('registered-companies').textContent = totalCompanies.size;
+            }
+        });
+    });
+
+    // Dummy inquiry data for now
+    if (inquiryListTable) {
+        const inquiryListBody = inquiryListTable.querySelector('tbody');
+        inquiryListBody.innerHTML = `
+            <tr>
+                <td>2025-08-03</td>
+                <td>Northvolt</td>
+                <td>Quote Request from Calculator</td>
+                <td>New</td>
+                <td><a href="#">View</a></td>
+            </tr>
+            <tr>
+                <td>2025-08-02</td>
+                <td>Dongguan Zhuohaoyang PKG Co., Ltd</td>
+                <td>General Inquiry</td>
+                <td>In Progress</td>
+                <td><a href="#">View</a></td>
+            </tr>
+        `;
+        if (document.getElementById('total-inquiries')) document.getElementById('total-inquiries').textContent = 2; // Placeholder
+    }
+}
+
 // Logout functionality
 if (logoutButton) {
     logoutButton.addEventListener('click', async () => {
@@ -243,8 +339,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.location.pathname.includes('portal.html')) {
         handlePortalPage();
         handleAuthForms();
-    } else if (window.location.pathname.includes('dashboard.html') || window.location.pathname.includes('admin.html')) {
+    } else if (window.location.pathname.includes('dashboard.html')) {
         handleDashboardPage();
+    } else if (window.location.pathname.includes('admin.html')) {
+        handleAdminPage();
     }
 });
 
