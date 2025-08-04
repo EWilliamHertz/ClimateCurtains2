@@ -60,6 +60,7 @@
                     <li><a href="our-solutions.html">SOLUTIONS</a></li>
                     <li><a href="about.html">ABOUT US</a></li>
                     <li><a href="funding.html">FUNDING</a></li>
+                    <li><a href="impact.html">IMPACT</a></li>
                     <li><a href="contact.html">CONTACT</a></li>
                     <li><a href="portal.html">CLIENT PORTAL</a></li>
                 </ul>
@@ -100,9 +101,13 @@
                                 <label for="r-value">Curtain R-Value *</label>
                                 <select id="r-value" required>
                                     <option value="" disabled selected>Select an R-value</option>
+                                    <option value="3">R-3</option>
                                     <option value="6">R-6</option>
+                                    <option value="8">R-8</option>
                                     <option value="10">R-10</option>
+                                    <option value="12">R-12</option>
                                     <option value="15">R-15</option>
+                                    <option value="20">R-20</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -111,7 +116,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="energy-cost">Local Energy Cost ($/kWh) *</label>
-                                <input type="number" id="energy-cost" step="0.01" required>
+                                <input type="number" id="energy-cost" step="0.01" value="0.15" required>
                             </div>
                             <div class="form-group">
                                 <label for="curtain-cost-per-sqm">Estimated Curtain Cost ($/m^2$)</label>
@@ -123,13 +128,13 @@
 
                     <div class="visual-container">
                         <div class="visual-before" id="visual-before">
-                            <h4 class="temp-text left">Warm: +20°C</h4>
-                            <h4 class="temp-text right">Cold: +5°C</h4>
+                            <h4 id="temp-text-before-left" class="temp-text left">Warm: +20°C</h4>
+                            <h4 id="temp-text-before-right" class="temp-text right">Cold: +5°C</h4>
                         </div>
                         <div class="visual-after hidden" id="visual-after">
                             <div class="curtain" id="curtain-visual"></div>
-                            <h4 class="temp-text left">Warm: +20°C</h4>
-                            <h4 class="temp-text right">Cold: +5°C</h4>
+                            <h4 id="temp-text-after-left" class="temp-text left">Warm: +20°C</h4>
+                            <h4 id="temp-text-after-right" class="temp-text right">Cold: +5°C</h4>
                         </div>
                     </div>
                 </div>
@@ -139,7 +144,7 @@
                     <p><strong>Estimated Total Curtain Cost:</strong> $<span id="total-cost"></span></p>
                     <p><strong>Estimated Annual Energy Savings:</strong> <span id="energy-savings"></span> kWh</p>
                     <p><strong>Estimated Annual Cost Savings:</strong> $<span id="cost-savings"></span></p>
-                    <p><strong>Estimated Payback Period:</strong> <span id="payback-period"></span> Years</p>
+                    <p><strong>Estimated Payback Period:</strong> <span id="payback-period"></span> months</p>
                     <div class="order-button">
                         <button class="cta-button" onclick="draftOrder()">Draft Your Order</button>
                     </div>
@@ -175,5 +180,6 @@
     </footer>
 
     <script src="../js/script.js" type="module"></script>
+    <script src="calculator-script.js" type="module"></script>
 </body>
 </html>
