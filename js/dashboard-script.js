@@ -32,7 +32,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
-const appId = firebaseConfig.projectId;
 
 // DOM elements
 const messageBox = document.getElementById('message-box');
@@ -58,7 +57,8 @@ function showMessage(msg, isError = false) {
 async function handleDashboardPage() {
     onAuthStateChanged(auth, async (user) => {
         if (user && !user.isAnonymous) {
-            const docRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles`, 'profile');
+            // *** FIXED: Simplified the path to the user profile document ***
+            const docRef = doc(db, 'users', user.uid);
             const unsubscribe = onSnapshot(docRef, async (docSnap) => {
                 if (docSnap.exists()) {
                     if (loadingSpinner) loadingSpinner.classList.add('hidden');
@@ -105,4 +105,4 @@ if (logoutButton) {
 // Initialize the correct page logic based on URL
 document.addEventListener('DOMContentLoaded', () => {
     handleDashboardPage();
-});
+});    
