@@ -13,7 +13,8 @@ import {
     collection,
     getDocs,
     addDoc,
-    serverTimestamp, getDoc
+    serverTimestamp,
+    getDoc
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
 import {
     getStorage,
@@ -248,6 +249,8 @@ async function handleAdminPage() {
                             const tr = document.createElement('tr');
                             tr.innerHTML = `
                                 <td>${userProfile.companyName || 'N/A'}</td>
+                                <td>${userProfile.firstName || 'N/A'}</td>
+                                <td>${userProfile.lastName || 'N/A'}</td>
                                 <td>${userProfile.email || 'N/A'}</td>
                                 <td>${userProfile.roleInCompany || 'N/A'}</td>
                                 <td>${userProfile.squareMeterInFactory || 'N/A'}</td>
