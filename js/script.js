@@ -3,7 +3,6 @@ import {
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js';
 import {
     getAuth,
-    signInWithCustomToken,
     onAuthStateChanged,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
@@ -47,7 +46,6 @@ const dashboardView = document.getElementById('dashboard-view');
 const welcomeMessage = document.getElementById('welcome-message');
 const logoutButton = document.getElementById('logout-button');
 const mainContent = document.getElementById('main-content');
-
 
 // Helper function to show messages
 function showMessage(msg, isError = false) {
@@ -186,7 +184,7 @@ function handlePortalPage() {
     });
 }
 
-// Function to handle auth state on dashboard/admin pages
+// Function to handle auth state on dashboard page
 function handleDashboardPage() {
     const userIsLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
     const userIsAdmin = localStorage.getItem('userIsAdmin') === 'true';
@@ -196,11 +194,6 @@ function handleDashboardPage() {
         return;
     }
 
-    if (window.location.pathname.includes('admin.html') && !userIsAdmin) {
-        window.location.href = 'dashboard.html';
-        return;
-    }
-    
     if (loadingSpinner) loadingSpinner.classList.remove('hidden');
 
     onAuthStateChanged(auth, async (user) => {
@@ -236,107 +229,6 @@ function handleDashboardPage() {
             window.location.href = 'portal.html';
         }
     });
-}
-
-
-// Admin page specific logic
-async function handleAdminPage() {
-    const userIsLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
-    const userIsAdmin = localStorage.getItem('userIsAdmin') === 'true';
-
-    if (!userIsLoggedIn || !userIsAdmin) {
-        window.location.href = 'portal.html';
-        return;
-    }
-
-    // Tab switching logic
-    window.switchTab = (tabName) => {
-        const tabs = document.querySelectorAll('.tabs button');
-        tabs.forEach(tab => tab.classList.remove('active'));
-        document.querySelector(`#tab-button-${tabName}`).classList.add('active');
-
-        document.getElementById('users-tab-content').classList.add('hidden');
-        document.getElementById('investors-tab-content').classList.add('hidden');
-        document.getElementById('inquiries-tab-content').classList.add('hidden');
-        document.getElementById(`${tabName}-tab-content`).classList.remove('hidden');
-    };
-    
-    // Fetch and display all users
-    const usersCollectionRef = collection(db, `/artifacts/${appId}/users`);
-    const usersListBody = document.querySelector('#user-list-table tbody');
-    let totalUsers = 0;
-    let totalCompanies = new Set();
-    
-    const usersSnapshot = await getDocs(usersCollectionRef);
-    usersSnapshot.forEach(userDoc => {
-        const userProfileRef = doc(db, userDoc.ref.path, 'user_profiles/profile');
-        onSnapshot(userProfileRef, (profileSnap) => {
-            if (profileSnap.exists()) {
-                const profile = profileSnap.data();
-                // Get email from Firestore profile data
-                const email = profile.email || 'N/A';
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${profile.companyName || 'N/A'}</td>
-                    <td>${email}</td>
-                    <td>${profile.roleInCompany || 'N/A'}</td>
-                    <td>${profile.squareMeterInFactory || 'N/A'}</td>
-                    <td>${profile.isInvestor ? 'Yes' : 'No'}</td>
-                    <td>${userDoc.id}</td>
-                `;
-                usersListBody.appendChild(tr);
-
-                totalUsers++;
-                totalCompanies.add(profile.companyName);
-                if (document.getElementById('total-users')) document.getElementById('total-users').textContent = totalUsers;
-                if (document.getElementById('registered-companies')) document.getElementById('registered-companies').textContent = totalCompanies.size;
-            }
-        });
-    });
-
-    // Populate investor list
-    const investorListGrid = document.getElementById('investor-list-grid');
-    if (investorListGrid) {
-        investorListGrid.innerHTML = ''; // Clear existing content
-        for (const category in investorData) {
-            investorData[category].forEach(investor => {
-                const card = document.createElement('div');
-                card.className = 'investor-card';
-                card.innerHTML = `
-                    <h3>${investor.contact.split(',')[0]}</h3>
-                    <p><strong>Contact:</strong> ${investor.contact}</p>
-                    <p><strong>Email:</strong> <a href="mailto:${investor.email}">${investor.email}</a></p>
-                    <p><strong>Website:</strong> <a href="${investor.website}" target="_blank">${investor.website}</a></p>
-                    <p><strong>Focus:</strong> ${investor.focus}</p>
-                    <p><strong>Relevance:</strong> ${investor.relevance}</p>
-                `;
-                investorListGrid.appendChild(card);
-            });
-        }
-    }
-
-
-    // Dummy inquiry data for now
-    if (inquiryListTable) {
-        const inquiryListBody = inquiryListTable.querySelector('tbody');
-        inquiryListBody.innerHTML = `
-            <tr>
-                <td>2025-08-03</td>
-                <td>Northvolt</td>
-                <td>Quote Request from Calculator</td>
-                <td>New</td>
-                <td><a href="#">View</a></td>
-            </tr>
-            <tr>
-                <td>2025-08-02</td>
-                <td>Dongguan Zhuohaoyang PKG Co., Ltd</td>
-                <td>General Inquiry</td>
-                <td>In Progress</td>
-                <td><a href="#">View</a></td>
-            </tr>
-        `;
-        if (document.getElementById('total-inquiries')) document.getElementById('total-inquiries').textContent = 2; // Placeholder
-    }
 }
 
 
