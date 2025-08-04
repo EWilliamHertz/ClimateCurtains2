@@ -7,8 +7,31 @@
     <link rel="stylesheet" href="../css/styles.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .calculator-container { max-width: 800px; margin: 2rem auto; padding: 2rem; background-color: #fff; border-radius: 8px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); }
+        .calculator-container { max-width: 1000px; margin: 2rem auto; padding: 2rem; background-color: #fff; border-radius: 8px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); display: flex; gap: 2rem; }
+        @media (max-width: 768px) {
+            .calculator-container { flex-direction: column; }
+        }
+        .calculator-form-section { flex: 1; }
+        .visual-container { flex: 1; display: flex; align-items: center; justify-content: center; }
+        .visual-before, .visual-after { width: 100%; height: 300px; border-radius: 8px; position: relative; overflow: hidden; border: 2px solid #e2e8f0; }
+        .visual-before { background: linear-gradient(to right, #60a5fa, #bfdbfe); }
+        .visual-after { background: linear-gradient(to right, #60a5fa, #bfdbfe); }
+        .curtain {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 0;
+            height: 100%;
+            background-color: #10b981;
+            transition: width 1s ease-in-out;
+            z-index: 10;
+        }
+        .curtain.active { width: 50%; }
+        .temp-text { position: absolute; top: 1rem; color: white; font-weight: bold; font-size: 1.5rem; }
+        .temp-text.left { left: 1rem; }
+        .temp-text.right { right: 1rem; }
         .calculator-form .form-group { margin-bottom: 1.5rem; }
         .calculator-form label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
         .calculator-form input, .calculator-form select { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 1rem; }
@@ -57,50 +80,68 @@
         <section class="contact-section">
             <div class="container">
                 <div class="calculator-container">
-                    <h3>Input your facility details:</h3>
-                    <form id="calculator-form" class="calculator-form">
-                        <div class="form-group">
-                            <label for="facility-area">Total Facility Area (SQM) *</label>
-                            <input type="number" id="facility-area" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="curtain-area">Estimated Curtain Area (SQM) *</label>
-                            <input type="number" id="curtain-area" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="r-value">Curtain R-Value *</label>
-                            <select id="r-value" required>
-                                <option value="" disabled selected>Select an R-value</option>
-                                <option value="3">R3</option>
-                                <option value="6">R6</option>
-                                <option value="9">R9</option>
-                                <option value="10">R10</option>
-                                <option value="15">R15 (Stationary)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="temp-diff">Average Temperature Differential (°C) *</label>
-                            <input type="number" id="temp-diff" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="operating-hours">Annual Operating Hours *</label>
-                            <input type="number" id="operating-hours" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="energy-cost">Local Energy Cost ($/kWh) *</label>
-                            <input type="number" id="energy-cost" step="0.01" required>
-                        </div>
-                        <button type="submit" class="form-submit">Calculate Savings</button>
-                    </form>
+                    <div class="calculator-form-section">
+                        <h3>Input your facility details:</h3>
+                        <form id="calculator-form" class="calculator-form">
+                            <div class="form-group">
+                                <label for="preset-industry">Choose a Preset Industry (Optional)</label>
+                                <select id="preset-industry" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700">
+                                    <option value="" disabled selected>Select an industry</option>
+                                    <option value="cold-storage">Cold Storage Warehouse</option>
+                                    <option value="industrial">Industrial Production Facility</option>
+                                    <option value="hospitality">Hotel Lobby</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="curtain-area">Estimated Curtain Area ($m^2$) *</label>
+                                <input type="number" id="curtain-area" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="r-value">Curtain R-Value *</label>
+                                <select id="r-value" required>
+                                    <option value="" disabled selected>Select an R-value</option>
+                                    <option value="6">R-6</option>
+                                    <option value="10">R-10</option>
+                                    <option value="15">R-15</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="temp-diff">Average Temperature Differential ($^\circ C$) *</label>
+                                <input type="number" id="temp-diff" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="energy-cost">Local Energy Cost ($/kWh) *</label>
+                                <input type="number" id="energy-cost" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="curtain-cost-per-sqm">Estimated Curtain Cost ($/m^2$)</label>
+                                <input type="number" id="curtain-cost-per-sqm" step="0.01" value="50" required>
+                            </div>
+                            <button type="submit" class="form-submit">Calculate Savings</button>
+                        </form>
+                    </div>
 
-                    <div id="results" class="results-section" style="display:none;">
-                        <h3>Estimated Annual Savings Report</h3>
-                        <p><strong>Estimated Annual Energy Savings:</strong> <span id="energy-savings"></span> kWh</p>
-                        <p><strong>Estimated Annual Cost Savings:</strong> <span id="cost-savings"></span></p>
-                        <p><strong>Estimated Payback Period:</strong> <span id="payback-period"></span> Years</p>
-                        <div class="order-button">
-                            <button class="cta-button" onclick="draftOrder()">Draft Your Order</button>
+                    <div class="visual-container">
+                        <div class="visual-before" id="visual-before">
+                            <h4 class="temp-text left">Warm: +20°C</h4>
+                            <h4 class="temp-text right">Cold: +5°C</h4>
                         </div>
+                        <div class="visual-after hidden" id="visual-after">
+                            <div class="curtain" id="curtain-visual"></div>
+                            <h4 class="temp-text left">Warm: +20°C</h4>
+                            <h4 class="temp-text right">Cold: +5°C</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="results" class="results-section hidden">
+                    <h3>Estimated Annual Savings Report</h3>
+                    <p><strong>Estimated Total Curtain Cost:</strong> $<span id="total-cost"></span></p>
+                    <p><strong>Estimated Annual Energy Savings:</strong> <span id="energy-savings"></span> kWh</p>
+                    <p><strong>Estimated Annual Cost Savings:</strong> $<span id="cost-savings"></span></p>
+                    <p><strong>Estimated Payback Period:</strong> <span id="payback-period"></span> Years</p>
+                    <div class="order-button">
+                        <button class="cta-button" onclick="draftOrder()">Draft Your Order</button>
                     </div>
                 </div>
             </div>
@@ -133,34 +174,6 @@
         </div>
     </footer>
 
-    <script src="../js/script.js"></script>
-    <script>
-        document.getElementById('calculator-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const curtainArea = document.getElementById('curtain-area').value;
-            const rValue = document.getElementById('r-value').value;
-            const tempDiff = document.getElementById('temp-diff').value;
-            const operatingHours = document.getElementById('operating-hours').value;
-            const energyCost = document.getElementById('energy-cost').value;
-
-            // Simplified calculation logic (placeholder for actual engineering formula)
-            // Heat Transfer (Q) = (Area * Temp Diff * Time) / R-value
-            const heatTransfer = (curtainArea * tempDiff * operatingHours) / rValue;
-            const energySavingsKWh = heatTransfer; // A more complex formula would be needed
-            const costSavings = energySavingsKWh * energyCost;
-            const curtainCost = 0; // Placeholder for a cost estimation
-            const paybackPeriod = curtainCost / costSavings;
-
-            document.getElementById('energy-savings').textContent = energySavingsKWh.toFixed(2);
-            document.getElementById('cost-savings').textContent = costSavings.toFixed(2);
-            document.getElementById('payback-period').textContent = isFinite(paybackPeriod) ? paybackPeriod.toFixed(2) : 'N/A';
-            document.getElementById('results').style.display = 'block';
-        });
-
-        function draftOrder() {
-            // Redirect to a specific order form or contact page with pre-filled details
-            alert('Redirecting to order form...');
-        }
-    </script>
+    <script src="../js/script.js" type="module"></script>
 </body>
 </html>
