@@ -108,8 +108,8 @@ function handleAuthForms() {
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const newUser = userCredential.user;
-                // *** FIXED: This now uses a simple, robust path for the new user profile ***
-                const userProfileRef = doc(db, 'users', newUser.uid); 
+                // Correct, simplified path for the user profile document
+                const userProfileRef = doc(db, 'users', newUser.uid);
                 const isAdmin = email === 'ernst@hatake.eu';
                 await setDoc(userProfileRef, {
                     email,
@@ -144,7 +144,6 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     if (user) {
-        // *** FIXED: This now checks the simple, robust path for the user profile ***
         const docRef = doc(db, 'users', user.uid);
         try {
             const docSnap = await getDoc(docRef);
