@@ -11,8 +11,16 @@ import {
     doc,
     onSnapshot,
     collection,
-    getDocs
+    getDocs,
+    addDoc,
+    serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
+import {
+    getStorage,
+    ref,
+    uploadBytes,
+    getDownloadURL
+} from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js';
 
 // Firebase configuration from the user
 const firebaseConfig = {
@@ -28,11 +36,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 const appId = firebaseConfig.projectId;
 
 // DOM elements
 const messageBox = document.getElementById('message-box');
 const loadingSpinner = document.getElementById('loading');
+const adminDashboardSection = document.querySelector('.admin-dashboard');
 const adminNameSpan = document.getElementById('admin-name');
 const totalUsersElem = document.getElementById('total-users');
 const registeredCompaniesElem = document.getElementById('registered-companies');
@@ -40,6 +50,8 @@ const totalInquiriesElem = document.getElementById('total-inquiries');
 const userListTableBody = document.querySelector('#user-list-table tbody');
 const investorListGrid = document.getElementById('investor-list-grid');
 const inquiryListTableBody = document.querySelector('#inquiry-list-table tbody');
+const uploadedFilesTableBody = document.querySelector('#uploaded-files-table tbody');
+const fileUploadForm = document.getElementById('file-upload-form');
 const logoutButton = document.getElementById('logout-button');
 
 // Investor data
@@ -208,15 +220,15 @@ window.switchTab = (tabName) => {
     document.getElementById('users-tab-content').classList.add('hidden');
     document.getElementById('investors-tab-content').classList.add('hidden');
     document.getElementById('inquiries-tab-content').classList.add('hidden');
+    document.getElementById('files-tab-content').classList.add('hidden'); // Ensure files tab is hidden initially
     document.getElementById(`${tabName}-tab-content`).classList.remove('hidden');
 };
 
-// Admin page specific logic
 async function handleAdminPage() {
     onAuthStateChanged(auth, async (user) => {
         if (user && !user.isAnonymous) {
             const userProfileRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles`, 'profile');
-            const unsubscribeProfile = onSnapshot(userProfileRef, async (docSnap) => {
+            onSnapshot(userProfileRef, async (docSnap) => {
                 if (docSnap.exists() && docSnap.data().isAdmin) {
                     const profile = docSnap.data();
                     if (adminNameSpan) adminNameSpan.textContent = profile.companyName;
@@ -226,7 +238,7 @@ async function handleAdminPage() {
                     const usersSnapshot = await getDocs(usersCollectionRef);
                     let totalUsers = 0;
                     let totalCompanies = new Set();
-                    userListTableBody.innerHTML = ''; // Clear table before populating
+                    if (userListTableBody) userListTableBody.innerHTML = '';
 
                     for (const userDoc of usersSnapshot.docs) {
                         const profileDocRef = doc(db, userDoc.ref.path, 'user_profiles/profile');
@@ -243,7 +255,6 @@ async function handleAdminPage() {
                                 <td>${userDoc.id}</td>
                             `;
                             userListTableBody.appendChild(tr);
-
                             totalUsers++;
                             totalCompanies.add(userProfile.companyName);
                         }
@@ -254,8 +265,12 @@ async function handleAdminPage() {
 
                     // Populate investor list
                     if (investorListGrid) {
-                        investorListGrid.innerHTML = ''; // Clear existing content
+                        investorListGrid.innerHTML = '';
                         for (const category in investorData) {
+                            const categoryTitle = document.createElement('h3');
+                            categoryTitle.className = 'col-span-full text-lg font-bold mt-4 mb-2';
+                            categoryTitle.textContent = category;
+                            investorListGrid.appendChild(categoryTitle);
                             investorData[category].forEach(investor => {
                                 const card = document.createElement('div');
                                 card.className = 'investor-card';
@@ -271,6 +286,52 @@ async function handleAdminPage() {
                             });
                         }
                     }
+
+                    // Handle file upload
+                    fileUploadForm.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        const fileInput = document.getElementById('investor-file-upload');
+                        const file = fileInput.files[0];
+                        if (!file) {
+                            showMessage("Please select a file to upload.", true);
+                            return;
+                        }
+
+                        const storageRef = ref(storage, `investor_files/${file.name}`);
+                        try {
+                            await uploadBytes(storageRef, file);
+                            const downloadURL = await getDownloadURL(storageRef);
+                            await addDoc(collection(db, `/artifacts/${appId}/public/investor_files`), {
+                                fileName: file.name,
+                                downloadURL: downloadURL,
+                                uploadedAt: serverTimestamp()
+                            });
+                            showMessage("File uploaded successfully!");
+                            fileInput.value = ''; // Clear the input
+                        } catch (error) {
+                            console.error("File upload failed:", error);
+                            showMessage(`File upload failed: ${error.message}`, true);
+                        }
+                    });
+
+                    // Fetch and display uploaded files
+                    const filesCollectionRef = collection(db, `/artifacts/${appId}/public/investor_files`);
+                    onSnapshot(filesCollectionRef, (snapshot) => {
+                        if (uploadedFilesTableBody) {
+                             uploadedFilesTableBody.innerHTML = ''; // Clear table
+                            snapshot.forEach(doc => {
+                                const fileData = doc.data();
+                                const date = fileData.uploadedAt ? new Date(fileData.uploadedAt.seconds * 1000).toLocaleDateString() : 'N/A';
+                                const tr = document.createElement('tr');
+                                tr.innerHTML = `
+                                    <td>${fileData.fileName}</td>
+                                    <td>${date}</td>
+                                    <td><a href="${fileData.downloadURL}" target="_blank" class="text-green-500 hover:underline">Download</a></td>
+                                `;
+                                uploadedFilesTableBody.appendChild(tr);
+                            });
+                        }
+                    });
 
                     // Dummy inquiry data for now
                     if (inquiryListTableBody) {
@@ -324,4 +385,10 @@ async function handleAdminPage() {
 
 document.addEventListener('DOMContentLoaded', () => {
     handleAdminPage();
+
+    // Attach tab click event listeners
+    document.getElementById('tab-button-users').addEventListener('click', () => switchTab('users'));
+    document.getElementById('tab-button-investors').addEventListener('click', () => switchTab('investors'));
+    document.getElementById('tab-button-inquiries').addEventListener('click', () => switchTab('inquiries'));
+    document.getElementById('tab-button-files').addEventListener('click', () => switchTab('files'));
 });
