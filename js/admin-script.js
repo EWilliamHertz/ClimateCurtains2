@@ -56,9 +56,7 @@ const fileUploadForm = document.getElementById('file-upload-form');
 const logoutButton = document.getElementById('logout-button');
 const emailModal = document.getElementById('email-modal');
 const investorNameModal = document.getElementById('investor-name-modal');
-const chatHistory = document.getElementById('chat-history');
-const chatInput = document.getElementById('chat-input');
-const sendChatButton = document.getElementById('send-chat-button');
+const emailDraftBody = document.getElementById('email-draft-body');
 const sendEmailLink = document.getElementById('send-email-link');
 
 // Investor data (hardcoded for now)
@@ -212,93 +210,119 @@ const emailTemplates = {
     'Venture Capital Firms': {
         subject: 'ClimateCurtainsAB: Award-Winning Energy Efficiency Technology Seeking Investment Partnership',
         body: `Dear [Investor Name],
+
 I hope this email finds you well. I am reaching out because [VC Firm Name]'s focus on [VC Focus] aligns perfectly with our mission at ClimateCurtainsAB.
+
 Founded in 2015 in Vänersborg, Sweden, ClimateCurtainsAB has developed patented energy-saving window solutions that significantly reduce heat loss in buildings. Our technology has been rigorously tested in collaboration with Chalmers University and supported by the Swedish Energy Agency, proving to save at least 15% of heating energy in typical Swedish homes—with even greater savings in buildings with larger windows or in harsher climates.
+
 Key highlights that may interest you:
 •Award-winning innovation: Winner of the Energy Globe National Award 2018, one of the world's most prestigious sustainability awards
 •Proven technology: Independent testing confirms our patented roller blinds deliver significant energy savings
 •Large addressable market: 30-50% of heating costs are due to heat loss through windows, representing approximately 5000 kWh in an average house annually
 •Versatile application: Our solutions work for residential, commercial, and even listed historic buildings without requiring structural modifications
 •Strong IP protection: Patented technology creates barriers to entry and potential for strategic acquisitions
+
 We are currently seeking [funding amount/stage] to scale our operations and expand our market reach. Given [VC Firm Name]'s impressive portfolio of companies addressing climate challenges, particularly [mention a relevant portfolio company if applicable], we believe there could be strong strategic alignment between our organizations.
+
 Would you be available for a brief call next week to discuss how ClimateCurtainsAB might fit within your investment thesis? I'm happy to provide our pitch deck and additional materials in advance.
+
 Thank you for your consideration. I look forward to the possibility of working together to create a more energy-efficient future.
+
 Best regards,
+
 Peter Hertz Founder & CEO ClimateCurtainsAB [Contact Information]`
     },
     'Angel Investors and Syndicates': {
         subject: 'Energy-Saving Innovation with Proven Results - ClimateCurtainsAB Investment Opportunity',
         body: `Dear [Angel Investor/Syndicate Name],
+
 I hope this message finds you well. As a [syndicate/angel investor] focused on climate solutions, I wanted to introduce you to ClimateCurtainsAB, an award-winning Swedish company revolutionizing energy efficiency in buildings.
+
 Since our founding in 2015, we've developed patented window solutions that address a critical but often overlooked source of energy waste: windows account for 30-50% of heating costs in residential buildings and even more in commercial structures with extensive glazing. Our technology has been proven through rigorous testing with Chalmers University to save at least 15% of heating energy in typical homes.
+
 What makes our solution particularly compelling for investors like you who understand climate impact:
 •Immediate market application: Our product is market-ready and already helping customers save energy and money
 •Recognition for excellence: Winner of the Energy Globe National Award 2018 from among projects in 180+ countries
 •Versatile use cases: Compatible with both modern and historic buildings, including listed properties where traditional energy retrofits are restricted
 •Strong validation: Developed in collaboration with Chalmers University and supported by the Swedish Energy Agency
 •Significant impact potential: Buildings are empty 60-75% of the time, creating enormous energy-saving opportunities through our technology
+
 We're seeking angel investment of [amount] to accelerate our growth and expand our market reach. As someone committed to backing impactful climate solutions, your expertise and network would be invaluable to our journey.
+
 Would you be interested in learning more about this opportunity? I'd be delighted to share our detailed business plan and discuss how you might participate in our next funding round.
+
 Thank you for considering this opportunity to support innovation that delivers both environmental impact and financial returns.
+
 Warm regards,
+
 Peter Hertz Founder & CEO ClimateCurtainsAB [Contact Information]`
     },
     'Corporate Venture Capital (CVC)': {
         subject: 'Strategic Partnership Opportunity: ClimateCurtainsAB\'s Energy-Saving Window Technology',
         body: `Dear [CVC Contact Name],
+
 I hope this email finds you well. I'm reaching out because I see significant potential for strategic alignment between [Parent Company Name]'s commitment to [energy efficiency/sustainability/relevant focus area] and ClimateCurtainsAB's innovative window solutions.
+
 ClimateCurtainsAB is a Swedish company founded in 2015 that has developed patented roller blind technology proven to significantly reduce heat loss through windows—which accounts for 30-50% of heating costs in buildings. Our solutions have been rigorously tested in collaboration with Chalmers University and supported by the Swedish Energy Agency, demonstrating energy savings of at least 15% in typical homes.
+
 I believe our technology could complement [Parent Company Name]'s portfolio and strategic objectives in several ways:
 •Product integration opportunities: Our technology could enhance your existing [relevant product lines or services]
 •Shared customer base: Our solutions address the same [customer segment] that your company serves
 •Technical validation: Our award-winning innovation (Energy Globe National Award 2018) could strengthen your company's sustainability offerings
 •Market expansion: Partnership could accelerate entry into new market segments for both organizations
 •ESG impact: Measurable energy savings contribute to corporate sustainability goals and reporting
+
 Beyond capital, we value the industry expertise, technical validation, and market access that a strategic investor like [Parent Company Name] could provide. Your experience in [relevant expertise area] would be particularly valuable as we scale our operations.
+
 Would you be interested in scheduling a conversation to explore potential synergies between our organizations? I'm happy to provide additional technical information and business metrics in advance.
+
 Thank you for your consideration. I look forward to the possibility of building a mutually beneficial relationship.
+
 Best regards,
+
 Peter Hertz Founder & CEO ClimateCurtainsAB [Contact Information]`
     },
     'Government Grants and Sustainable Funding Programs': {
         subject: 'ClimateCurtainsAB Grant Application: Proven Energy Efficiency Technology Aligned with [Program Name] Objectives',
         body: `Dear [Program Officer Name],
+
 I am writing to express ClimateCurtainsAB's interest in the [specific grant program] and to inquire about the application process for the upcoming funding cycle.
+
 ClimateCurtainsAB is a Swedish company founded in 2015 that has developed patented window solutions to significantly reduce building energy consumption. Our technology directly addresses the [specific policy goal, e.g., "energy efficiency targets" or "carbon reduction commitments"] outlined in your program priorities.
+
 Our achievements and alignment with your funding objectives include:
 •Proven impact: Independent testing with Chalmers University confirms our technology saves at least 15% of heating energy in typical Swedish homes
 •Recognition: Winner of the Energy Globe National Award 2018, highlighting our contribution to global sustainability
 •Research collaboration: Ongoing partnership with Chalmers University and support from the Swedish Energy Agency
 •Market readiness: Technology is fully developed and being implemented in residential and commercial buildings
 •Broad applicability: Solutions work for both new construction and retrofits, including historically significant buildings where traditional energy improvements are restricted
+
 The funding from [Program Name] would enable us to [specific use of funds, e.g., "scale production," "enter new markets," or "further enhance our technology"]. This aligns perfectly with your program's goal to [reference specific program objectives].
+
 Could you please provide information on:
 1.The timeline for the next application cycle
 2.Specific eligibility requirements for our type of technology
 3.Any preliminary materials we should prepare
+
 We are committed to advancing [relevant policy goals] through practical innovation and would welcome the opportunity to discuss how our work aligns with your funding priorities.
+
 Thank you for your consideration. I look forward to your guidance on next steps.
+
 Sincerely,
+
 Peter Hertz Founder & CEO ClimateCurtainsAB [Contact Information]`
     }
 };
 
-let currentInvestor = null;
-const chatMessages = [];
-
-function appendMessage(sender, message) {
-    const messageElement = document.createElement('div');
-    messageElement.classList.add('chat-message', sender);
-    const bubble = document.createElement('div');
-    bubble.classList.add('message-bubble', sender === 'user' ? 'bg-blue-100' : 'bg-gray-200');
-    bubble.textContent = message;
-    messageElement.appendChild(bubble);
-    chatHistory.appendChild(messageElement);
-    chatHistory.scrollTop = chatHistory.scrollHeight;
-}
-
-function generateInitialDraft(category, investor) {
+// Function to open the email drafting modal
+function openModal(category, investor) {
     const template = emailTemplates[category];
+    if (!template) {
+        showMessage("No template found for this investor category.", true);
+        return;
+    }
+    
+    // Dynamic content for the email draft
     const recipientName = investor.contact.split(',')[0].trim();
     const companyName = category.includes('Venture Capital') ? category : investor.contact.split(',')[1] ? investor.contact.split(',')[1].trim() : category;
     
@@ -309,58 +333,13 @@ function generateInitialDraft(category, investor) {
                              .replace(/\[syndicate\/angel investor\]/g, category.includes('Syndicates') ? 'syndicate' : 'angel investor')
                              .replace(/\[specific grant program\]/g, 'EIC Accelerator')
                              .replace(/\[specific policy goal, e.g., "energy efficiency targets" or "carbon reduction commitments"\]/g, 'energy efficiency targets');
-    
-    return `Subject: ${subject}\n\n${body}`;
-}
 
-// Function to handle sending a chat message
-sendChatButton.addEventListener('click', async () => {
-    const message = chatInput.value.trim();
-    if (message === '') return;
-
-    appendMessage('user', message);
-    chatInput.value = '';
-
-    // Simulate AI response (since we don't have a backend connection)
-    const simulatedResponse = `I've received your request. The email draft has been updated based on your input. You can now review it in the modal.`;
-    appendMessage('ai', simulatedResponse);
-    
-    // Update the email draft in the modal
-    const currentDraft = chatMessages[0] ? chatMessages[0].message : generateInitialDraft(currentInvestor.category, currentInvestor.investor);
-    const updatedDraft = await simulateGeminiResponse(currentDraft, message);
-    chatMessages.push({ sender: 'ai', message: updatedDraft });
-    
-    const mailtoLink = `mailto:${currentInvestor.investor.email}?subject=${encodeURIComponent(updatedDraft.split('\n')[0].replace('Subject: ', ''))}&body=${encodeURIComponent(updatedDraft.substring(updatedDraft.indexOf('\n\n') + 2))}`;
-    sendEmailLink.href = mailtoLink;
-});
-
-// A placeholder for the Gemini response logic
-async function simulateGeminiResponse(currentDraft, userMessage) {
-    // This is a simplified function to demonstrate the concept.
-    // A real implementation would send a request to a secure backend.
-    const prompt = `Rewrite this email draft based on the following instructions: "${userMessage}"\n\nEmail draft:\n${currentDraft}`;
-    console.log(`Simulating Gemini request with prompt: ${prompt}`);
-    
-    // For now, we just return the original draft with a note about the update
-    return currentDraft + `\n\n--- Draft updated based on your prompt: "${userMessage}" ---`;
-}
-
-// Function to open the email drafting modal
-function openModal(category, investor) {
-    currentInvestor = { category, investor };
-    chatMessages.length = 0;
-    chatHistory.innerHTML = '';
-    
-    const initialDraft = generateInitialDraft(category, investor);
-    chatMessages.push({ sender: 'ai', message: initialDraft });
-    appendMessage('ai', initialDraft);
-
-    investorNameModal.textContent = investor.contact.split(',')[0].trim();
-    const mailtoLink = `mailto:${investor.email}?subject=${encodeURIComponent(initialDraft.split('\n')[0].replace('Subject: ', ''))}&body=${encodeURIComponent(initialDraft.substring(initialDraft.indexOf('\n\n') + 2))}`;
-    sendEmailLink.href = mailtoLink;
+    // Populate the modal
+    investorNameModal.textContent = recipientName;
+    emailDraftBody.value = body;
+    sendEmailLink.href = `mailto:${investor.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     emailModal.style.display = "block";
 }
-window.openModal = openModal;
 
 // Function to close the modal
 function closeModal() {
