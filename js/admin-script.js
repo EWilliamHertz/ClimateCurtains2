@@ -56,7 +56,9 @@ const fileUploadForm = document.getElementById('file-upload-form');
 const logoutButton = document.getElementById('logout-button');
 const emailModal = document.getElementById('email-modal');
 const investorNameModal = document.getElementById('investor-name-modal');
-const emailDraftBody = document.getElementById('email-draft-body');
+const chatHistory = document.getElementById('chat-history');
+const chatInput = document.getElementById('chat-input');
+const sendChatButton = document.getElementById('send-chat-button');
 const sendEmailLink = document.getElementById('send-email-link');
 
 // Investor data (hardcoded for now)
@@ -281,15 +283,22 @@ Peter Hertz Founder & CEO ClimateCurtainsAB [Contact Information]`
     }
 };
 
-// Function to open the email drafting modal
-function openModal(category, investor) {
+let currentInvestor = null;
+const chatMessages = [];
+
+function appendMessage(sender, message) {
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('chat-message', sender);
+    const bubble = document.createElement('div');
+    bubble.classList.add('message-bubble', sender === 'user' ? 'bg-blue-100' : 'bg-gray-200');
+    bubble.textContent = message;
+    messageElement.appendChild(bubble);
+    chatHistory.appendChild(messageElement);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+}
+
+function generateInitialDraft(category, investor) {
     const template = emailTemplates[category];
-    if (!template) {
-        showMessage("No template found for this investor category.", true);
-        return;
-    }
-    
-    // Dynamic content for the email draft
     const recipientName = investor.contact.split(',')[0].trim();
     const companyName = category.includes('Venture Capital') ? category : investor.contact.split(',')[1] ? investor.contact.split(',')[1].trim() : category;
     
@@ -300,13 +309,58 @@ function openModal(category, investor) {
                              .replace(/\[syndicate\/angel investor\]/g, category.includes('Syndicates') ? 'syndicate' : 'angel investor')
                              .replace(/\[specific grant program\]/g, 'EIC Accelerator')
                              .replace(/\[specific policy goal, e.g., "energy efficiency targets" or "carbon reduction commitments"\]/g, 'energy efficiency targets');
+    
+    return `Subject: ${subject}\n\n${body}`;
+}
 
-    // Populate the modal
-    investorNameModal.textContent = recipientName;
-    emailDraftBody.value = body;
-    sendEmailLink.href = `mailto:${investor.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+// Function to handle sending a chat message
+sendChatButton.addEventListener('click', async () => {
+    const message = chatInput.value.trim();
+    if (message === '') return;
+
+    appendMessage('user', message);
+    chatInput.value = '';
+
+    // Simulate AI response (since we don't have a backend connection)
+    const simulatedResponse = `I've received your request. The email draft has been updated based on your input. You can now review it in the modal.`;
+    appendMessage('ai', simulatedResponse);
+    
+    // Update the email draft in the modal
+    const currentDraft = chatMessages[0] ? chatMessages[0].message : generateInitialDraft(currentInvestor.category, currentInvestor.investor);
+    const updatedDraft = await simulateGeminiResponse(currentDraft, message);
+    chatMessages.push({ sender: 'ai', message: updatedDraft });
+    
+    const mailtoLink = `mailto:${currentInvestor.investor.email}?subject=${encodeURIComponent(updatedDraft.split('\n')[0].replace('Subject: ', ''))}&body=${encodeURIComponent(updatedDraft.substring(updatedDraft.indexOf('\n\n') + 2))}`;
+    sendEmailLink.href = mailtoLink;
+});
+
+// A placeholder for the Gemini response logic
+async function simulateGeminiResponse(currentDraft, userMessage) {
+    // This is a simplified function to demonstrate the concept.
+    // A real implementation would send a request to a secure backend.
+    const prompt = `Rewrite this email draft based on the following instructions: "${userMessage}"\n\nEmail draft:\n${currentDraft}`;
+    console.log(`Simulating Gemini request with prompt: ${prompt}`);
+    
+    // For now, we just return the original draft with a note about the update
+    return currentDraft + `\n\n--- Draft updated based on your prompt: "${userMessage}" ---`;
+}
+
+// Function to open the email drafting modal
+function openModal(category, investor) {
+    currentInvestor = { category, investor };
+    chatMessages.length = 0;
+    chatHistory.innerHTML = '';
+    
+    const initialDraft = generateInitialDraft(category, investor);
+    chatMessages.push({ sender: 'ai', message: initialDraft });
+    appendMessage('ai', initialDraft);
+
+    investorNameModal.textContent = investor.contact.split(',')[0].trim();
+    const mailtoLink = `mailto:${investor.email}?subject=${encodeURIComponent(initialDraft.split('\n')[0].replace('Subject: ', ''))}&body=${encodeURIComponent(initialDraft.substring(initialDraft.indexOf('\n\n') + 2))}`;
+    sendEmailLink.href = mailtoLink;
     emailModal.style.display = "block";
 }
+window.openModal = openModal;
 
 // Function to close the modal
 function closeModal() {
