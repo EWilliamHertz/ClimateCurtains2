@@ -17,11 +17,11 @@
         .dashboard-card { background-color: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); text-align: center; }
         .dashboard-card h3 { margin-bottom: 0.5rem; color: var(--primary-color); }
         .dashboard-card p { font-size: 2rem; font-weight: 700; color: var(--dark-color); }
-        .inquiry-list, .investor-list { margin-top: 2rem; background-color: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); }
-        .inquiry-list table, .investor-list table { width: 100%; border-collapse: collapse; }
-        .inquiry-list th, .inquiry-list td, .investor-list th, .investor-list td { padding: 1rem; text-align: left; border-bottom: 1px solid #eee; }
-        .inquiry-list th, .investor-list th { background-color: var(--primary-color); color: #fff; }
-        .inquiry-list a, .investor-list a { color: var(--primary-color); }
+        .data-list { margin-top: 2rem; background-color: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); }
+        .data-list table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .data-list th, .data-list td { padding: 1rem; text-align: left; border-bottom: 1px solid #eee; word-wrap: break-word; }
+        .data-list th { background-color: var(--primary-color); color: #fff; }
+        .data-list a { color: var(--primary-color); }
     </style>
 </head>
 <body>
@@ -57,20 +57,39 @@
                 <p>Welcome, Admin. Here is a summary of your website's activity.</p>
                 <div class="dashboard-grid">
                     <div class="dashboard-card">
-                        <h3>New Inquiries</h3>
-                        <p>12</p>
+                        <h3>Total Users</h3>
+                        <p id="total-users">...</p>
                     </div>
                     <div class="dashboard-card">
                         <h3>Registered Companies</h3>
-                        <p>45</p>
+                        <p id="registered-companies">...</p>
                     </div>
                     <div class="dashboard-card">
-                        <h3>Pending Tasks</h3>
-                        <p>6</p>
+                        <h3>Inquiries</h3>
+                        <p id="total-inquiries">...</p>
                     </div>
                 </div>
 
-                <div class="inquiry-list">
+                <div id="user-list-section" class="data-list">
+                    <h2>Registered Users</h2>
+                    <table id="user-list-table">
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Factory SQM</th>
+                                <th>Investor</th>
+                                <th>User ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- User data will be dynamically loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="inquiry-list-section" class="data-list">
                     <h2>Recent Inquiries</h2>
                     <table>
                         <thead>
@@ -79,81 +98,11 @@
                                 <th>Company</th>
                                 <th>Subject</th>
                                 <th>Status</th>
-                                <th>Assigned To</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>2025-08-03</td>
-                                <td>Northvolt</td>
-                                <td>Quote Request from Calculator</td>
-                                <td>New</td>
-                                <td>N/A</td>
-                                <td><a href="#">View</a></td>
-                            </tr>
-                            <tr>
-                                <td>2025-08-02</td>
-                                <td>Dongguan Zhuohaoyang PKG Co., Ltd</td>
-                                <td>General Inquiry</td>
-                                <td>In Progress</td>
-                                <td>Phoebe Wong</td>
-                                <td><a href="#">View</a></td>
-                            </tr>
-                            <tr>
-                                <td>2025-07-30</td>
-                                <td>Client A</td>
-                                <td>Follow-up on Order #12345</td>
-                                <td>Closed</td>
-                                <td>Peter Hertz</td>
-                                <td><a href="#">View</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="investor-list">
-                    <h2>Investor Mail List</h2>
-                    <p>This is a curated list of potential investors, including VCs, angels, and government programs.</p>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Firm / Fund</th>
-                                <th>Contact</th>
-                                <th>Email</th>
-                                <th>Focus</th>
-                                <th>Relevance</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>2150</td>
-                                <td>Christian Hernandez</td>
-                                <td><a href="mailto:info@2150.vc">info@2150.vc</a></td>
-                                <td>Climate tech (urban solutions)</td>
-                                <td>Focuses on how cities are designed, constructed, and operated.</td>
-                            </tr>
-                            <tr>
-                                <td>4impact</td>
-                                <td>Pauline Wink</td>
-                                <td><a href="mailto:info@4impact.vc">info@4impact.vc</a></td>
-                                <td>Digital tech for social/environmental impact</td>
-                                <td>Backs European tech4good companies tackling environmental challenges.</td>
-                            </tr>
-                            <tr>
-                                <td>World Fund</td>
-                                <td>Danijel Višević</td>
-                                <td><a href="mailto:hello@worldfund.vc">hello@worldfund.vc</a></td>
-                                <td>Energy, building materials, manufacturing</td>
-                                <td>Backs climate tech that can save significant CO2e emissions.</td>
-                            </tr>
-                            <tr>
-                                <td>Eneco Ventures</td>
-                                <td>Jordy Klaassen</td>
-                                <td><a href="mailto:ventures@eneco.com">ventures@eneco.com</a></td>
-                                <td>Energy efficiency, sustainability</td>
-                                <td>Helps startups test propositions and scale through customer base.</td>
-                            </tr>
-                            <!-- Add more rows for other investors from the provided list -->
+                            <!-- Inquiry data will be dynamically loaded here -->
                         </tbody>
                     </table>
                 </div>
