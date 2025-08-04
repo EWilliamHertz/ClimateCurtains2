@@ -15,13 +15,8 @@ import {
     setDoc,
     getDoc,
     onSnapshot,
-    serverTimestamp,
-    collection,
-    getDocs
+    serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
-import {
-    getAnalytics
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
 
 // Firebase configuration from the user
 const firebaseConfig = {
@@ -52,156 +47,7 @@ const dashboardView = document.getElementById('dashboard-view');
 const welcomeMessage = document.getElementById('welcome-message');
 const logoutButton = document.getElementById('logout-button');
 const mainContent = document.getElementById('main-content');
-const investorListGrid = document.getElementById('investor-list-grid');
-const inquiryListTable = document.getElementById('inquiry-list-table');
-const userListTable = document.getElementById('user-list-table');
-const adminNameSpan = document.getElementById('admin-name');
 
-// Investor data
-const investorData = {
-    'Venture Capital Firms': [{
-        contact: 'Christian Hernandez, Partner',
-        email: 'info@2150.vc',
-        website: 'https://www.2150.vc',
-        focus: 'Climate tech (environment and urban solutions)',
-        relevance: 'Focuses on technologies that reimagine how cities are designed, constructed, and operated'
-    }, {
-        contact: 'Pauline Wink, Managing Partner',
-        email: 'info@4impact.vc',
-        website: 'https://www.4impact.vc',
-        focus: 'Digital tech solutions driving positive social and environmental impact',
-        relevance: 'Backs European tech4good companies tackling environmental challenges'
-    }, {
-        contact: 'Danijel Višević, General Partner',
-        email: 'hello@worldfund.vc',
-        website: 'https://www.worldfund.vc',
-        focus: 'Energy, building materials, manufacturing',
-        relevance: 'Backs entrepreneurs building climate tech that can save significant CO2e emissions'
-    }, {
-        contact: 'Investment Team',
-        email: 'info@blumeequity.com',
-        website: 'https://www.blumeequity.com',
-        focus: 'Climate tech with proven traction',
-        relevance: 'Backs European companies addressing climate and sustainability challenges'
-    }, {
-        contact: 'Peet Denny, Founding Partner',
-        email: 'hello@climate.vc',
-        website: 'https://www.climate.vc',
-        focus: 'Climate tech startups with gigaton-level impact potential',
-        relevance: 'Focuses on businesses that can reduce significant CO2e per year'
-    }, {
-        contact: 'Rokas Peciulaitis, Managing Partner',
-        email: 'info@cventures.vc',
-        website: 'https://www.cventures.vc',
-        focus: 'Climate tech (excluding food and agri)',
-        relevance: 'Invests in early-stage European climate tech startups'
-    }, {
-        contact: 'Investment Team',
-        email: 'capital@systemiq.earth',
-        website: 'https://www.systemiqcapital.com',
-        focus: 'Circular economy, energy transition',
-        relevance: 'Focuses on energy transition technologies'
-    }, {
-        contact: 'Investment Team',
-        email: 'hello@aenu.com',
-        website: 'https://www.aenu.com',
-        focus: 'Climate tech and social impact startups',
-        relevance: 'Invests in solutions addressing climate challenges'
-    }, {
-        contact: 'Max ter Horst, Managing Partner',
-        email: 'energy@rockstart.com',
-        website: 'https://www.rockstart.com/energy',
-        focus: 'Energy transition and emerging tech',
-        relevance: 'Specializes in energy transition technologies'
-    }, {
-        contact: 'Investment Team',
-        email: 'hello@faber.vc',
-        website: 'https://www.faber.vc',
-        focus: 'Climate tech, digital transformation, sustainability',
-        relevance: 'Invests in climate tech solutions with digital components'
-    }],
-    'Angel Investors and Syndicates': [{
-        contact: 'Investment Team',
-        email: 'climate@coreangels.com',
-        website: 'https://www.coreangels.com/coreangelsclimate',
-        focus: 'Climate innovation',
-        relevance: 'Pan-European group of business angels focused on climate tech'
-    }, {
-        contact: 'Nick Lyth, Founder & CEO',
-        email: 'enquiries@greenangelsyndicate.com',
-        website: 'https://greenangelsyndicate.com',
-        focus: 'Investments that reduce carbon emissions',
-        relevance: 'UK\'s only angel syndicate specializing in the fight against climate change'
-    }, {
-        contact: 'Investment Team',
-        email: 'info@greenangelventures.com',
-        website: 'https://greenangelventures.com',
-        focus: 'Emerging climate tech start-ups',
-        relevance: 'Specializes in early-stage climate startups'
-    }],
-    'Corporate Venture Capital (CVC)': [{
-        contact: 'Jordy Klaassen, Investment Manager',
-        email: 'ventures@eneco.com',
-        website: 'https://www.eneco.com/ventures',
-        focus: 'Energy efficiency, sustainability solutions',
-        relevance: 'Helps startups test propositions and scale through customer base'
-    }, {
-        contact: 'Frederico Gonçalves, Partner & Managing Director',
-        email: 'edpventures@edp.com',
-        website: 'https://www.edpventures.com',
-        focus: 'Energy efficiency and sustainability solutions',
-        relevance: 'Focuses on strategic collaborations and industry expertise'
-    }, {
-        contact: 'Kendra Rauschenberger, General Partner',
-        email: 'ventures@siemens-energy.com',
-        website: 'https://www.siemens-energy.com/ventures',
-        focus: 'Energy technologies',
-        relevance: 'Supports "hard tech" companies with technical expertise'
-    }, {
-        contact: 'Investment Team',
-        email: 'ventures@abb.com',
-        website: 'https://new.abb.com/about/technology/ventures',
-        focus: 'Energy efficiency and industrial applications',
-        relevance: 'Provides market credibility and expertise in scaling products'
-    }, {
-        contact: 'Investment Team',
-        email: 'info@futureenergyventures.com',
-        website: 'https://www.futureenergyventures.com',
-        focus: 'Energy efficiency and sustainability solutions',
-        relevance: 'Brings together corporate partners and startups'
-    }],
-    'Government Grants and Sustainable Funding Programs': [{
-        contact: 'EIC Program Officers',
-        email: 'EISMEA-EIC-ACCELERATOR-ENQUIRIES@ec.europa.eu',
-        website: 'https://eic.ec.europa.eu/eic-funding-opportunities/eic-accelerator_en',
-        focus: 'SMEs developing game-changing innovations',
-        relevance: 'Supports sustainability and climate solutions'
-    }, {
-        contact: 'Program Officers',
-        email: 'EC-HORIZON-EUROPE-HELPDESK@ec.europa.eu',
-        website: 'https://research-and-innovation.ec.europa.eu/funding/funding-opportunities/funding-programmes-and-open-calls/horizon-europe_en',
-        focus: 'Research and innovation',
-        relevance: 'Significant portion dedicated to climate action'
-    }, {
-        contact: 'LIFE Program Officers',
-        email: 'LIFE@ec.europa.eu',
-        website: 'https://cinea.ec.europa.eu/programmes/life_en',
-        focus: 'Environment and climate action',
-        relevance: 'Provides grants for innovative climate solutions'
-    }, {
-        contact: 'EIT Climate-KIC',
-        email: 'info@climate-kic.org',
-        website: 'https://eit.europa.eu/our-communities/eit-climate-kic',
-        focus: 'Climate, energy, sustainability',
-        relevance: 'Funding and acceleration for climate tech startups'
-    }, {
-        contact: 'Program Officers',
-        email: 'vinnova@vinnova.se',
-        website: 'https://www.vinnova.se/en/',
-        focus: 'Innovation in Sweden',
-        relevance: 'Country-specific grants for innovative climate solutions'
-    }]
-};
 
 // Helper function to show messages
 function showMessage(msg, isError = false) {
@@ -421,14 +267,14 @@ async function handleAdminPage() {
     let totalUsers = 0;
     let totalCompanies = new Set();
     
+    const usersSnapshot = await getDocs(usersCollectionRef);
     usersSnapshot.forEach(userDoc => {
         const userProfileRef = doc(db, userDoc.ref.path, 'user_profiles/profile');
         onSnapshot(userProfileRef, (profileSnap) => {
             if (profileSnap.exists()) {
                 const profile = profileSnap.data();
-                // Fetch email from auth for a specific user ID
-                const user = auth.currentUser;
-                const email = user ? user.email : 'N/A'; // This is a limitation of not being able to list all users' emails directly from Firestore
+                // Get email from Firestore profile data
+                const email = profile.email || 'N/A';
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${profile.companyName || 'N/A'}</td>
@@ -492,6 +338,7 @@ async function handleAdminPage() {
         if (document.getElementById('total-inquiries')) document.getElementById('total-inquiries').textContent = 2; // Placeholder
     }
 }
+
 
 // Logout functionality
 if (logoutButton) {
