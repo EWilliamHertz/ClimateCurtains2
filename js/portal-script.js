@@ -20,7 +20,7 @@ const firebaseConfig = {
     apiKey: "AIzaSyB7_Tdz7SGtcj-qN8Ro7uAmoVrPyuR5cqc",
     authDomain: "climatecurtainsab.firebaseapp.com",
     projectId: "climatecurtainsab",
-    storageBucket: "climatecurtainsab.firebasestorage.app",
+    storageBucket: "climatecurtainsab.appspot.com",
     messagingSenderId: "534408595576",
     appId: "1:534408595576:web:c73c886ab1ea1abd9e858d",
     measurementId: "G-3GNNYNJKM7"
@@ -39,7 +39,6 @@ const authTitle = document.getElementById('auth-title');
 const loginForm = document.getElementById('login-form');
 const registerForm = document.getElementById('register-form');
 const toggleAuthLink = document.getElementById('toggle-auth');
-const toggleRegisterLink = document.getElementById('toggle-register-link');
 
 // Helper function to show messages
 function showMessage(msg, isError = false) {
@@ -79,22 +78,8 @@ function handleAuthForms() {
             const email = loginForm.querySelector('#login-email').value;
             const password = loginForm.querySelector('#login-password').value;
             try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                const docRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles`, 'profile');
-                const docSnap = await getDoc(docRef);
-                let isAdmin = false;
-                if (docSnap.exists()) {
-                    isAdmin = docSnap.data().isAdmin || false;
-                }
-                localStorage.setItem('userLoggedIn', 'true');
-                localStorage.setItem('userIsAdmin', isAdmin);
-                showMessage("Login successful!");
-                if (isAdmin) {
-                    window.location.href = 'admin.html';
-                } else {
-                    window.location.href = 'dashboard.html';
-                }
+                await signInWithEmailAndPassword(auth, email, password);
+                // The onAuthStateChanged listener will handle the redirect
             } catch (error) {
                 console.error("Login failed:", error);
                 showMessage(`Login failed: ${error.message}`, true);
@@ -141,14 +126,7 @@ function handleAuthForms() {
                     registeredAt: serverTimestamp(),
                     isAdmin
                 });
-                localStorage.setItem('userLoggedIn', 'true');
-                localStorage.setItem('userIsAdmin', isAdmin);
-                showMessage("Registration successful!");
-                if (isAdmin) {
-                    window.location.href = 'admin.html';
-                } else {
-                    window.location.href = 'dashboard.html';
-                }
+                // The onAuthStateChanged listener will handle the redirect
             } catch (error) {
                 console.error("Registration failed:", error);
                 showMessage(`Registration failed: ${error.message}`, true);
@@ -159,36 +137,36 @@ function handleAuthForms() {
     }
 }
 
-// Function to handle auth state on portal page
-function handlePortalPage() {
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            const docRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles`, 'profile');
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists() && !user.isAnonymous) {
-                if (docSnap.data().isAdmin) {
-                    window.location.href = 'admin.html';
-                } else {
-                    window.location.href = 'dashboard.html';
-                }
+// Centralized authentication handler
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        const docRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles`, 'profile');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists() && !user.isAnonymous) {
+            if (docSnap.data().isAdmin) {
+                window.location.href = 'admin.html';
             } else {
-                 if (loadingSpinner) loadingSpinner.classList.add('hidden');
-                 if (authView) authView.classList.remove('hidden');
-                 const toggleRegisterLink = document.getElementById('toggle-register-link');
-                 if (toggleRegisterLink) toggleRegisterLink.addEventListener('click', () => window.toggleView('register'));
+                window.location.href = 'dashboard.html';
             }
         } else {
-            if (loadingSpinner) loadingSpinner.classList.add('hidden');
-            if (authView) authView.classList.remove('hidden');
-            const toggleRegisterLink = document.getElementById('toggle-register-link');
-            if (toggleRegisterLink) toggleRegisterLink.addEventListener('click', () => window.toggleView('register'));
+             // If profile doesn't exist yet, stay on this page to complete it
+             if (loadingSpinner) loadingSpinner.classList.add('hidden');
+             if (authView) authView.classList.remove('hidden');
         }
-    });
-}
+    } else {
+        // No user, show login/register forms
+        if (loadingSpinner) loadingSpinner.classList.add('hidden');
+        if (authView) authView.classList.remove('hidden');
+        const toggleRegisterLink = document.getElementById('toggle-register-link');
+        if (toggleRegisterLink) toggleRegisterLink.addEventListener('click', () => window.toggleView('register'));
+    }
+});
 
 
-// Initialize the correct page logic based on URL
+// Initialize the correct page logic
 document.addEventListener('DOMContentLoaded', () => {
-    handlePortalPage();
     handleAuthForms();
+    // Set up the initial toggle link state
+    const toggleRegisterLink = document.getElementById('toggle-register-link');
+    if (toggleRegisterLink) toggleRegisterLink.addEventListener('click', () => window.toggleView('register'));
 });
