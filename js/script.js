@@ -16,8 +16,12 @@ import {
     onSnapshot,
     serverTimestamp,
     collection,
+    query,
     getDocs
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
+import {
+    getAnalytics
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
 
 // Firebase configuration from the user
 const firebaseConfig = {
@@ -47,6 +51,9 @@ const toggleRegisterLink = document.getElementById('toggle-register-link');
 const dashboardView = document.getElementById('dashboard-view');
 const welcomeMessage = document.getElementById('welcome-message');
 const logoutButton = document.getElementById('logout-button');
+const mainContent = document.getElementById('main-content');
+const investorResourcesSection = document.getElementById('investor-resources');
+const investorFilesList = document.getElementById('investor-files-list');
 
 // Helper function to show messages
 function showMessage(msg, isError = false) {
@@ -127,7 +134,7 @@ function handleAuthForms() {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const newUser = userCredential.user;
                 const userProfileRef = doc(db, `/artifacts/${appId}/users/${newUser.uid}/user_profiles`, 'profile');
-                const isAdmin = email === 'ernst@hatake.eu'; 
+                const isAdmin = email === 'ernst@hatake.eu';
                 await setDoc(userProfileRef, {
                     companyName,
                     roleInCompany,
@@ -181,20 +188,14 @@ function handlePortalPage() {
 }
 
 // Function to handle auth state on dashboard page
-function handleDashboardPage() {
+async function handleDashboardPage() {
     const userIsLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
-    const userIsAdmin = localStorage.getItem('userIsAdmin') === 'true';
 
     if (!userIsLoggedIn) {
         window.location.href = 'portal.html';
         return;
     }
 
-    if (window.location.pathname.includes('admin.html') && !userIsAdmin) {
-        window.location.href = 'dashboard.html';
-        return;
-    }
-    
     if (loadingSpinner) loadingSpinner.classList.remove('hidden');
 
     onAuthStateChanged(auth, async (user) => {
@@ -214,6 +215,24 @@ function handleDashboardPage() {
                     }
                     if (document.getElementById('dashboard-uid')) document.getElementById('dashboard-uid').textContent = user.uid;
                     if (dashboardView) dashboardView.classList.remove('hidden');
+
+                    // Show investor resources if the user is an investor
+                    if (profile.isInvestor && investorResourcesSection) {
+                        investorResourcesSection.classList.remove('hidden');
+                        const filesCollectionRef = collection(db, `/artifacts/${appId}/public/investor_files`);
+                        const filesSnapshot = await getDocs(filesCollectionRef);
+                        investorFilesList.innerHTML = '';
+                        filesSnapshot.forEach(fileDoc => {
+                            const fileData = fileDoc.data();
+                            const fileItem = document.createElement('div');
+                            fileItem.className = 'flex justify-between items-center bg-white p-4 rounded-lg shadow-sm';
+                            fileItem.innerHTML = `
+                                <span class="font-semibold">${fileData.fileName}</span>
+                                <a href="${fileData.downloadURL}" target="_blank" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Download</a>
+                            `;
+                            investorFilesList.appendChild(fileItem);
+                        });
+                    }
                 } else {
                     showMessage("User profile not found. Please contact support.", true);
                     signOut(auth);
