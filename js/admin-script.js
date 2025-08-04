@@ -54,7 +54,7 @@ const uploadedFilesTableBody = document.querySelector('#uploaded-files-table tbo
 const fileUploadForm = document.getElementById('file-upload-form');
 const logoutButton = document.getElementById('logout-button');
 
-// Investor data
+// Investor data (hardcoded for now)
 const investorData = {
     'Venture Capital Firms': [{
         contact: 'Christian Hernandez, Partner',
@@ -212,7 +212,7 @@ function showMessage(msg, isError = false) {
 }
 
 // Tab switching logic
-window.switchTab = (tabName) => {
+function switchTab(tabName) {
     const tabs = document.querySelectorAll('.tabs button');
     tabs.forEach(tab => tab.classList.remove('active'));
     document.querySelector(`#tab-button-${tabName}`).classList.add('active');
@@ -220,7 +220,7 @@ window.switchTab = (tabName) => {
     document.getElementById('users-tab-content').classList.add('hidden');
     document.getElementById('investors-tab-content').classList.add('hidden');
     document.getElementById('inquiries-tab-content').classList.add('hidden');
-    document.getElementById('files-tab-content').classList.add('hidden'); // Ensure files tab is hidden initially
+    document.getElementById('files-tab-content').classList.add('hidden');
     document.getElementById(`${tabName}-tab-content`).classList.remove('hidden');
 };
 
