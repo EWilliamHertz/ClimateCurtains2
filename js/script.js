@@ -13,12 +13,10 @@ import {
     getFirestore,
     doc,
     setDoc,
+    getDoc,
     onSnapshot,
     serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
-import {
-    getAnalytics
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
 
 // Firebase configuration from the user
 const firebaseConfig = {
@@ -34,7 +32,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const analytics = getAnalytics(app);
 const appId = firebaseConfig.projectId;
 
 // DOM elements
@@ -52,6 +49,7 @@ const logoutButton = document.getElementById('logout-button');
 const mainContent = document.getElementById('main-content');
 const investorListTable = document.getElementById('investor-list-table');
 const inquiryListTable = document.getElementById('inquiry-list-table');
+
 
 // Helper function to show messages
 function showMessage(msg, isError = false) {
@@ -162,14 +160,12 @@ function handlePortalPage() {
             } else {
                  if (loadingSpinner) loadingSpinner.classList.add('hidden');
                  if (authView) authView.classList.remove('hidden');
-                 const toggleLink = document.getElementById('toggle-register-link');
-                 if (toggleLink) toggleLink.addEventListener('click', () => toggleView('register'));
+                 if (toggleRegisterLink) toggleRegisterLink.addEventListener('click', () => toggleView('register'));
             }
         } else {
             if (loadingSpinner) loadingSpinner.classList.add('hidden');
             if (authView) authView.classList.remove('hidden');
-            const toggleLink = document.getElementById('toggle-register-link');
-            if (toggleLink) toggleLink.addEventListener('click', () => toggleView('register'));
+            if (toggleRegisterLink) toggleRegisterLink.addEventListener('click', () => toggleView('register'));
         }
     });
 }
