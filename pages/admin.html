@@ -59,7 +59,7 @@
             padding: 20px;
             border: 1px solid #888;
             width: 90%;
-            max-width: 800px;
+            max-width: 1200px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
@@ -82,9 +82,17 @@
             text-decoration: none;
             cursor: pointer;
         }
+        .modal-body {
+            display: flex;
+            gap: 1.5rem;
+        }
+        .modal-body .email-editor,
+        .modal-body .chat-editor {
+            flex: 1;
+        }
         .modal-body textarea {
             width: 100%;
-            height: 300px;
+            height: 400px;
             border: 1px solid #ddd;
             padding: 1rem;
             border-radius: 4px;
@@ -110,20 +118,29 @@
         }
         .chat-message {
             margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
         }
         .chat-message.user {
-            text-align: right;
+            align-items: flex-end;
         }
-        .chat-message.ai .message-bubble {
-            background-color: #dcfce7;
-            color: #15803d;
+        .chat-message.ai {
+            align-items: flex-start;
         }
         .chat-message .message-bubble {
             display: inline-block;
             padding: 0.75rem;
-            border-radius: 1.5rem;
+            border-radius: 1rem;
             max-width: 80%;
             text-align: left;
+        }
+        .chat-message.user .message-bubble {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        .chat-message.ai .message-bubble {
+            background-color: #dcfce7;
+            color: #15803d;
         }
         .chat-input-container {
             display: flex;
@@ -170,7 +187,6 @@
                     <li><a href="impact.html">IMPACT</a></li>
                     <li><a href="contact.html">CONTACT</a></li>
                     <li><a href="portal.html">CLIENT PORTAL</a></li>
-                    <li><a href="#" id="logout-button">LOGOUT</a></li>
                 </ul>
             </nav>
         </div>
@@ -310,7 +326,24 @@
                 <span class="close-button" onclick="closeModal()">×</span>
             </div>
             <div class="modal-body">
-                <textarea id="email-draft-body" class="w-full h-96"></textarea>
+                <div class="email-editor">
+                    <h3 class="text-lg font-semibold mb-2">Email Draft</h3>
+                    <textarea id="email-draft-body"></textarea>
+                </div>
+                <div class="chat-editor">
+                    <h3 class="text-lg font-semibold mb-2">Chat with AI Assistant</h3>
+                    <div class="chat-container">
+                        <div id="chat-history" class="chat-history">
+                            <div class="chat-message ai">
+                                <div class="message-bubble">Hello! I can help you tailor this email. What would you like to change or add?</div>
+                            </div>
+                        </div>
+                        <div class="chat-input-container">
+                            <input type="text" id="chat-input" class="chat-input" placeholder="Type your message...">
+                            <button id="chat-send-button" class="send-button">Send</button>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <a id="send-email-link" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Send Email</a>
