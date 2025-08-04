@@ -108,7 +108,7 @@ function handleAuthForms() {
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const newUser = userCredential.user;
-                // *** FIXED: Simplified the path for the user profile document ***
+                // *** FIXED: This now uses a simple, robust path for the new user profile ***
                 const userProfileRef = doc(db, 'users', newUser.uid); 
                 const isAdmin = email === 'ernst@hatake.eu';
                 await setDoc(userProfileRef, {
@@ -139,13 +139,12 @@ function handleAuthForms() {
 
 // Centralized authentication handler
 onAuthStateChanged(auth, async (user) => {
-    // If the current URL is already dashboard.html or admin.html, do nothing.
     if (window.location.pathname.includes('dashboard.html') || window.location.pathname.includes('admin.html')) {
         return;
     }
 
     if (user) {
-        // *** FIXED: Simplified the path to check for the user profile document ***
+        // *** FIXED: This now checks the simple, robust path for the user profile ***
         const docRef = doc(db, 'users', user.uid);
         try {
             const docSnap = await getDoc(docRef);
@@ -181,7 +180,6 @@ onAuthStateChanged(auth, async (user) => {
 // Initialize the correct page logic
 document.addEventListener('DOMContentLoaded', () => {
     handleAuthForms();
-    // Set up the initial toggle link state
     const toggleRegisterLink = document.getElementById('toggle-register-link');
     if (toggleRegisterLink) toggleRegisterLink.addEventListener('click', () => window.toggleView('register'));
 });
