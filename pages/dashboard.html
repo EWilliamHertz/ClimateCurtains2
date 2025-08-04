@@ -28,7 +28,7 @@
                     <li><a href="../index.html">HOME</a></li>
                     <li><a href="our-solutions.html">SOLUTIONS</a></li>
                     <li><a href="about.html">ABOUT US</a></li>
-                    <li><a href="invest.html">INVEST</a></li>
+                    <li><a href="funding.html">FUNDING</a></li>
                     <li><a href="contact.html">CONTACT</a></li>
                     <li><a href="portal.html">CLIENT PORTAL</a></li>
                 </ul>
@@ -38,13 +38,16 @@
 
     <main id="main-content">
         <div id="app-container" class="min-h-screen bg-gray-100 p-4 flex flex-col items-center justify-center">
+            <!-- Message Box -->
             <div id="message-box" class="fixed top-4 left-1/2 -translate-x-1/2 bg-green-500 text-white p-4 rounded-lg shadow-xl z-50 hidden"></div>
             
+            <!-- Loading Spinner -->
             <div id="loading" class="text-center">
                 <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-500"></div>
                 <p class="mt-4 text-gray-600">Loading dashboard...</p>
             </div>
 
+            <!-- Dashboard View -->
             <div id="dashboard-view" class="w-full max-w-2xl bg-white p-8 rounded-xl shadow-lg border border-gray-200 hidden">
                 <h1 id="welcome-message" class="text-3xl font-bold text-center text-green-700 mb-6"></h1>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
@@ -73,11 +76,13 @@
                         <p id="dashboard-uid" class="font-bold text-lg break-all"></p>
                     </div>
                 </div>
+                <!-- Investor Resources Section (Visible only to investors) -->
                 <div id="investor-resources" class="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-xl hidden">
                     <h2 class="text-xl font-bold text-blue-800 mb-4">Investor Resources</h2>
                     <p class="text-blue-700 mb-4">Welcome, valued investor. Here you can find important documents such as our investor deck and financial models.</p>
                     <div id="investor-files-list" class="space-y-2">
-                        </div>
+                        <!-- Files will be dynamically loaded here -->
+                    </div>
                 </div>
                 <button id="logout-button" class="w-full mt-8 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200">Logout</button>
             </div>
@@ -94,7 +99,7 @@
                     <h3>Quick Links</h3>
                     <ul>
                         <li><a href="about.html">ABOUT US</a></li>
-                        <li><a href="invest.html">INVEST</a></li>
+                        <li><a href="funding.html">FUNDING</a></li>
                         <li><a href="contact.html">CONTACT</a></li>
                     </ul>
                 </div>
