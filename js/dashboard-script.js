@@ -11,7 +11,6 @@ import {
     doc,
     onSnapshot,
     collection,
-    query,
     getDocs
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
 import {
@@ -25,7 +24,7 @@ const firebaseConfig = {
     apiKey: "AIzaSyB7_Tdz7SGtcj-qN8Ro7uAmoVrPyuR5cqc",
     authDomain: "climatecurtainsab.firebaseapp.com",
     projectId: "climatecurtainsab",
-    storageBucket: "climatecurtainsab.firebasestorage.app",
+    storageBucket: "climatecurtainsab.appspot.com",
     messagingSenderId: "534408595576",
     appId: "1:534408595576:web:c73c886ab1ea1abd9e858d",
     measurementId: "G-3GNNYNJKM7"
@@ -59,20 +58,12 @@ function showMessage(msg, isError = false) {
 
 // Function to handle auth state on dashboard page
 async function handleDashboardPage() {
-    const userIsLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
-
-    if (!userIsLoggedIn) {
-        window.location.href = 'portal.html';
-        return;
-    }
-
-    if (loadingSpinner) loadingSpinner.classList.remove('hidden');
-
     onAuthStateChanged(auth, async (user) => {
         if (user && !user.isAnonymous) {
             const docRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles`, 'profile');
             const unsubscribe = onSnapshot(docRef, async (docSnap) => {
                 if (docSnap.exists()) {
+                    if (loadingSpinner) loadingSpinner.classList.add('hidden');
                     const profile = docSnap.data();
                     if (welcomeMessage) welcomeMessage.textContent = `Welcome, ${profile.companyName}!`;
                     if (document.getElementById('dashboard-company-name')) document.getElementById('dashboard-company-name').textContent = profile.companyName;
@@ -86,7 +77,6 @@ async function handleDashboardPage() {
                     if (document.getElementById('dashboard-uid')) document.getElementById('dashboard-uid').textContent = user.uid;
                     if (dashboardView) dashboardView.classList.remove('hidden');
                     
-                    // Show investor resources if the user is an investor
                     if (profile.isInvestor && investorResourcesSection) {
                         investorResourcesSection.classList.remove('hidden');
                         const filesCollectionRef = collection(db, `/artifacts/${appId}/public/investor_files`);
@@ -106,11 +96,10 @@ async function handleDashboardPage() {
                         }
                     }
                 } else {
-                    showMessage("User profile not found. Please contact support.", true);
+                    showMessage("User profile not found. Redirecting to login.", true);
                     signOut(auth);
                     window.location.href = 'portal.html';
                 }
-                if (loadingSpinner) loadingSpinner.classList.add('hidden');
             }, (error) => {
                 console.error("Error fetching user profile:", error);
                 showMessage(`Error fetching user profile: ${error.message}`, true);
@@ -129,9 +118,6 @@ if (logoutButton) {
     logoutButton.addEventListener('click', async () => {
         try {
             await signOut(auth);
-            localStorage.removeItem('userLoggedIn');
-            localStorage.removeItem('userIsAdmin');
-            showMessage("Logged out successfully.");
             window.location.href = 'portal.html';
         } catch (error) {
             console.error("Logout failed:", error);
