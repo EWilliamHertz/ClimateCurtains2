@@ -24,7 +24,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js';
 
 // --- Gemini API Configuration ---
-const GEMINI_API_KEY = "AIzaSyBQeLMNbrjf8RPO01wipxS0JrWNyTv9az0";
+const GEMINI_API_KEY = "AIzaSyBQeLMNbrjf8RPO01wipxS0JrWNyTv9az0"; // This should be kept secure in a real application
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
 
 // Firebase configuration from the user
@@ -65,7 +65,7 @@ const chatHistory = document.getElementById('chat-history');
 const chatInput = document.getElementById('chat-input');
 const chatSendButton = document.getElementById('chat-send-button');
 
-// Investor data (hardcoded for now)
+// --- Hardcoded Investor Data and Templates ---
 const investorData = {
     'Venture Capital Firms': [{
         contact: 'Christian Hernandez, Partner',
@@ -214,75 +214,32 @@ const investorData = {
 const emailTemplates = {
     'Venture Capital Firms': {
         subject: "Investment Opportunity: ClimateCurtainsAB - Revolutionizing Industrial Energy Efficiency",
-        body: `Dear [Investor Name],
-
-I am writing to you from ClimateCurtainsAB, a Swedish company at the forefront of industrial energy efficiency. We have developed a patented thermal curtain technology that delivers significant energy and cost savings to large-scale industrial clients.
-
-Given [VC Firm Name]'s focus on [VC Focus], we believe our solution aligns perfectly with your investment thesis. Our technology has a proven track record, a strong ROI for clients, and a massive addressable market.
-
-We are currently seeking investment to scale our production and expand our market reach. We would be delighted to share our investor deck and financial model with you.
-
-Would you be available for a brief call next week to discuss this further?
-
-Best regards,
-
-Peter Hertz
-CEO, ClimateCurtainsAB`
+        body: `Dear [Investor Name],\n\nI am writing to you from ClimateCurtainsAB, a Swedish company at the forefront of industrial energy efficiency. We have developed a patented thermal curtain technology that delivers significant energy and cost savings to large-scale industrial clients.\n\nGiven [VC Firm Name]'s focus on [VC Focus], we believe our solution aligns perfectly with your investment thesis. Our technology has a proven track record, a strong ROI for clients, and a massive addressable market.\n\nWe are currently seeking investment to scale our production and expand our market reach. We would be delighted to share our investor deck and financial model with you.\n\nWould you be available for a brief call next week to discuss this further?\n\nBest regards,\n\nPeter Hertz\nCEO, ClimateCurtainsAB`
     },
     'Angel Investors and Syndicates': {
         subject: "Angel Investment Opportunity: ClimateCurtainsAB - Sustainable Impact & Strong Returns",
-        body: `Dear [Investor Name],
-
-I am Peter Hertz, the founder of ClimateCurtainsAB. We are on a mission to combat industrial energy waste with our innovative thermal curtain technology. Our solution not only saves our clients money but also makes a tangible impact on CO2 emissions.
-
-As a [syndicate/angel investor] with a focus on sustainable technology, we believe our venture presents a compelling opportunity. We have a solid business model, a patented product, and are poised for significant growth.
-
-We are looking for angel investors who share our vision and want to be part of a company with both strong financial returns and a positive environmental impact.
-
-I would welcome the opportunity to discuss our plans with you. Please let me know if you would be open to a brief conversation.
-
-Sincerely,
-
-Peter Hertz
-CEO, ClimateCurtainsAB`
+        body: `Dear [Investor Name],\n\nI am Peter Hertz, the founder of ClimateCurtainsAB. We are on a mission to combat industrial energy waste with our innovative thermal curtain technology. Our solution not only saves our clients money but also makes a tangible impact on CO2 emissions.\n\nAs a [syndicate/angel investor] with a focus on sustainable technology, we believe our venture presents a compelling opportunity. We have a solid business model, a patented product, and are poised for significant growth.\n\nWe are looking for angel investors who share our vision and want to be part of a company with both strong financial returns and a positive environmental impact.\n\nI would welcome the opportunity to discuss our plans with you. Please let me know if you would be open to a brief conversation.\n\nSincerely,\n\nPeter Hertz\nCEO, ClimateCurtainsAB`
     },
     'Corporate Venture Capital (CVC)': {
         subject: "Strategic Partnership & Investment: ClimateCurtainsAB & [VC Firm Name]",
-        body: `Dear [Investor Name],
-
-I am writing to you from ClimateCurtainsAB to explore a potential strategic partnership and investment opportunity with [VC Firm Name]. Our patented industrial thermal curtains offer a unique solution to reduce energy consumption in large facilities, a challenge that is highly relevant to your industry.
-
-We see a strong synergy between our technology and your company's sustainability goals. A partnership could provide us with invaluable market access and industry expertise, while our solution could enhance your operational efficiency and sustainability credentials.
-
-We are confident that our technology can deliver significant value to your business and would be eager to discuss a pilot project or a strategic investment.
-
-I look forward to hearing from you.
-
-Best regards,
-
-Peter Hertz
-CEO, ClimateCurtainsAB`
+        body: `Dear [Investor Name],\n\nI am writing to you from ClimateCurtainsAB to explore a potential strategic partnership and investment opportunity with [VC Firm Name]. Our patented industrial thermal curtains offer a unique solution to reduce energy consumption in large facilities, a challenge that is highly relevant to your industry.\n\nWe see a strong synergy between our technology and your company's sustainability goals. A partnership could provide us with invaluable market access and industry expertise, while our solution could enhance your operational efficiency and sustainability credentials.\n\nWe are confident that our technology can deliver significant value to your business and would be eager to discuss a pilot project or a strategic investment.\n\nI look forward to hearing from you.\n\nBest regards,\n\nPeter Hertz\nCEO, ClimateCurtainsAB`
     },
     'Government Grants and Sustainable Funding Programs': {
         subject: "Application for [specific grant program]: ClimateCurtainsAB - Innovative Energy-Saving Technology",
-        body: `Dear Sir/Madam,
-
-On behalf of ClimateCurtainsAB, I am writing to express our strong interest in the [specific grant program]. As a Swedish company dedicated to climate solutions, our mission aligns perfectly with the goals of this program.
-
-Our patented industrial thermal curtains are a game-changing innovation that addresses the urgent need for energy efficiency in the industrial sector. Our technology helps businesses significantly reduce their energy consumption and CO2 footprint, contributing directly to [specific policy goal, e.g., "energy efficiency targets" or "carbon reduction commitments"].
-
-We have a scalable business model and a clear plan for market expansion. Funding from this program would be instrumental in accelerating our growth and maximizing our environmental impact.
-
-We have attached our full proposal for your review and would be honored to be considered for this grant.
-
-Thank you for your time and consideration.
-
-Sincerely,
-
-Peter Hertz
-CEO, ClimateCurtainsAB`
+        body: `Dear Sir/Madam,\n\nOn behalf of ClimateCurtainsAB, I am writing to express our strong interest in the [specific grant program]. As a Swedish company dedicated to climate solutions, our mission aligns perfectly with the goals of this program.\n\nOur patented industrial thermal curtains are a game-changing innovation that addresses the urgent need for energy efficiency in the industrial sector. Our technology helps businesses significantly reduce their energy consumption and CO2 footprint, contributing directly to [specific policy goal, e.g., "energy efficiency targets" or "carbon reduction commitments"].\n\nWe have a scalable business model and a clear plan for market expansion. Funding from this program would be instrumental in accelerating our growth and maximizing our environmental impact.\n\nWe have attached our full proposal for your review and would be honored to be considered for this grant.\n\nThank you for your time and consideration.\n\nSincerely,\n\nPeter Hertz\nCEO, ClimateCurtainsAB`
     }
 };
+
+// --- Helper Functions ---
+function showMessage(msg, isError = false) {
+    if (!messageBox) return;
+    messageBox.textContent = msg;
+    messageBox.classList.remove('hidden', 'bg-green-500', 'bg-red-500');
+    messageBox.classList.add(isError ? 'bg-red-500' : 'bg-green-500');
+    setTimeout(() => {
+        messageBox.classList.add('hidden');
+    }, 5000);
+}
 
 // --- Gemini Chat Functions ---
 async function handleChatSubmit() {
@@ -294,43 +251,21 @@ async function handleChatSubmit() {
     chatSendButton.disabled = true;
 
     const thinkingBubble = appendMessage("Thinking...", 'ai', true);
-
     const currentEmail = emailDraftBody.value;
-    const prompt = `You are an expert business communication assistant. Your task is to refine an email draft based on user instructions.
-    
-    Current Email Draft:
-    ---
-    ${currentEmail}
-    ---
-    
-    User's instruction: "${userInput}"
-    
-    Based on the instruction, please provide a revised version of the email. Only output the full, revised email text, without any additional comments or explanations.`;
+    const prompt = `You are an expert business communication assistant. Your task is to refine an email draft based on user instructions.\n\nCurrent Email Draft:\n---\n${currentEmail}\n---\n\nUser's instruction: "${userInput}"\n\nBased on the instruction, please provide a revised version of the email. Only output the full, revised email text, without any additional comments or explanations.`;
 
     try {
         const response = await fetch(GEMINI_API_URL, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: prompt
-                    }]
-                }]
-            }),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
         });
-
         chatHistory.removeChild(thinkingBubble);
-
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.error.message || `API request failed with status ${response.status}`);
         }
-
         const data = await response.json();
-        
         if (data.candidates && data.candidates.length > 0) {
             const revisedEmail = data.candidates[0].content.parts[0].text;
             emailDraftBody.value = revisedEmail;
@@ -338,12 +273,9 @@ async function handleChatSubmit() {
         } else {
             throw new Error("No response from AI. The content may have been blocked.");
         }
-
     } catch (error) {
         console.error('Error with Gemini API:', error);
-        if (thinkingBubble.parentNode) {
-            chatHistory.removeChild(thinkingBubble);
-        }
+        if (thinkingBubble.parentNode) chatHistory.removeChild(thinkingBubble);
         appendMessage(`Sorry, an error occurred: ${error.message}. Please check your API key and network, then try again.`, 'ai');
     } finally {
         chatSendButton.disabled = false;
@@ -353,35 +285,26 @@ async function handleChatSubmit() {
 
 function appendMessage(text, sender, isThinking = false) {
     const messageElement = document.createElement('div');
-    messageElement.classList.add('chat-message', sender);
-    if (isThinking) {
-        messageElement.classList.add('thinking');
-    }
+    messageElement.className = `chat-message ${sender}`;
+    if (isThinking) messageElement.classList.add('thinking');
     
     const bubbleElement = document.createElement('div');
-    bubbleElement.classList.add('message-bubble');
+    bubbleElement.className = 'message-bubble';
     bubbleElement.textContent = text;
     
     messageElement.appendChild(bubbleElement);
     chatHistory.appendChild(messageElement);
     chatHistory.scrollTop = chatHistory.scrollHeight;
-    
     return messageElement;
 }
 
-
 // --- Core Admin Functions ---
-
-function openModal(category, investor) {
+window.openModal = function(category, investor) {
     const template = emailTemplates[category];
-    if (!template) {
-        showMessage("No template found for this investor category.", true);
-        return;
-    }
+    if (!template) return showMessage("No template found for this category.", true);
     
     const recipientName = investor.contact.split(',')[0].trim();
     const companyName = category.includes('Venture Capital') ? category : investor.contact.split(',')[1] ? investor.contact.split(',')[1].trim() : category;
-    
     const subject = template.subject.replace(/\[VC Firm Name\]/g, companyName).replace(/\[Investor Name\]/g, recipientName);
     const body = template.body.replace(/\[Investor Name\]/g, recipientName)
                              .replace(/\[VC Firm Name\]/g, companyName)
@@ -394,63 +317,32 @@ function openModal(category, investor) {
     emailDraftBody.value = body;
     sendEmailLink.href = `mailto:${investor.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
-    // Reset chat history
-    chatHistory.innerHTML = `
-        <div class="chat-message ai">
-            <div class="message-bubble">Hello! I can help you tailor this email to ${recipientName}. What would you like to change or add?</div>
-        </div>`;
-    
+    chatHistory.innerHTML = `<div class="chat-message ai"><div class="message-bubble">Hello! I can help you tailor this email to ${recipientName}. What would you like to change or add?</div></div>`;
     emailModal.style.display = "block";
-}
-window.openModal = openModal;
+};
 
-function closeModal() {
+window.closeModal = function() {
     emailModal.style.display = "none";
-}
-window.closeModal = closeModal;
-
-function showMessage(msg, isError = false) {
-    if (!messageBox) return;
-    messageBox.textContent = msg;
-    messageBox.classList.remove('hidden', 'bg-green-500', 'bg-red-500');
-    messageBox.classList.add(isError ? 'bg-red-500' : 'bg-green-500');
-    setTimeout(() => {
-        messageBox.classList.add('hidden');
-    }, 5000);
-}
+};
 
 window.switchTab = (tabName) => {
-    const tabs = document.querySelectorAll('.tabs button');
-    tabs.forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tabs button').forEach(tab => tab.classList.remove('active'));
     document.querySelector(`#tab-button-${tabName}`).classList.add('active');
-
-    document.getElementById('users-tab-content').classList.add('hidden');
-    document.getElementById('investors-tab-content').classList.add('hidden');
-    document.getElementById('inquiries-tab-content').classList.add('hidden');
-    document.getElementById('files-tab-content').classList.add('hidden');
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
     document.getElementById(`${tabName}-tab-content`).classList.remove('hidden');
 };
 
 async function fetchInquiries() {
     try {
-        const inquiriesCollectionRef = collection(db, 'inquiries');
-        const inquiriesSnapshot = await getDocs(inquiriesCollectionRef);
-        if (inquiryListTableBody) inquiryListTableBody.innerHTML = '';
-        let inquiryCount = 0;
-        inquiriesSnapshot.forEach(inquiryDoc => {
-            const inquiryData = inquiryDoc.data();
+        const inquiriesSnapshot = await getDocs(collection(db, 'inquiries'));
+        inquiryListTableBody.innerHTML = '';
+        totalInquiriesElem.textContent = inquiriesSnapshot.size;
+        inquiriesSnapshot.forEach(doc => {
+            const data = doc.data();
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${inquiryData.timestamp ? new Date(inquiryData.timestamp.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
-                <td>${inquiryData.company || inquiryData.name || 'N/A'}</td>
-                <td>${inquiryData.subject || 'N/A'}</td>
-                <td>${inquiryData.status || 'New'}</td>
-                <td><a href="#">View</a></td>
-            `;
+            tr.innerHTML = `<td>${data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleDateString() : 'N/A'}</td><td>${data.company || data.name}</td><td>${data.subject}</td><td>${data.status || 'New'}</td><td><a href="#">View</a></td>`;
             inquiryListTableBody.appendChild(tr);
-            inquiryCount++;
         });
-        if (totalInquiriesElem) totalInquiriesElem.textContent = inquiryCount;
     } catch (error) {
         console.error("Error fetching inquiries:", error);
     }
@@ -458,172 +350,102 @@ async function fetchInquiries() {
 
 async function fetchUsers() {
     try {
-        const usersCollectionRef = collection(db, `users`);
-        const usersSnapshot = await getDocs(usersCollectionRef);
-        let totalUsers = 0;
+        const usersSnapshot = await getDocs(collection(db, 'users'));
+        userListTableBody.innerHTML = '';
         const companyNames = new Set();
-        if (userListTableBody) userListTableBody.innerHTML = '';
-        
-        for (const userDoc of usersSnapshot.docs) {
-            const userProfile = userDoc.data();
+        totalUsersElem.textContent = usersSnapshot.size;
+        usersSnapshot.forEach(doc => {
+            const data = doc.data();
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${userProfile.companyName || 'N/A'}</td>
-                <td>${userProfile.firstName || 'N/A'}</td>
-                <td>${userProfile.lastName || 'N/A'}</td>
-                <td>${userProfile.email || 'N/A'}</td>
-                <td>${userProfile.roleInCompany || 'N/A'}</td>
-                <td>${userProfile.squareMeterInFactory || 'N/A'}</td>
-                <td>${userProfile.isInvestor ? 'Yes' : 'No'}</td>
-                <td>${userDoc.id}</td>
-            `;
+            tr.innerHTML = `<td>${data.companyName}</td><td>${data.firstName}</td><td>${data.lastName}</td><td>${data.email}</td><td>${data.roleInCompany}</td><td>${data.squareMeterInFactory}</td><td>${data.isInvestor ? 'Yes' : 'No'}</td><td>${doc.id}</td>`;
             userListTableBody.appendChild(tr);
-            totalUsers++;
-            if (userProfile.companyName) {
-                companyNames.add(userProfile.companyName);
-            }
-        }
-        
-        if (totalUsersElem) totalUsersElem.textContent = totalUsers;
-        if (registeredCompaniesElem) registeredCompaniesElem.textContent = companyNames.size;
+            if (data.companyName) companyNames.add(data.companyName);
+        });
+        registeredCompaniesElem.textContent = companyNames.size;
     } catch (error) {
         console.error("Error fetching users:", error);
-        if (totalUsersElem) totalUsersElem.textContent = 'Error';
-        if (registeredCompaniesElem) registeredCompaniesElem.textContent = 'Error';
     }
 }
 
-async function handleAdminPage() {
+function populateInvestorList() {
+    investorListGrid.innerHTML = '';
+    for (const category in investorData) {
+        const categoryTitle = document.createElement('h3');
+        categoryTitle.className = 'col-span-full text-lg font-bold mt-4 mb-2';
+        categoryTitle.textContent = category;
+        investorListGrid.appendChild(categoryTitle);
+        investorData[category].forEach(investor => {
+            const card = document.createElement('div');
+            card.className = 'investor-card bg-white p-4 rounded-lg shadow';
+            card.innerHTML = `
+                <h3 class="font-bold text-green-600">${investor.contact.split(',')[0]}</h3>
+                <p><strong>Contact:</strong> ${investor.contact}</p>
+                <p><strong>Email:</strong> <a href="mailto:${investor.email}" class="text-blue-500 hover:underline">${investor.email}</a></p>
+                <p><strong>Website:</strong> <a href="${investor.website}" target="_blank" class="text-blue-500 hover:underline">${investor.website}</a></p>
+                <p><strong>Focus:</strong> ${investor.focus}</p>
+                <p><strong>Relevance:</strong> ${investor.relevance}</p>
+                <button onclick="openModal('${category}', ${JSON.stringify(investor).replace(/"/g, "'")})" class="mt-2 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Draft Email</button>
+            `;
+            investorListGrid.appendChild(card);
+        });
+    }
+}
+
+// Main logic for admin page
+function handleAdminPage() {
     onAuthStateChanged(auth, async (user) => {
         if (user && !user.isAnonymous) {
-            const userProfileRef = doc(db, `users`, user.uid);
-            try {
-                const docSnap = await getDoc(userProfileRef);
-                if (docSnap.exists() && docSnap.data().isAdmin) {
-                    // User is an admin, show the dashboard.
-                    loadingSpinner.classList.add('hidden');
-                    adminDashboardSection.classList.remove('hidden');
+            const docRef = doc(db, 'users', user.uid);
+            const docSnap = await getDoc(docRef);
 
-                    const profile = docSnap.data();
-                    if (adminNameSpan) adminNameSpan.textContent = profile.companyName;
+            if (docSnap.exists() && docSnap.data().isAdmin) {
+                loadingSpinner.classList.add('hidden');
+                adminDashboardSection.classList.remove('hidden');
+                adminNameSpan.textContent = docSnap.data().companyName;
 
-                    await fetchUsers();
-                    await fetchInquiries();
+                fetchUsers();
+                fetchInquiries();
+                populateInvestorList();
 
-                    if (investorListGrid) {
-                        investorListGrid.innerHTML = '';
-                        for (const category in investorData) {
-                            const categoryTitle = document.createElement('h3');
-                            categoryTitle.className = 'col-span-full text-lg font-bold mt-4 mb-2';
-                            categoryTitle.textContent = category;
-                            investorListGrid.appendChild(categoryTitle);
-                            investorData[category].forEach(investor => {
-                                const card = document.createElement('div');
-                                card.className = 'investor-card';
-                                card.innerHTML = `
-                                    <h3>${investor.contact.split(',')[0]}</h3>
-                                    <p><strong>Contact:</strong> ${investor.contact}</p>
-                                    <p><strong>Email:</strong> <a href="mailto:${investor.email}">${investor.email}</a></p>
-                                    <p><strong>Website:</strong> <a href="${investor.website}" target="_blank">${investor.website}</a></p>
-                                    <p><strong>Focus:</strong> ${investor.focus}</p>
-                                    <p><strong>Relevance:</strong> ${investor.relevance}</p>
-                                    <button onclick="openModal('${category}', ${JSON.stringify(investor).replace(/"/g, "'")})" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200 mt-2">Draft Email</button>
-                                `;
-                                investorListGrid.appendChild(card);
-                            });
-                        }
-                    }
-
-                    if (fileUploadForm) {
-                         fileUploadForm.addEventListener('submit', async (e) => {
-                             e.preventDefault();
-                             const fileInput = document.getElementById('investor-file-upload');
-                             const file = fileInput.files[0];
-                             if (!file) {
-                                 showMessage("Please select a file to upload.", true);
-                                 return;
-                             }
-                             const storageRef = ref(storage, `investor_files/${file.name}`);
-                             try {
-                                 await uploadBytes(storageRef, file);
-                                 const downloadURL = await getDownloadURL(storageRef);
-                                 await addDoc(collection(db, `public/investor_files`), {
-                                     fileName: file.name,
-                                     downloadURL: downloadURL,
-                                     uploadedAt: serverTimestamp()
-                                 });
-                                 showMessage("File uploaded successfully!");
-                                 fileInput.value = '';
-                             } catch (error) {
-                                 console.error("File upload failed:", error);
-                                 showMessage(`File upload failed: ${error.message}`, true);
-                             }
-                         });
-                    }
-
-                    const filesCollectionRef = collection(db, `public/investor_files`);
-                    if(uploadedFilesTableBody) {
-                      onSnapshot(filesCollectionRef, (snapshot) => {
-                          uploadedFilesTableBody.innerHTML = '';
-                          snapshot.forEach(doc => {
-                              const fileData = doc.data();
-                              const date = fileData.uploadedAt ? new Date(fileData.uploadedAt.seconds * 1000).toLocaleDateString() : 'N/A';
-                              const tr = document.createElement('tr');
-                              tr.innerHTML = `
-                                  <td>${fileData.fileName}</td>
-                                  <td>${date}</td>
-                                  <td><a href="${fileData.downloadURL}" target="_blank" class="text-green-500 hover:underline">Download</a></td>
-                              `;
-                              uploadedFilesTableBody.appendChild(tr);
-                          });
-                      });
-                    }
-
-                } else {
-                     // User is logged in, but not an admin. Redirect to user dashboard.
-                    showMessage("Access Denied. You are not an administrator.", true);
-                    if (!window.location.pathname.includes('dashboard.html')) {
-                        setTimeout(() => { window.location.href = 'dashboard.html'; }, 2000);
-                    }
-                }
-            } catch (error) {
-                console.error("Error checking admin status:", error);
-                 // If there's an error (e.g., profile not found), sign out and redirect
-                await signOut(auth);
-                if (!window.location.pathname.includes('portal.html')) {
-                    window.location.href = 'portal.html';
-                }
+            } else {
+                showMessage("Access Denied. You are not an administrator.", true);
+                setTimeout(() => { window.location.href = 'portal.html'; }, 2000);
             }
         } else {
-            // No user is signed in, redirect to the portal.
-            if (!window.location.pathname.includes('portal.html')) {
-                window.location.href = 'portal.html';
-            }
+            window.location.href = 'portal.html';
         }
     });
 
     if (logoutButton) {
-        logoutButton.addEventListener('click', async () => {
-            try {
-                await signOut(auth);
-                // The onAuthStateChanged listener will handle the redirect.
-            } catch (error) {
-                console.error("Logout failed:", error);
-                showMessage(`Logout failed: ${error.message}`, true);
-            }
-        });
+        logoutButton.addEventListener('click', () => signOut(auth));
     }
 
-    if (chatSendButton) {
-        chatSendButton.addEventListener('click', handleChatSubmit);
-    }
-    if (chatInput) {
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                handleChatSubmit();
+    if (fileUploadForm) {
+        fileUploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fileInput = document.getElementById('investor-file-upload');
+            const file = fileInput.files[0];
+            if (!file) return showMessage("Please select a file.", true);
+
+            const storageRef = ref(storage, `investor_files/${file.name}`);
+            try {
+                await uploadBytes(storageRef, file);
+                const downloadURL = await getDownloadURL(storageRef);
+                await addDoc(collection(db, 'public/investor_files'), {
+                    fileName: file.name,
+                    downloadURL: downloadURL,
+                    uploadedAt: serverTimestamp()
+                });
+                showMessage("File uploaded successfully!");
+                fileInput.value = '';
+            } catch (error) {
+                showMessage(`File upload failed: ${error.message}`, true);
             }
         });
     }
+    
+    if (chatSendButton) chatSendButton.addEventListener('click', handleChatSubmit);
+    if (chatInput) chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleChatSubmit(); });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
