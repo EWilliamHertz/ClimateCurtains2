@@ -52,10 +52,12 @@ const dashboardView = document.getElementById('dashboard-view');
 const welcomeMessage = document.getElementById('welcome-message');
 const logoutButton = document.getElementById('logout-button');
 const mainContent = document.getElementById('main-content');
-const investorListTable = document.getElementById('investor-list-table');
+const investorListGrid = document.getElementById('investor-list-grid');
 const inquiryListTable = document.getElementById('inquiry-list-table');
 const userListTable = document.getElementById('user-list-table');
+const adminNameSpan = document.getElementById('admin-name');
 
+// Investor data
 const investorData = {
     'Venture Capital Firms': [{
         contact: 'Christian Hernandez, Partner',
@@ -415,7 +417,6 @@ async function handleAdminPage() {
     
     // Fetch and display all users
     const usersCollectionRef = collection(db, `/artifacts/${appId}/users`);
-    const usersSnapshot = await getDocs(usersCollectionRef);
     const usersListBody = document.querySelector('#user-list-table tbody');
     let totalUsers = 0;
     let totalCompanies = new Set();
