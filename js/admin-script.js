@@ -54,6 +54,10 @@ const inquiryListTableBody = document.querySelector('#inquiry-list-table tbody')
 const uploadedFilesTableBody = document.querySelector('#uploaded-files-table tbody');
 const fileUploadForm = document.getElementById('file-upload-form');
 const logoutButton = document.getElementById('logout-button');
+const emailModal = document.getElementById('email-modal');
+const investorNameModal = document.getElementById('investor-name-modal');
+const emailDraftBody = document.getElementById('email-draft-body');
+const sendEmailLink = document.getElementById('send-email-link');
 
 // Investor data (hardcoded for now)
 const investorData = {
@@ -277,17 +281,18 @@ Peter Hertz Founder & CEO ClimateCurtainsAB [Contact Information]`
     }
 };
 
-function draftEmail(category, investor) {
+// Function to open the email drafting modal
+function openModal(category, investor) {
     const template = emailTemplates[category];
     if (!template) {
         showMessage("No template found for this investor category.", true);
         return;
     }
-
+    
+    // Dynamic content for the email draft
     const recipientName = investor.contact.split(',')[0].trim();
     const companyName = category.includes('Venture Capital') ? category : investor.contact.split(',')[1] ? investor.contact.split(',')[1].trim() : category;
-
-    // Fill the template with dynamic data
+    
     let subject = template.subject.replace(/\[VC Firm Name\]/g, companyName).replace(/\[Investor Name\]/g, recipientName);
     let body = template.body.replace(/\[Investor Name\]/g, recipientName)
                              .replace(/\[VC Firm Name\]/g, companyName)
@@ -296,10 +301,18 @@ function draftEmail(category, investor) {
                              .replace(/\[specific grant program\]/g, 'EIC Accelerator')
                              .replace(/\[specific policy goal, e.g., "energy efficiency targets" or "carbon reduction commitments"\]/g, 'energy efficiency targets');
 
-    const mailtoLink = `mailto:${investor.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.open(mailtoLink, '_blank');
+    // Populate the modal
+    investorNameModal.textContent = recipientName;
+    emailDraftBody.value = body;
+    sendEmailLink.href = `mailto:${investor.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    emailModal.style.display = "block";
 }
-window.draftEmail = draftEmail;
+
+// Function to close the modal
+function closeModal() {
+    emailModal.style.display = "none";
+}
+window.closeModal = closeModal;
 
 // Helper function to show messages
 function showMessage(msg, isError = false) {
@@ -390,7 +403,7 @@ async function handleAdminPage() {
                                     <p><strong>Focus:</strong> ${investor.focus}</p>
                                     <p><strong>Relevance:</strong> ${investor.relevance}</p>
                                     <div class="mt-4">
-                                        <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg text-sm" onclick="draftEmail('${category}', ${JSON.stringify(investor).replace(/"/g, '&quot;')})">Draft Email</button>
+                                        <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg text-sm" onclick="openModal('${category}', ${JSON.stringify(investor).replace(/"/g, "'")})">Draft Email</button>
                                     </div>
                                 `;
                                 investorListGrid.appendChild(card);
