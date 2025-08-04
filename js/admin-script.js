@@ -434,7 +434,7 @@ window.switchTab = (tabName) => {
 
 async function fetchInquiries() {
     try {
-        const inquiriesCollectionRef = collection(db, `inquiries`); // CORRECTED PATH
+        const inquiriesCollectionRef = collection(db, 'inquiries');
         const inquiriesSnapshot = await getDocs(inquiriesCollectionRef);
         if (inquiryListTableBody) inquiryListTableBody.innerHTML = '';
         let inquiryCount = 0;
@@ -459,14 +459,14 @@ async function fetchInquiries() {
 
 async function fetchUsers() {
     try {
-        const usersCollectionRef = collection(db, `/artifacts/${appId}/users`); // CORRECTED PATH
+        const usersCollectionRef = collection(db, `/artifacts/${appId}/users`);
         const usersSnapshot = await getDocs(usersCollectionRef);
         let totalUsers = 0;
         const companyNames = new Set();
         if (userListTableBody) userListTableBody.innerHTML = '';
         
         for (const userDoc of usersSnapshot.docs) {
-            const profileDocRef = doc(db, `/artifacts/${appId}/users`, userDoc.id, 'user_profiles', 'profile'); // CORRECTED PATH
+            const profileDocRef = doc(db, `/artifacts/${appId}/users/${userDoc.id}/user_profiles`, 'profile');
             const profileDocSnap = await getDoc(profileDocRef);
             
             if (profileDocSnap.exists()) {
@@ -502,7 +502,7 @@ async function fetchUsers() {
 async function handleAdminPage() {
     onAuthStateChanged(auth, async (user) => {
         if (user && !user.isAnonymous) {
-            const userProfileRef = doc(db, `/artifacts/${appId}/users`, user.uid, 'user_profiles', 'profile'); // CORRECTED PATH
+            const userProfileRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles`, 'profile');
             try {
                 const docSnap = await getDoc(userProfileRef);
                 if (docSnap.exists() && docSnap.data().isAdmin) {
@@ -552,7 +552,7 @@ async function handleAdminPage() {
                              try {
                                  await uploadBytes(storageRef, file);
                                  const downloadURL = await getDownloadURL(storageRef);
-                                 await addDoc(collection(db, `/artifacts/${appId}/public`, 'investor_files'), { // CORRECTED PATH
+                                 await addDoc(collection(db, `/artifacts/${appId}/public/investor_files`), {
                                      fileName: file.name,
                                      downloadURL: downloadURL,
                                      uploadedAt: serverTimestamp()
@@ -566,7 +566,7 @@ async function handleAdminPage() {
                          });
                     }
 
-                    const filesCollectionRef = collection(db, `/artifacts/${appId}/public`, 'investor_files'); // CORRECTED PATH
+                    const filesCollectionRef = collection(db, `/artifacts/${appId}/public/investor_files`);
                     if(uploadedFilesTableBody) {
                       onSnapshot(filesCollectionRef, (snapshot) => {
                           uploadedFilesTableBody.innerHTML = '';
@@ -585,7 +585,6 @@ async function handleAdminPage() {
                     }
 
                 } else {
-                    showMessage("Access denied. You are not an admin.", true);
                     window.location.href = 'portal.html';
                 }
             } catch (error) {
