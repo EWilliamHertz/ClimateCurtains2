@@ -1,3 +1,42 @@
+// This file contains core, non-Firebase related UI functions
+// that are shared across all pages.
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Mobile Navigation Toggle
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (hamburger) {
+        hamburger.addEventListener('click', function() {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+    }
+    
+    // Close mobile menu when clicking on a link
+    const navItems = document.querySelectorAll('.nav-links a');
+    navItems.forEach(item => {
+        item.addEventListener('click', function() {
+            hamburger.classList.remove('active');
+            navLinks.classList.remove('active');
+        });
+    });
+    
+    // Add active class to current page in navigation
+    const currentLocation = window.location.pathname;
+    const navLinkItems = document.querySelectorAll('.nav-links a');
+    const menuLength = navLinkItems.length;
+    
+    for (let i = 0; i < menuLength; i++) {
+        const linkPath = navLinkItems[i].getAttribute('href');
+        const currentPath = currentLocation.substring(currentLocation.lastIndexOf('/') + 1);
+
+        if (linkPath === currentPath || (linkPath === '../index.html' && (currentPath === '' || currentPath === 'index.html'))) {
+            navLinkItems[i].classList.add('active');
+        }
+    }
+});
+
 import {
     initializeApp
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js';
@@ -16,7 +55,6 @@ import {
     onSnapshot,
     serverTimestamp,
     collection,
-    query,
     getDocs,
     addDoc
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
@@ -295,7 +333,7 @@ function handleAuthForms() {
                 const userProfileRef = doc(db, `/artifacts/${appId}/users/${newUser.uid}/user_profiles`, 'profile');
                 const isAdmin = email === 'ernst@hatake.eu';
                 await setDoc(userProfileRef, {
-                    email, // Save email to Firestore profile
+                    email,
                     companyName,
                     roleInCompany,
                     linkedinProfile,
@@ -432,6 +470,11 @@ function handleAdminPage() {
                     const profile = docSnap.data();
                     if (adminNameSpan) adminNameSpan.textContent = profile.companyName;
 
+                    if (document.getElementById('tab-button-users')) document.getElementById('tab-button-users').addEventListener('click', () => switchTab('users'));
+                    if (document.getElementById('tab-button-investors')) document.getElementById('tab-button-investors').addEventListener('click', () => switchTab('investors'));
+                    if (document.getElementById('tab-button-inquiries')) document.getElementById('tab-button-inquiries').addEventListener('click', () => switchTab('inquiries'));
+                    if (document.getElementById('tab-button-files')) document.getElementById('tab-button-files').addEventListener('click', () => switchTab('files'));
+                    
                     const usersCollectionRef = collection(db, `/artifacts/${appId}/users`);
                     const usersSnapshot = await getDocs(usersCollectionRef);
                     let totalUsers = 0;
