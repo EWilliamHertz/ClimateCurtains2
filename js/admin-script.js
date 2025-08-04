@@ -292,6 +292,9 @@ async function handleChatSubmit() {
 
     appendMessage(userInput, 'user');
     chatInput.value = '';
+    chatSendButton.disabled = true;
+
+    const thinkingBubble = appendMessage("Thinking...", 'ai', true);
 
     const currentEmail = emailDraftBody.value;
     const prompt = `You are an expert business communication assistant. Your task is to refine an email draft based on user instructions.
@@ -320,25 +323,41 @@ async function handleChatSubmit() {
             }),
         });
 
+        chatHistory.removeChild(thinkingBubble);
+
         if (!response.ok) {
-            throw new Error(`API request failed with status ${response.status}`);
+            const errorData = await response.json();
+            throw new Error(errorData.error.message || `API request failed with status ${response.status}`);
         }
 
         const data = await response.json();
-        const revisedEmail = data.candidates[0].content.parts[0].text;
         
-        emailDraftBody.value = revisedEmail;
-        appendMessage("I've updated the email draft for you. How does it look?", 'ai');
+        if (data.candidates && data.candidates.length > 0) {
+            const revisedEmail = data.candidates[0].content.parts[0].text;
+            emailDraftBody.value = revisedEmail;
+            appendMessage("I've updated the email draft for you based on your instructions. How does it look?", 'ai');
+        } else {
+            throw new Error("No response from AI. The content may have been blocked.");
+        }
 
     } catch (error) {
         console.error('Error with Gemini API:', error);
-        appendMessage("Sorry, I couldn't process that request. Please try again.", 'ai');
+        if (thinkingBubble.parentNode) {
+            chatHistory.removeChild(thinkingBubble);
+        }
+        appendMessage(`Sorry, an error occurred: ${error.message}. Please check your API key and network, then try again.`, 'ai');
+    } finally {
+        chatSendButton.disabled = false;
+        chatInput.focus();
     }
 }
 
-function appendMessage(text, sender) {
+function appendMessage(text, sender, isThinking = false) {
     const messageElement = document.createElement('div');
     messageElement.classList.add('chat-message', sender);
+    if (isThinking) {
+        messageElement.classList.add('thinking');
+    }
     
     const bubbleElement = document.createElement('div');
     bubbleElement.classList.add('message-bubble');
@@ -347,6 +366,8 @@ function appendMessage(text, sender) {
     messageElement.appendChild(bubbleElement);
     chatHistory.appendChild(messageElement);
     chatHistory.scrollTop = chatHistory.scrollHeight;
+    
+    return messageElement;
 }
 
 
