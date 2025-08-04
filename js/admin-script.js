@@ -208,6 +208,79 @@ const investorData = {
 
 let currentInvestor = null;
 
+const emailTemplates = {
+    'Venture Capital Firms': {
+        subject: "Investment Opportunity: ClimateCurtainsAB - Revolutionizing Industrial Energy Efficiency",
+        body: `Dear [Investor Name],
+
+I am writing to you from ClimateCurtainsAB, a Swedish company at the forefront of industrial energy efficiency. We have developed a patented thermal curtain technology that delivers significant energy and cost savings to large-scale industrial clients.
+
+Given [VC Firm Name]'s focus on [VC Focus], we believe our solution aligns perfectly with your investment thesis. Our technology has a proven track record, a strong ROI for clients, and a massive addressable market.
+
+We are currently seeking investment to scale our production and expand our market reach. We would be delighted to share our investor deck and financial model with you.
+
+Would you be available for a brief call next week to discuss this further?
+
+Best regards,
+
+Peter Hertz
+CEO, ClimateCurtainsAB`
+    },
+    'Angel Investors and Syndicates': {
+        subject: "Angel Investment Opportunity: ClimateCurtainsAB - Sustainable Impact & Strong Returns",
+        body: `Dear [Investor Name],
+
+I am Peter Hertz, the founder of ClimateCurtainsAB. We are on a mission to combat industrial energy waste with our innovative thermal curtain technology. Our solution not only saves our clients money but also makes a tangible impact on CO2 emissions.
+
+As a [syndicate/angel investor] with a focus on sustainable technology, we believe our venture presents a compelling opportunity. We have a solid business model, a patented product, and are poised for significant growth.
+
+We are looking for angel investors who share our vision and want to be part of a company with both strong financial returns and a positive environmental impact.
+
+I would welcome the opportunity to discuss our plans with you. Please let me know if you would be open to a brief conversation.
+
+Sincerely,
+
+Peter Hertz
+CEO, ClimateCurtainsAB`
+    },
+    'Corporate Venture Capital (CVC)': {
+        subject: "Strategic Partnership & Investment: ClimateCurtainsAB & [VC Firm Name]",
+        body: `Dear [Investor Name],
+
+I am writing to you from ClimateCurtainsAB to explore a potential strategic partnership and investment opportunity with [VC Firm Name]. Our patented industrial thermal curtains offer a unique solution to reduce energy consumption in large facilities, a challenge that is highly relevant to your industry.
+
+We see a strong synergy between our technology and your company's sustainability goals. A partnership could provide us with invaluable market access and industry expertise, while our solution could enhance your operational efficiency and sustainability credentials.
+
+We are confident that our technology can deliver significant value to your business and would be eager to discuss a pilot project or a strategic investment.
+
+I look forward to hearing from you.
+
+Best regards,
+
+Peter Hertz
+CEO, ClimateCurtainsAB`
+    },
+    'Government Grants and Sustainable Funding Programs': {
+        subject: "Application for [specific grant program]: ClimateCurtainsAB - Innovative Energy-Saving Technology",
+        body: `Dear Sir/Madam,
+
+On behalf of ClimateCurtainsAB, I am writing to express our strong interest in the [specific grant program]. As a Swedish company dedicated to climate solutions, our mission aligns perfectly with the goals of this program.
+
+Our patented industrial thermal curtains are a game-changing innovation that addresses the urgent need for energy efficiency in the industrial sector. Our technology helps businesses significantly reduce their energy consumption and CO2 footprint, contributing directly to [specific policy goal, e.g., "energy efficiency targets" or "carbon reduction commitments"].
+
+We have a scalable business model and a clear plan for market expansion. Funding from this program would be instrumental in accelerating our growth and maximizing our environmental impact.
+
+We have attached our full proposal for your review and would be honored to be considered for this grant.
+
+Thank you for your time and consideration.
+
+Sincerely,
+
+Peter Hertz
+CEO, ClimateCurtainsAB`
+    }
+};
+
 // Function to open the email drafting modal
 function openModal(category, investor) {
     const template = emailTemplates[category];
@@ -325,6 +398,7 @@ async function handleAdminPage() {
                                     <p><strong>Website:</strong> <a href="${investor.website}" target="_blank">${investor.website}</a></p>
                                     <p><strong>Focus:</strong> ${investor.focus}</p>
                                     <p><strong>Relevance:</strong> ${investor.relevance}</p>
+                                    <button onclick="openModal('${category}', ${JSON.stringify(investor).replace(/"/g, "'")})" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200 mt-2">Draft Email</button>
                                 `;
                                 investorListGrid.appendChild(card);
                             });
