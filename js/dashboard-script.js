@@ -9,13 +9,8 @@ import {
 import {
     getFirestore,
     doc,
-    onSnapshot,
-    collection,
-    getDocs
+    onSnapshot
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
-import {
-    getStorage
-} from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js';
 
 // Firebase configuration from the user
 const firebaseConfig = {
@@ -31,7 +26,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
 // DOM elements
 const messageBox = document.getElementById('message-box');
@@ -39,8 +33,6 @@ const loadingSpinner = document.getElementById('loading');
 const dashboardView = document.getElementById('dashboard-view');
 const welcomeMessage = document.getElementById('welcome-message');
 const logoutButton = document.getElementById('logout-button');
-const investorResourcesSection = document.getElementById('investor-resources');
-const investorFilesList = document.getElementById('investor-files-list');
 
 // Helper function to show messages
 function showMessage(msg, isError = false) {
@@ -57,7 +49,6 @@ function showMessage(msg, isError = false) {
 async function handleDashboardPage() {
     onAuthStateChanged(auth, async (user) => {
         if (user && !user.isAnonymous) {
-            // *** FIXED: Simplified the path to the user profile document ***
             const docRef = doc(db, 'users', user.uid);
             const unsubscribe = onSnapshot(docRef, async (docSnap) => {
                 if (docSnap.exists()) {
@@ -66,12 +57,11 @@ async function handleDashboardPage() {
 
                     const profile = docSnap.data();
                     if (welcomeMessage) welcomeMessage.textContent = `Welcome, ${profile.companyName}!`;
-                    // ... (rest of the profile display logic remains the same)
+                    // You can add more dashboard population logic here if needed
 
                 } else {
-                    // Profile doesn't exist, something is wrong.
                     showMessage("User profile not found. Please contact support.", true);
-                    signOut(auth); // Sign out and redirect
+                    signOut(auth);
                 }
             }, (error) => {
                 console.error("Error fetching user profile:", error);
@@ -80,7 +70,6 @@ async function handleDashboardPage() {
             });
             window.addEventListener('beforeunload', () => unsubscribe());
         } else {
-            // No user is signed in, redirect to the portal.
             if (!window.location.pathname.includes('portal.html')) {
                 window.location.href = 'portal.html';
             }
@@ -88,13 +77,10 @@ async function handleDashboardPage() {
     });
 }
 
-
-// Logout functionality
 if (logoutButton) {
     logoutButton.addEventListener('click', async () => {
         try {
             await signOut(auth);
-            // The onAuthStateChanged listener will handle the redirect to portal.html
         } catch (error) {
             console.error("Logout failed:", error);
             showMessage(`Logout failed: ${error.message}`, true);
@@ -102,7 +88,6 @@ if (logoutButton) {
     });
 }
 
-// Initialize the correct page logic based on URL
 document.addEventListener('DOMContentLoaded', () => {
     handleDashboardPage();
-});    
+});
