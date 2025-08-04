@@ -1,4 +1,3 @@
-
 import {
     initializeApp
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js';
@@ -212,102 +211,95 @@ window.switchTab = (tabName) => {
     document.getElementById(`${tabName}-tab-content`).classList.remove('hidden');
 };
 
+// Admin page specific logic
 async function handleAdminPage() {
-    const userIsLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
-    const userIsAdmin = localStorage.getItem('userIsAdmin') === 'true';
-
-    if (!userIsLoggedIn || !userIsAdmin) {
-        window.location.href = 'portal.html';
-        return;
-    }
-
-    if (loadingSpinner) loadingSpinner.classList.remove('hidden');
-
     onAuthStateChanged(auth, async (user) => {
         if (user && !user.isAnonymous) {
             const userProfileRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles`, 'profile');
-            const unsubscribeProfile = onSnapshot(userProfileRef, (docSnap) => {
-                if (docSnap.exists()) {
+            const unsubscribeProfile = onSnapshot(userProfileRef, async (docSnap) => {
+                if (docSnap.exists() && docSnap.data().isAdmin) {
                     const profile = docSnap.data();
                     if (adminNameSpan) adminNameSpan.textContent = profile.companyName;
-                }
-            });
 
-            // Fetch and display all users
-            const usersCollectionRef = collection(db, `/artifacts/${appId}/users`);
-            const usersSnapshot = await getDocs(usersCollectionRef);
-            let totalUsers = 0;
-            let totalCompanies = new Set();
-            userListTableBody.innerHTML = ''; // Clear table before populating
+                    // Fetch and display all users
+                    const usersCollectionRef = collection(db, `/artifacts/${appId}/users`);
+                    const usersSnapshot = await getDocs(usersCollectionRef);
+                    let totalUsers = 0;
+                    let totalCompanies = new Set();
+                    userListTableBody.innerHTML = ''; // Clear table before populating
 
-            usersSnapshot.forEach(async userDoc => {
-                const profileDocRef = doc(db, userDoc.ref.path, 'user_profiles/profile');
-                const profileDocSnap = await getDoc(profileDocRef);
-                if (profileDocSnap.exists()) {
-                    const profile = profileDocSnap.data();
-                    // We can't list all user emails directly, so we use the user's display name if available, or the company name.
-                    const userEmail = profile.email || 'N/A';
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${profile.companyName || 'N/A'}</td>
-                        <td>${userEmail}</td>
-                        <td>${profile.roleInCompany || 'N/A'}</td>
-                        <td>${profile.squareMeterInFactory || 'N/A'}</td>
-                        <td>${profile.isInvestor ? 'Yes' : 'No'}</td>
-                        <td>${userDoc.id}</td>
-                    `;
-                    userListTableBody.appendChild(tr);
+                    for (const userDoc of usersSnapshot.docs) {
+                        const profileDocRef = doc(db, userDoc.ref.path, 'user_profiles/profile');
+                        const profileDocSnap = await getDoc(profileDocRef);
+                        if (profileDocSnap.exists()) {
+                            const userProfile = profileDocSnap.data();
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td>${userProfile.companyName || 'N/A'}</td>
+                                <td>${userProfile.email || 'N/A'}</td>
+                                <td>${userProfile.roleInCompany || 'N/A'}</td>
+                                <td>${userProfile.squareMeterInFactory || 'N/A'}</td>
+                                <td>${userProfile.isInvestor ? 'Yes' : 'No'}</td>
+                                <td>${userDoc.id}</td>
+                            `;
+                            userListTableBody.appendChild(tr);
 
-                    totalUsers++;
-                    totalCompanies.add(profile.companyName);
-                }
-            });
+                            totalUsers++;
+                            totalCompanies.add(userProfile.companyName);
+                        }
+                    }
 
-            if (totalUsersElem) totalUsersElem.textContent = totalUsers;
-            if (registeredCompaniesElem) registeredCompaniesElem.textContent = totalCompanies.size;
+                    if (totalUsersElem) totalUsersElem.textContent = totalUsers;
+                    if (registeredCompaniesElem) registeredCompaniesElem.textContent = totalCompanies.size;
 
-            // Populate investor list
-            if (investorListGrid) {
-                investorListGrid.innerHTML = ''; // Clear existing content
-                for (const category in investorData) {
-                    investorData[category].forEach(investor => {
-                        const card = document.createElement('div');
-                        card.className = 'investor-card';
-                        card.innerHTML = `
-                            <h3>${investor.contact.split(',')[0]}</h3>
-                            <p><strong>Contact:</strong> ${investor.contact}</p>
-                            <p><strong>Email:</strong> <a href="mailto:${investor.email}">${investor.email}</a></p>
-                            <p><strong>Website:</strong> <a href="${investor.website}" target="_blank">${investor.website}</a></p>
-                            <p><strong>Focus:</strong> ${investor.focus}</p>
-                            <p><strong>Relevance:</strong> ${investor.relevance}</p>
+                    // Populate investor list
+                    if (investorListGrid) {
+                        investorListGrid.innerHTML = ''; // Clear existing content
+                        for (const category in investorData) {
+                            investorData[category].forEach(investor => {
+                                const card = document.createElement('div');
+                                card.className = 'investor-card';
+                                card.innerHTML = `
+                                    <h3>${investor.contact.split(',')[0]}</h3>
+                                    <p><strong>Contact:</strong> ${investor.contact}</p>
+                                    <p><strong>Email:</strong> <a href="mailto:${investor.email}">${investor.email}</a></p>
+                                    <p><strong>Website:</strong> <a href="${investor.website}" target="_blank">${investor.website}</a></p>
+                                    <p><strong>Focus:</strong> ${investor.focus}</p>
+                                    <p><strong>Relevance:</strong> ${investor.relevance}</p>
+                                `;
+                                investorListGrid.appendChild(card);
+                            });
+                        }
+                    }
+
+                    // Dummy inquiry data for now
+                    if (inquiryListTableBody) {
+                        inquiryListTableBody.innerHTML = `
+                            <tr>
+                                <td>2025-08-03</td>
+                                <td>Northvolt</td>
+                                <td>Quote Request from Calculator</td>
+                                <td>New</td>
+                                <td><a href="#">View</a></td>
+                            </tr>
+                            <tr>
+                                <td>2025-08-02</td>
+                                <td>Dongguan Zhuohaoyang PKG Co., Ltd</td>
+                                <td>General Inquiry</td>
+                                <td>In Progress</td>
+                                <td><a href="#">View</a></td>
+                            </tr>
                         `;
-                        investorListGrid.appendChild(card);
-                    });
-                }
-            }
+                        if (totalInquiriesElem) totalInquiriesElem.textContent = 2; // Placeholder
+                    }
+                    
+                    if (loadingSpinner) loadingSpinner.classList.add('hidden');
+                    document.querySelector('.admin-dashboard').classList.remove('hidden');
 
-            // Dummy inquiry data for now
-            if (inquiryListTableBody) {
-                inquiryListTableBody.innerHTML = `
-                    <tr>
-                        <td>2025-08-03</td>
-                        <td>Northvolt</td>
-                        <td>Quote Request from Calculator</td>
-                        <td>New</td>
-                        <td><a href="#">View</a></td>
-                    </tr>
-                    <tr>
-                        <td>2025-08-02</td>
-                        <td>Dongguan Zhuohaoyang PKG Co., Ltd</td>
-                        <td>General Inquiry</td>
-                        <td>In Progress</td>
-                        <td><a href="#">View</a></td>
-                    </tr>
-                `;
-                if (totalInquiriesElem) totalInquiriesElem.textContent = 2; // Placeholder
-            }
-        
-            if (loadingSpinner) loadingSpinner.classList.add('hidden');
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+            });
         } else {
             window.location.href = 'portal.html';
         }
@@ -330,7 +322,6 @@ async function handleAdminPage() {
     }
 }
 
-// Initialize admin page logic
 document.addEventListener('DOMContentLoaded', () => {
     handleAdminPage();
 });
