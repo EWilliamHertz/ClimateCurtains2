@@ -13,7 +13,7 @@ import {
     collection,
     getDocs,
     addDoc,
-    serverTimestamp
+    serverTimestamp, getDoc
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
 import {
     getStorage,
@@ -301,7 +301,7 @@ async function handleAdminPage() {
                              try {
                                  await uploadBytes(storageRef, file);
                                  const downloadURL = await getDownloadURL(storageRef);
-                                 await addDoc(collection(db, `/artifacts/${appId}/public/investor_files`), {
+                                 await addDoc(collection(db, `/artifacts/${appId}/investor_files`), {
                                      fileName: file.name,
                                      downloadURL: downloadURL,
                                      uploadedAt: serverTimestamp()
@@ -316,7 +316,7 @@ async function handleAdminPage() {
                     }
 
                     // Fetch and display uploaded files
-                    const filesCollectionRef = collection(db, `/artifacts/${appId}/public/investor_files`);
+                    const filesCollectionRef = collection(db, `/artifacts/${appId}/investor_files`);
                     if(uploadedFilesTableBody) {
                       onSnapshot(filesCollectionRef, (snapshot) => {
                           uploadedFilesTableBody.innerHTML = '';
