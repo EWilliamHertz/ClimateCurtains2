@@ -23,6 +23,10 @@ import {
     getDownloadURL
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js';
 
+// --- Gemini API Configuration ---
+const GEMINI_API_KEY = "AIzaSyBQeLMNbrjf8RPO01wipxS0JrWNyTv9az0";
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+
 // Firebase configuration from the user
 const firebaseConfig = {
     apiKey: "AIzaSyB7_Tdz7SGtcj-qN8Ro7uAmoVrPyuR5cqc",
@@ -58,7 +62,9 @@ const emailModal = document.getElementById('email-modal');
 const investorNameModal = document.getElementById('investor-name-modal');
 const emailDraftBody = document.getElementById('email-draft-body');
 const sendEmailLink = document.getElementById('send-email-link');
-const addInvestorForm = document.getElementById('add-investor-form');
+const chatHistory = document.getElementById('chat-history');
+const chatInput = document.getElementById('chat-input');
+const chatSendButton = document.getElementById('chat-send-button');
 
 // Investor data (hardcoded for now)
 const investorData = {
@@ -206,8 +212,6 @@ const investorData = {
     }]
 };
 
-let currentInvestor = null;
-
 const emailTemplates = {
     'Venture Capital Firms': {
         subject: "Investment Opportunity: ClimateCurtainsAB - Revolutionizing Industrial Energy Efficiency",
@@ -281,7 +285,73 @@ CEO, ClimateCurtainsAB`
     }
 };
 
-// Function to open the email drafting modal
+// --- Gemini Chat Functions ---
+async function handleChatSubmit() {
+    const userInput = chatInput.value.trim();
+    if (!userInput) return;
+
+    appendMessage(userInput, 'user');
+    chatInput.value = '';
+
+    const currentEmail = emailDraftBody.value;
+    const prompt = `You are an expert business communication assistant. Your task is to refine an email draft based on user instructions.
+    
+    Current Email Draft:
+    ---
+    ${currentEmail}
+    ---
+    
+    User's instruction: "${userInput}"
+    
+    Based on the instruction, please provide a revised version of the email. Only output the full, revised email text, without any additional comments or explanations.`;
+
+    try {
+        const response = await fetch(GEMINI_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: prompt
+                    }]
+                }]
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`API request failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+        const revisedEmail = data.candidates[0].content.parts[0].text;
+        
+        emailDraftBody.value = revisedEmail;
+        appendMessage("I've updated the email draft for you. How does it look?", 'ai');
+
+    } catch (error) {
+        console.error('Error with Gemini API:', error);
+        appendMessage("Sorry, I couldn't process that request. Please try again.", 'ai');
+    }
+}
+
+function appendMessage(text, sender) {
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('chat-message', sender);
+    
+    const bubbleElement = document.createElement('div');
+    bubbleElement.classList.add('message-bubble');
+    bubbleElement.textContent = text;
+    
+    messageElement.appendChild(bubbleElement);
+    chatHistory.appendChild(messageElement);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+}
+
+
+// --- Core Admin Functions ---
+
 function openModal(category, investor) {
     const template = emailTemplates[category];
     if (!template) {
@@ -289,7 +359,6 @@ function openModal(category, investor) {
         return;
     }
     
-    // Dynamic content for the email draft
     const recipientName = investor.contact.split(',')[0].trim();
     const companyName = category.includes('Venture Capital') ? category : investor.contact.split(',')[1] ? investor.contact.split(',')[1].trim() : category;
     
@@ -301,21 +370,25 @@ function openModal(category, investor) {
                              .replace(/\[specific grant program\]/g, 'EIC Accelerator')
                              .replace(/\[specific policy goal, e.g., "energy efficiency targets" or "carbon reduction commitments"\]/g, 'energy efficiency targets');
 
-    // Populate the modal
     investorNameModal.textContent = recipientName;
     emailDraftBody.value = body;
     sendEmailLink.href = `mailto:${investor.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    
+    // Reset chat history
+    chatHistory.innerHTML = `
+        <div class="chat-message ai">
+            <div class="message-bubble">Hello! I can help you tailor this email to ${recipientName}. What would you like to change or add?</div>
+        </div>`;
+    
     emailModal.style.display = "block";
 }
 window.openModal = openModal;
 
-// Function to close the modal
 function closeModal() {
     emailModal.style.display = "none";
 }
 window.closeModal = closeModal;
 
-// Helper function to show messages
 function showMessage(msg, isError = false) {
     if (!messageBox) return;
     messageBox.textContent = msg;
@@ -326,7 +399,6 @@ function showMessage(msg, isError = false) {
     }, 5000);
 }
 
-// Tab switching logic
 window.switchTab = (tabName) => {
     const tabs = document.querySelectorAll('.tabs button');
     tabs.forEach(tab => tab.classList.remove('active'));
@@ -422,8 +494,6 @@ async function handleAdminPage() {
                     await fetchUsers();
                     await fetchInquiries();
 
-                    // The rest of your admin functions (investor list, file management) can remain here
-                    // Populate investor list
                     if (investorListGrid) {
                         investorListGrid.innerHTML = '';
                         for (const category in investorData) {
@@ -448,7 +518,6 @@ async function handleAdminPage() {
                         }
                     }
 
-                    // Handle file upload
                     if (fileUploadForm) {
                          fileUploadForm.addEventListener('submit', async (e) => {
                              e.preventDefault();
@@ -476,7 +545,6 @@ async function handleAdminPage() {
                          });
                     }
 
-                    // Fetch and display uploaded files
                     const filesCollectionRef = collection(db, 'public', 'investor_files');
                     if(uploadedFilesTableBody) {
                       onSnapshot(filesCollectionRef, (snapshot) => {
@@ -496,7 +564,6 @@ async function handleAdminPage() {
                     }
 
                 } else {
-                    // Not an admin or profile doesn't exist
                     window.location.href = 'portal.html';
                 }
             } catch (error) {
@@ -504,12 +571,10 @@ async function handleAdminPage() {
                 window.location.href = 'portal.html';
             }
         } else {
-            // No user logged in
             window.location.href = 'portal.html';
         }
     });
 
-    // Logout functionality for admin page
     if (logoutButton) {
         logoutButton.addEventListener('click', async () => {
             try {
@@ -521,6 +586,17 @@ async function handleAdminPage() {
             } catch (error) {
                 console.error("Logout failed:", error);
                 showMessage(`Logout failed: ${error.message}`, true);
+            }
+        });
+    }
+
+    if (chatSendButton) {
+        chatSendButton.addEventListener('click', handleChatSubmit);
+    }
+    if (chatInput) {
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleChatSubmit();
             }
         });
     }
