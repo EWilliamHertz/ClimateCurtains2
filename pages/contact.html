@@ -12,15 +12,9 @@
     <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js" type="module"></script>
     <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js" type="module"></script>
     <style>
-        .contact-section .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-        .contact-grid {
-            text-align: left; /* Keep form labels and info left-aligned within the grid */
+        /* This style is to accommodate the message box */
+        main {
+            position: relative;
         }
     </style>
 </head>
@@ -64,7 +58,7 @@
 
         <section class="contact-section">
             <div class="container">
-                <div id="message-box" class="fixed top-24 left-1/2 -translate-x-1/2 bg-green-500 text-white p-4 rounded-lg shadow-xl z-50 hidden"></div>
+                 <div id="message-box" style="position: absolute; top: 1rem; left: 50%; transform: translateX(-50%); background-color: #4CAF50; color: white; padding: 1rem 2rem; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1001; display: none;"></div>
                 <div class="contact-grid">
                     <div class="contact-info">
                         <h3>Contact Information</h3>
@@ -214,10 +208,11 @@
         function showMessage(msg, isError = false) {
             if (!messageBox) return;
             messageBox.textContent = msg;
-            messageBox.classList.remove('hidden', 'bg-red-500');
-            messageBox.classList.add(isError ? 'bg-red-500' : 'bg-green-500');
+            messageBox.style.backgroundColor = isError ? '#f44336' : '#4CAF50';
+            messageBox.style.display = 'block';
+
             setTimeout(() => {
-                messageBox.classList.add('hidden');
+                messageBox.style.display = 'none';
             }, 5000);
         }
 
