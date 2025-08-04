@@ -8,8 +8,6 @@
     <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js" type="module"></script>
     <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js" type="module"></script>
     <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js" type="module"></script>
-    <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js" type="module"></script>
-    <!-- Add Tailwind CSS for modern styling -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
@@ -44,7 +42,7 @@
             <div id="message-box" class="fixed top-4 left-1/2 -translate-x-1/2 bg-green-500 text-white p-4 rounded-lg shadow-xl z-50 hidden"></div>
             
             <!-- Loading Spinner -->
-            <div id="loading" class="text-center hidden">
+            <div id="loading" class="text-center">
                 <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-500"></div>
                 <p class="mt-4 text-gray-600">Connecting to database...</p>
             </div>
@@ -100,10 +98,10 @@
                 </form>
 
                 <div class="mt-4 text-center">
-                    <p id="toggle-auth">Don't have an account? <span class="text-green-500 cursor-pointer hover:underline" onclick="toggleView('register')">Register here</span></p>
+                    <p id="toggle-auth">Don't have an account? <span id="toggle-register-link" class="text-green-500 cursor-pointer hover:underline">Register here</span></p>
                 </div>
             </div>
-
+            
             <!-- Dashboard View (hidden by default) -->
             <div id="dashboard-view" class="w-full max-w-2xl bg-white p-8 rounded-xl shadow-lg border border-gray-200 hidden">
                 <h1 id="welcome-message" class="text-3xl font-bold text-center text-green-700 mb-6"></h1>
