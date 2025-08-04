@@ -340,31 +340,78 @@ window.switchTab = (tabName) => {
 };
 
 async function fetchInquiries() {
-    const inquiriesCollectionRef = collection(db, `/artifacts/${appId}/inquiries`);
-    const inquiriesSnapshot = await getDocs(inquiriesCollectionRef);
-    if (inquiryListTableBody) inquiryListTableBody.innerHTML = '';
-    let inquiryCount = 0;
-    for (const inquiryDoc of inquiriesSnapshot.docs) {
-        const inquiryData = inquiryDoc.data();
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${inquiryData.timestamp ? new Date(inquiryData.timestamp.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
-            <td>${inquiryData.company || 'N/A'}</td>
-            <td>${inquiryData.subject || 'N/A'}</td>
-            <td>${inquiryData.status || 'New'}</td>
-            <td><a href="#">View</a></td>
-        `;
-        inquiryListTableBody.appendChild(tr);
-        inquiryCount++;
+    try {
+        const inquiriesCollectionRef = collection(db, 'inquiries');
+        const inquiriesSnapshot = await getDocs(inquiriesCollectionRef);
+        if (inquiryListTableBody) inquiryListTableBody.innerHTML = '';
+        let inquiryCount = 0;
+        inquiriesSnapshot.forEach(inquiryDoc => {
+            const inquiryData = inquiryDoc.data();
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${inquiryData.timestamp ? new Date(inquiryData.timestamp.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
+                <td>${inquiryData.company || inquiryData.name || 'N/A'}</td>
+                <td>${inquiryData.subject || 'N/A'}</td>
+                <td>${inquiryData.status || 'New'}</td>
+                <td><a href="#">View</a></td>
+            `;
+            inquiryListTableBody.appendChild(tr);
+            inquiryCount++;
+        });
+        if (totalInquiriesElem) totalInquiriesElem.textContent = inquiryCount;
+    } catch (error) {
+        console.error("Error fetching inquiries:", error);
     }
-    if (totalInquiriesElem) totalInquiriesElem.textContent = inquiryCount;
+}
+
+async function fetchUsers() {
+    try {
+        const usersCollectionRef = collection(db, 'users');
+        const usersSnapshot = await getDocs(usersCollectionRef);
+        let totalUsers = 0;
+        const companyNames = new Set();
+        if (userListTableBody) userListTableBody.innerHTML = '';
+        
+        for (const userDoc of usersSnapshot.docs) {
+            const profileDocRef = doc(db, 'users', userDoc.id, 'user_profiles', 'profile');
+            const profileDocSnap = await getDoc(profileDocRef);
+            
+            if (profileDocSnap.exists()) {
+                const userProfile = profileDocSnap.data();
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${userProfile.companyName || 'N/A'}</td>
+                    <td>${userProfile.firstName || 'N/A'}</td>
+                    <td>${userProfile.lastName || 'N/A'}</td>
+                    <td>${userProfile.email || 'N/A'}</td>
+                    <td>${userProfile.roleInCompany || 'N/A'}</td>
+                    <td>${userProfile.squareMeterInFactory || 'N/A'}</td>
+                    <td>${userProfile.isInvestor ? 'Yes' : 'No'}</td>
+                    <td>${userDoc.id}</td>
+                `;
+                userListTableBody.appendChild(tr);
+                totalUsers++;
+                if (userProfile.companyName) {
+                    companyNames.add(userProfile.companyName);
+                }
+            }
+        }
+        
+        if (totalUsersElem) totalUsersElem.textContent = totalUsers;
+        if (registeredCompaniesElem) registeredCompaniesElem.textContent = companyNames.size;
+    } catch (error) {
+        console.error("Error fetching users:", error);
+        if (totalUsersElem) totalUsersElem.textContent = 'Error';
+        if (registeredCompaniesElem) registeredCompaniesElem.textContent = 'Error';
+    }
 }
 
 async function handleAdminPage() {
     onAuthStateChanged(auth, async (user) => {
         if (user && !user.isAnonymous) {
-            const userProfileRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles`, 'profile');
-            onSnapshot(userProfileRef, async (docSnap) => {
+            const userProfileRef = doc(db, 'users', user.uid, 'user_profiles', 'profile');
+            try {
+                const docSnap = await getDoc(userProfileRef);
                 if (docSnap.exists() && docSnap.data().isAdmin) {
                     if (loadingSpinner) loadingSpinner.classList.add('hidden');
                     if (adminDashboardSection) adminDashboardSection.classList.remove('hidden');
@@ -372,38 +419,10 @@ async function handleAdminPage() {
                     const profile = docSnap.data();
                     if (adminNameSpan) adminNameSpan.textContent = profile.companyName;
 
-                    // Fetch and display all users
-                    const usersCollectionRef = collection(db, `/artifacts/${appId}/users`);
-                    const usersSnapshot = await getDocs(usersCollectionRef);
-                    let totalUsers = 0;
-                    let totalCompanies = new Set();
-                    if (userListTableBody) userListTableBody.innerHTML = '';
+                    await fetchUsers();
+                    await fetchInquiries();
 
-                    for (const userDoc of usersSnapshot.docs) {
-                        const profileDocRef = doc(db, userDoc.ref.path, 'user_profiles/profile');
-                        const profileDocSnap = await getDoc(profileDocRef);
-                        if (profileDocSnap.exists()) {
-                            const userProfile = profileDocSnap.data();
-                            const tr = document.createElement('tr');
-                            tr.innerHTML = `
-                                <td>${userProfile.companyName || 'N/A'}</td>
-                                <td>${userProfile.firstName || 'N/A'}</td>
-                                <td>${userProfile.lastName || 'N/A'}</td>
-                                <td>${userProfile.email || 'N/A'}</td>
-                                <td>${userProfile.roleInCompany || 'N/A'}</td>
-                                <td>${userProfile.squareMeterInFactory || 'N/A'}</td>
-                                <td>${userProfile.isInvestor ? 'Yes' : 'No'}</td>
-                                <td>${userDoc.id}</td>
-                            `;
-                            userListTableBody.appendChild(tr);
-                            totalUsers++;
-                            totalCompanies.add(userProfile.companyName);
-                        }
-                    }
-
-                    if (totalUsersElem) totalUsersElem.textContent = totalUsers;
-                    if (registeredCompaniesElem) registeredCompaniesElem.textContent = totalCompanies.size;
-
+                    // The rest of your admin functions (investor list, file management) can remain here
                     // Populate investor list
                     if (investorListGrid) {
                         investorListGrid.innerHTML = '';
@@ -428,8 +447,6 @@ async function handleAdminPage() {
                             });
                         }
                     }
-                    
-                    await fetchInquiries();
 
                     // Handle file upload
                     if (fileUploadForm) {
@@ -445,7 +462,7 @@ async function handleAdminPage() {
                              try {
                                  await uploadBytes(storageRef, file);
                                  const downloadURL = await getDownloadURL(storageRef);
-                                 await addDoc(collection(db, `/artifacts/${appId}/public/investor_files`), {
+                                 await addDoc(collection(db, 'public', 'investor_files'), {
                                      fileName: file.name,
                                      downloadURL: downloadURL,
                                      uploadedAt: serverTimestamp()
@@ -460,7 +477,7 @@ async function handleAdminPage() {
                     }
 
                     // Fetch and display uploaded files
-                    const filesCollectionRef = collection(db, `/artifacts/${appId}/public/investor_files`);
+                    const filesCollectionRef = collection(db, 'public', 'investor_files');
                     if(uploadedFilesTableBody) {
                       onSnapshot(filesCollectionRef, (snapshot) => {
                           uploadedFilesTableBody.innerHTML = '';
@@ -477,11 +494,17 @@ async function handleAdminPage() {
                           });
                       });
                     }
+
                 } else {
-                    window.location.href = 'dashboard.html';
+                    // Not an admin or profile doesn't exist
+                    window.location.href = 'portal.html';
                 }
-            });
+            } catch (error) {
+                console.error("Error checking admin status:", error);
+                window.location.href = 'portal.html';
+            }
         } else {
+            // No user logged in
             window.location.href = 'portal.html';
         }
     });
