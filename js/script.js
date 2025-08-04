@@ -27,6 +27,35 @@ import {
     getDownloadURL
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js';
 
+// --- Hamburger Menu ---
+const hamburger = document.querySelector('.hamburger');
+const navLinks = document.querySelector('.nav-links');
+
+if (hamburger) {
+    hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navLinks.classList.toggle('active');
+    });
+}
+
+// --- Back to Top Button ---
+const backToTopButton = document.getElementById('back-to-top');
+
+if (backToTopButton) {
+    window.onscroll = function() {
+        if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+            backToTopButton.style.display = "block";
+        } else {
+            backToTopButton.style.display = "none";
+        }
+    };
+
+    backToTopButton.addEventListener('click', () => {
+        document.body.scrollTop = 0; // For Safari
+        document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+    });
+}
+
 // Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyB7_Tdz7SGtcj-qN8Ro7uAmoVrPyuR5cqc",
@@ -254,7 +283,7 @@ function handleAuthForms() {
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-                const docRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles`, 'profile');
+                const docRef = doc(db, 'users', user.uid, 'user_profiles', 'profile');
                 const docSnap = await getDoc(docRef);
                 let isAdmin = false;
                 if (docSnap.exists()) {
@@ -292,7 +321,7 @@ function handleAuthForms() {
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const newUser = userCredential.user;
-                const userProfileRef = doc(db, `/artifacts/${appId}/users/${newUser.uid}/user_profiles`, 'profile');
+                const userProfileRef = doc(db, 'users', newUser.uid, 'user_profiles', 'profile');
                 const isAdmin = email === 'ernst@hatake.eu';
                 await setDoc(userProfileRef, {
                     email,
@@ -326,7 +355,7 @@ function handleAuthForms() {
 function handlePortalPage() {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            const docRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles`, 'profile');
+            const docRef = doc(db, 'users', user.uid, 'user_profiles', 'profile');
             const docSnap = await getDoc(docRef);
             if (docSnap.exists() && !user.isAnonymous) {
                 if (docSnap.data().isAdmin) {
@@ -362,7 +391,7 @@ function handleDashboardPage() {
 
     onAuthStateChanged(auth, async (user) => {
         if (user && !user.isAnonymous) {
-            const docRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles`, 'profile');
+            const docRef = doc(db, 'users', user.uid, 'user_profiles', 'profile');
             const unsubscribe = onSnapshot(docRef, async (docSnap) => {
                 if (docSnap.exists()) {
                     const profile = docSnap.data();
@@ -380,7 +409,7 @@ function handleDashboardPage() {
                     
                     if (profile.isInvestor && investorResourcesSection) {
                         investorResourcesSection.classList.remove('hidden');
-                        const filesCollectionRef = collection(db, `/artifacts/${appId}/public/investor_files`);
+                        const filesCollectionRef = collection(db, 'public', 'investor_files');
                         const filesSnapshot = await getDocs(filesCollectionRef);
                         if (investorFilesList) {
                             investorFilesList.innerHTML = '';
@@ -430,38 +459,36 @@ function handleDashboardPage() {
 
 // Logic for admin.html
 function handleAdminPage() {
-    const userIsLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
-    const userIsAdmin = localStorage.getItem('userIsAdmin') === 'true';
-
-    if (!userIsLoggedIn || !userIsAdmin) {
-        window.location.href = 'portal.html';
-        return;
-    }
-
-    if (loadingSpinner) loadingSpinner.classList.remove('hidden');
-
     onAuthStateChanged(auth, async (user) => {
         if (user && !user.isAnonymous) {
-            const userProfileRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles`, 'profile');
-            onSnapshot(userProfileRef, async (docSnap) => {
+            const userProfileRef = doc(db, 'users', user.uid, 'user_profiles', 'profile');
+            try {
+                const docSnap = await getDoc(userProfileRef);
                 if (docSnap.exists() && docSnap.data().isAdmin) {
+                    if (loadingSpinner) loadingSpinner.classList.add('hidden');
+                    if (adminDashboardSection) adminDashboardSection.classList.remove('hidden');
+
                     const profile = docSnap.data();
                     if (adminNameSpan) adminNameSpan.textContent = profile.companyName;
 
-                    const usersCollectionRef = collection(db, `/artifacts/${appId}/users`);
+                    // Fetch and display all users
+                    const usersCollectionRef = collection(db, 'users');
                     const usersSnapshot = await getDocs(usersCollectionRef);
                     let totalUsers = 0;
-                    let totalCompanies = new Set();
+                    const companyNames = new Set();
                     if (userListTableBody) userListTableBody.innerHTML = '';
-
+                    
                     for (const userDoc of usersSnapshot.docs) {
-                        const profileDocRef = doc(db, userDoc.ref.path, 'user_profiles/profile');
+                        const profileDocRef = doc(db, 'users', userDoc.id, 'user_profiles', 'profile');
                         const profileDocSnap = await getDoc(profileDocRef);
+                        
                         if (profileDocSnap.exists()) {
                             const userProfile = profileDocSnap.data();
                             const tr = document.createElement('tr');
                             tr.innerHTML = `
                                 <td>${userProfile.companyName || 'N/A'}</td>
+                                <td>${userProfile.firstName || 'N/A'}</td>
+                                <td>${userProfile.lastName || 'N/A'}</td>
                                 <td>${userProfile.email || 'N/A'}</td>
                                 <td>${userProfile.roleInCompany || 'N/A'}</td>
                                 <td>${userProfile.squareMeterInFactory || 'N/A'}</td>
@@ -470,13 +497,16 @@ function handleAdminPage() {
                             `;
                             userListTableBody.appendChild(tr);
                             totalUsers++;
-                            totalCompanies.add(userProfile.companyName);
+                            if (userProfile.companyName) {
+                                companyNames.add(userProfile.companyName);
+                            }
                         }
                     }
-
+                    
                     if (totalUsersElem) totalUsersElem.textContent = totalUsers;
-                    if (registeredCompaniesElem) registeredCompaniesElem.textContent = totalCompanies.size;
+                    if (registeredCompaniesElem) registeredCompaniesElem.textContent = companyNames.size;
 
+                    // Populate investor list
                     if (investorListGrid) {
                         investorListGrid.innerHTML = '';
                         for (const category in investorData) {
@@ -513,7 +543,7 @@ function handleAdminPage() {
                              try {
                                  await uploadBytes(storageRef, file);
                                  const downloadURL = await getDownloadURL(storageRef);
-                                 await addDoc(collection(db, `/artifacts/${appId}/public/investor_files`), {
+                                 await addDoc(collection(db, 'public', 'investor_files'), {
                                      fileName: file.name,
                                      downloadURL: downloadURL,
                                      uploadedAt: serverTimestamp()
@@ -527,7 +557,7 @@ function handleAdminPage() {
                          });
                     }
 
-                    const filesCollectionRef = collection(db, `/artifacts/${appId}/public/investor_files`);
+                    const filesCollectionRef = collection(db, 'public', 'investor_files');
                     if(uploadedFilesTableBody) {
                       onSnapshot(filesCollectionRef, (snapshot) => {
                           uploadedFilesTableBody.innerHTML = '';
@@ -545,36 +575,13 @@ function handleAdminPage() {
                       });
                     }
 
-                    if (inquiryListTableBody) {
-                        inquiryListTableBody.innerHTML = `
-                            <tr>
-                                <td>2025-08-03</td>
-                                <td>Northvolt</td>
-                                <td>Quote Request from Calculator</td>
-                                <td>New</td>
-                                <td><a href="#">View</a></td>
-                            </tr>
-                            <tr>
-                                <td>2025-08-02</td>
-                                <td>Dongguan Zhuohaoyang PKG Co., Ltd</td>
-                                <td>General Inquiry</td>
-                                <td>In Progress</td>
-                                <td><a href="#">View</a></td>
-                            </tr>
-                        `;
-                        if (totalInquiriesElem) totalInquiriesElem.textContent = 2; // Placeholder
-                    }
-                    
-                    if (loadingSpinner) loadingSpinner.classList.add('hidden');
-                    if (adminDashboardSection) adminDashboardSection.classList.remove('hidden');
-
                 } else {
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'portal.html';
                 }
-            }, (error) => {
-                 console.error("Error fetching admin profile:", error);
-                 window.location.href = 'dashboard.html';
-            });
+            } catch (error) {
+                console.error("Error checking admin status:", error);
+                window.location.href = 'portal.html';
+            }
         } else {
             window.location.href = 'portal.html';
         }
@@ -588,7 +595,8 @@ function handleAdminPage() {
                 localStorage.removeItem('userIsAdmin');
                 showMessage("Logged out successfully.");
                 window.location.href = 'portal.html';
-            } catch (error) {
+            } catch (error)
+{
                 console.error("Logout failed:", error);
                 showMessage(`Logout failed: ${error.message}`, true);
             }
