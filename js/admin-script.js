@@ -502,7 +502,8 @@ async function fetchUsers() {
 async function handleAdminPage() {
     onAuthStateChanged(auth, async (user) => {
         if (user && !user.isAnonymous) {
-            const userProfileRef = doc(db, `users/${user.uid}/user_profiles`, 'profile');
+             // Corrected path to user profile
+            const userProfileRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles/`, 'profile');
             try {
                 const docSnap = await getDoc(userProfileRef);
                 if (docSnap.exists() && docSnap.data().isAdmin) {
@@ -553,7 +554,8 @@ async function handleAdminPage() {
                              try {
                                  await uploadBytes(storageRef, file);
                                  const downloadURL = await getDownloadURL(storageRef);
-                                 await addDoc(collection(db, `public/investor_files`), {
+                                 // Corrected path for uploading files
+                                 await addDoc(collection(db, `/artifacts/${appId}/public/investor_files`), {
                                      fileName: file.name,
                                      downloadURL: downloadURL,
                                      uploadedAt: serverTimestamp()
@@ -567,7 +569,8 @@ async function handleAdminPage() {
                          });
                     }
 
-                    const filesCollectionRef = collection(db, `public/investor_files`);
+                     // Corrected path for fetching files
+                    const filesCollectionRef = collection(db, `/artifacts/${appId}/public/investor_files`);
                     if(uploadedFilesTableBody) {
                       onSnapshot(filesCollectionRef, (snapshot) => {
                           uploadedFilesTableBody.innerHTML = '';
@@ -594,7 +597,11 @@ async function handleAdminPage() {
                 }
             } catch (error) {
                 console.error("Error checking admin status:", error);
-                signOut(auth); // Sign out on error and redirect
+                 // If there's an error (e.g., profile not found), sign out and redirect
+                await signOut(auth);
+                if (!window.location.pathname.includes('portal.html')) {
+                    window.location.href = 'portal.html';
+                }
             }
         } else {
             // No user is signed in, redirect to the portal.
