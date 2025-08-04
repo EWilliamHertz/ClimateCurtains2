@@ -69,7 +69,7 @@
         <section class="admin-dashboard">
             <div class="container">
                 <h1>Admin Dashboard</h1>
-                <p>Welcome, Admin. Here is a summary of your website's activity.</p>
+                <p>Welcome, <span id="admin-name">Admin</span>. Here is a summary of your website's activity.</p>
                 <div class="dashboard-grid">
                     <div class="dashboard-card">
                         <h3>Total Users</h3>
@@ -86,9 +86,9 @@
                 </div>
 
                 <div class="tabs">
-                    <button class="active" onclick="switchTab('users')">Registered Users</button>
-                    <button onclick="switchTab('investors')">Investor Mail List</button>
-                    <button onclick="switchTab('inquiries')">Recent Inquiries</button>
+                    <button id="tab-button-users" class="active" onclick="switchTab('users')">Registered Users</button>
+                    <button id="tab-button-investors" onclick="switchTab('investors')">Investor Mail List</button>
+                    <button id="tab-button-inquiries" onclick="switchTab('inquiries')">Recent Inquiries</button>
                 </div>
 
                 <div id="users-tab-content" class="tab-content">
@@ -115,195 +115,8 @@
                 <div id="investors-tab-content" class="tab-content hidden">
                     <h2>Investor Mail List</h2>
                     <p>This is a curated list of potential investors, including VCs, angels, and government programs.</p>
-                    <div class="investor-grid">
-                        <!-- Venture Capital Firms -->
-                        <div class="investor-card">
-                            <h3>2150</h3>
-                            <p><strong>Contact:</strong> Christian Hernandez, Partner</p>
-                            <p><strong>Email:</strong> <a href="mailto:info@2150.vc">info@2150.vc</a></p>
-                            <p><strong>Website:</strong> <a href="https://www.2150.vc" target="_blank">https://www.2150.vc</a></p>
-                            <p><strong>Focus:</strong> Climate tech (environment and urban solutions)</p>
-                            <p><strong>Relevance:</strong> Focuses on technologies that reimagine how cities are designed, constructed, and operated</p>
-                        </div>
-                        <div class="investor-card">
-                            <h3>4impact</h3>
-                            <p><strong>Contact:</strong> Pauline Wink, Managing Partner</p>
-                            <p><strong>Email:</strong> <a href="mailto:info@4impact.vc">info@4impact.vc</a></p>
-                            <p><strong>Website:</strong> <a href="https://www.4impact.vc" target="_blank">https://www.4impact.vc</a></p>
-                            <p><strong>Focus:</strong> Digital tech solutions driving positive social and environmental impact</p>
-                            <p><strong>Relevance:</strong> Backs European tech4good companies tackling environmental challenges</p>
-                        </div>
-                        <div class="investor-card">
-                            <h3>World Fund</h3>
-                            <p><strong>Contact:</strong> Danijel Višević, General Partner</p>
-                            <p><strong>Email:</strong> <a href="mailto:hello@worldfund.vc">hello@worldfund.vc</a></p>
-                            <p><strong>Website:</strong> <a href="https://www.worldfund.vc" target="_blank">https://www.worldfund.vc</a></p>
-                            <p><strong>Focus:</strong> Energy, building materials, manufacturing</p>
-                            <p><strong>Relevance:</strong> Backs entrepreneurs building climate tech that can save significant CO2e emissions</p>
-                        </div>
-                        <div class="investor-card">
-                            <h3>Blume Equity</h3>
-                            <p><strong>Contact:</strong> Investment Team</p>
-                            <p><strong>Email:</strong> <a href="mailto:info@blumeequity.com">info@blumeequity.com</a></p>
-                            <p><strong>Website:</strong> <a href="https://www.blumeequity.com" target="_blank">https://www.blumeequity.com</a></p>
-                            <p><strong>Focus:</strong> Climate tech with proven traction</p>
-                            <p><strong>Relevance:</strong> Backs European companies addressing climate and sustainability challenges</p>
-                        </div>
-                        <div class="investor-card">
-                            <h3>Climate VC</h3>
-                            <p><strong>Contact:</strong> Peet Denny, Founding Partner</p>
-                            <p><strong>Email:</strong> <a href="mailto:hello@climate.vc">hello@climate.vc</a></p>
-                            <p><strong>Website:</strong> <a href="https://www.climate.vc" target="_blank">https://www.climate.vc</a></p>
-                            <p><strong>Focus:</strong> Climate tech startups with gigaton-level impact potential</p>
-                            <p><strong>Relevance:</strong> Focuses on businesses that can reduce significant CO2e per year</p>
-                        </div>
-                        <div class="investor-card">
-                            <h3>Contrarian Ventures</h3>
-                            <p><strong>Contact:</strong> Rokas Peciulaitis, Managing Partner</p>
-                            <p><strong>Email:</strong> <a href="mailto:info@cventures.vc">info@cventures.vc</a></p>
-                            <p><strong>Website:</strong> <a href="https://www.cventures.vc" target="_blank">https://www.cventures.vc</a></p>
-                            <p><strong>Focus:</strong> Climate tech (excluding food and agri)</p>
-                            <p><strong>Relevance:</strong> Invests in early-stage European climate tech startups</p>
-                        </div>
-                        <div class="investor-card">
-                            <h3>Systemiq Capital</h3>
-                            <p><strong>Contact:</strong> Investment Team</p>
-                            <p><strong>Email:</strong> <a href="mailto:capital@systemiq.earth">capital@systemiq.earth</a></p>
-                            <p><strong>Website:</strong> <a href="https://www.systemiqcapital.com" target="_blank">https://www.systemiqcapital.com</a></p>
-                            <p><strong>Focus:</strong> Circular economy, energy transition</p>
-                            <p><strong>Relevance:</strong> Focuses on energy transition technologies</p>
-                        </div>
-                        <div class="investor-card">
-                            <h3>AENU</h3>
-                            <p><strong>Contact:</strong> Investment Team</p>
-                            <p><strong>Email:</strong> <a href="mailto:hello@aenu.com">hello@aenu.com</a></p>
-                            <p><strong>Website:</strong> <a href="https://www.aenu.com" target="_blank">https://www.aenu.com</a></p>
-                            <p><strong>Focus:</strong> Climate tech and social impact startups</p>
-                            <p><strong>Relevance:</strong> Invests in solutions addressing climate challenges</p>
-                        </div>
-                        <div class="investor-card">
-                            <h3>Rockstart Energy</h3>
-                            <p><strong>Contact:</strong> Max ter Horst, Managing Partner</p>
-                            <p><strong>Email:</strong> <a href="mailto:energy@rockstart.com">energy@rockstart.com</a></p>
-                            <p><strong>Website:</strong> <a href="https://www.rockstart.com/energy" target="_blank">https://www.rockstart.com/energy</a></p>
-                            <p><strong>Focus:</strong> Energy transition and emerging tech</p>
-                            <p><strong>Relevance:</strong> Specializes in energy transition technologies</p>
-                        </div>
-                        <div class="investor-card">
-                            <h3>Faber</h3>
-                            <p><strong>Contact:</strong> Investment Team</p>
-                            <p><strong>Email:</strong> <a href="mailto:hello@faber.vc">hello@faber.vc</a></p>
-                            <p><strong>Website:</strong> <a href="https://www.faber.vc" target="_blank">https://www.faber.vc</a></p>
-                            <p><strong>Focus:</strong> Climate tech, digital transformation, sustainability</p>
-                            <p><strong>Relevance:</strong> Invests in climate tech solutions with digital components</p>
-                        </div>
-                        <!-- Angel Investors and Syndicates -->
-                        <div class="investor-card">
-                            <h3>COREangels Climate Fund</h3>
-                            <p><strong>Contact:</strong> Investment Team</p>
-                            <p><strong>Email:</strong> <a href="mailto:climate@coreangels.com">climate@coreangels.com</a></p>
-                            <p><strong>Website:</strong> <a href="https://www.coreangels.com/coreangelsclimate" target="_blank">https://www.coreangels.com/coreangelsclimate</a></p>
-                            <p><strong>Focus:</strong> Climate innovation</p>
-                            <p><strong>Relevance:</strong> Pan-European group of business angels focused on climate tech</p>
-                        </div>
-                        <div class="investor-card">
-                            <h3>Green Angel Syndicate</h3>
-                            <p><strong>Contact:</strong> Nick Lyth, Founder & CEO</p>
-                            <p><strong>Email:</strong> <a href="mailto:enquiries@greenangelsyndicate.com">enquiries@greenangelsyndicate.com</a></p>
-                            <p><strong>Website:</strong> <a href="https://greenangelsyndicate.com" target="_blank">https://greenangelsyndicate.com</a></p>
-                            <p><strong>Focus:</strong> Investments that reduce carbon emissions</p>
-                            <p><strong>Relevance:</strong> UK's only angel syndicate specializing in the fight against climate change</p>
-                        </div>
-                        <div class="investor-card">
-                            <h3>Green Angel Ventures</h3>
-                            <p><strong>Contact:</strong> Investment Team</p>
-                            <p><strong>Email:</strong> <a href="mailto:info@greenangelventures.com">info@greenangelventures.com</a></p>
-                            <p><strong>Website:</strong> <a href="https://greenangelventures.com" target="_blank">https://greenangelventures.com</a></p>
-                            <p><strong>Focus:</strong> Emerging climate tech start-ups</p>
-                            <p><strong>Relevance:</strong> Specializes in early-stage climate startups</p>
-                        </div>
-                        <!-- Corporate Venture Capital (CVC) -->
-                        <div class="investor-card">
-                            <h3>Eneco Ventures</h3>
-                            <p><strong>Contact:</strong> Jordy Klaassen, Investment Manager</p>
-                            <p><strong>Email:</strong> <a href="mailto:ventures@eneco.com">ventures@eneco.com</a></p>
-                            <p><strong>Website:</strong> <a href="https://www.eneco.com/ventures" target="_blank">https://www.eneco.com/ventures</a></p>
-                            <p><strong>Focus:</strong> Energy efficiency, sustainability solutions</p>
-                            <p><strong>Relevance:</strong> Helps startups test propositions and scale through customer base</p>
-                        </div>
-                        <div class="investor-card">
-                            <h3>EDP Ventures</h3>
-                            <p><strong>Contact:</strong> Frederico Gonçalves, Partner & Managing Director</p>
-                            <p><strong>Email:</strong> <a href="mailto:edpventures@edp.com">edpventures@edp.com</a></p>
-                            <p><strong>Website:</strong> <a href="https://www.edpventures.com" target="_blank">https://www.edpventures.com</a></p>
-                            <p><strong>Focus:</strong> Energy efficiency and sustainability solutions</p>
-                            <p><strong>Relevance:</strong> Focuses on strategic collaborations and industry expertise</p>
-                        </div>
-                        <div class="investor-card">
-                            <h3>Siemens Energy Ventures</h3>
-                            <p><strong>Contact:</strong> Kendra Rauschenberger, General Partner</p>
-                            <p><strong>Email:</strong> <a href="mailto:ventures@siemens-energy.com">ventures@siemens-energy.com</a></p>
-                            <p><strong>Website:</strong> <a href="https://www.siemens-energy.com/ventures" target="_blank">https://www.siemens-energy.com/ventures</a></p>
-                            <p><strong>Focus:</strong> Energy technologies</p>
-                            <p><strong>Relevance:</strong> Supports "hard tech" companies with technical expertise</p>
-                        </div>
-                        <div class="investor-card">
-                            <h3>ABB Technology Ventures</h3>
-                            <p><strong>Contact:</strong> Investment Team</p>
-                            <p><strong>Email:</strong> <a href="mailto:ventures@abb.com">ventures@abb.com</a></p>
-                            <p><strong>Website:</strong> <a href="https://new.abb.com/about/technology/ventures" target="_blank">https://new.abb.com/about/technology/ventures</a></p>
-                            <p><strong>Focus:</strong> Energy efficiency and industrial applications</p>
-                            <p><strong>Relevance:</strong> Provides market credibility and expertise in scaling products</p>
-                        </div>
-                        <div class="investor-card">
-                            <h3>Future Energy Ventures</h3>
-                            <p><strong>Contact:</strong> Investment Team</p>
-                            <p><strong>Email:</strong> <a href="mailto:info@futureenergyventures.com">info@futureenergyventures.com</a></p>
-                            <p><strong>Website:</strong> <a href="https://www.futureenergyventures.com" target="_blank">https://www.futureenergyventures.com</a></p>
-                            <p><strong>Focus:</strong> Energy efficiency and sustainability solutions</p>
-                            <p><strong>Relevance:</strong> Brings together corporate partners and startups</p>
-                        </div>
-                        <!-- Government Grants and Sustainable Funding Programs -->
-                        <div class="investor-card">
-                            <h3>European Innovation Council (EIC) Accelerator</h3>
-                            <p><strong>Contact:</strong> EIC Program Officers</p>
-                            <p><strong>Email:</strong> <a href="mailto:EISMEA-EIC-ACCELERATOR-ENQUIRIES@ec.europa.eu">EISMEA-EIC-ACCELERATOR-ENQUIRIES@ec.europa.eu</a></p>
-                            <p><strong>Website:</strong> <a href="https://eic.ec.europa.eu/eic-funding-opportunities/eic-accelerator_en" target="_blank">https://eic.ec.europa.eu/eic-funding-opportunities/eic-accelerator_en</a></p>
-                            <p><strong>Focus:</strong> SMEs developing game-changing innovations</p>
-                            <p><strong>Relevance:</strong> Supports sustainability and climate solutions</p>
-                        </div>
-                        <div class="investor-card">
-                            <h3>Horizon Europe</h3>
-                            <p><strong>Contact:</strong> Program Officers</p>
-                            <p><strong>Email:</strong> <a href="mailto:EC-HORIZON-EUROPE-HELPDESK@ec.europa.eu">EC-HORIZON-EUROPE-HELPDESK@ec.europa.eu</a></p>
-                            <p><strong>Website:</strong> <a href="https://research-and-innovation.ec.europa.eu/funding/funding-opportunities/funding-programmes-and-open-calls/horizon-europe_en" target="_blank">https://research-and-innovation.ec.europa.eu/funding/funding-opportunities/funding-programmes-and-open-calls/horizon-europe_en</a></p>
-                            <p><strong>Focus:</strong> Research and innovation</p>
-                            <p><strong>Relevance:</strong> Significant portion dedicated to climate action</p>
-                        </div>
-                        <div class="investor-card">
-                            <h3>LIFE Programme</h3>
-                            <p><strong>Contact:</strong> LIFE Program Officers</p>
-                            <p><strong>Email:</strong> <a href="mailto:LIFE@ec.europa.eu">LIFE@ec.europa.eu</a></p>
-                            <p><strong>Website:</strong> <a href="https://cinea.ec.europa.eu/programmes/life_en" target="_blank">https://cinea.ec.europa.eu/programmes/life_en</a></p>
-                            <p><strong>Focus:</strong> Environment and climate action</p>
-                            <p><strong>Relevance:</strong> Provides grants for innovative climate solutions</p>
-                        </div>
-                        <div class="investor-card">
-                            <h3>European Institute of Innovation and Technology (EIT)</h3>
-                            <p><strong>Contact:</strong> EIT Climate-KIC</p>
-                            <p><strong>Email:</strong> <a href="mailto:info@climate-kic.org">info@climate-kic.org</a></p>
-                            <p><strong>Website:</strong> <a href="https://eit.europa.eu/our-communities/eit-climate-kic" target="_blank">https://eit.europa.eu/our-communities/eit-climate-kic</a></p>
-                            <p><strong>Focus:</strong> Climate, energy, sustainability</p>
-                            <p><strong>Relevance:</strong> Funding and acceleration for climate tech startups</p>
-                        </div>
-                        <div class="investor-card">
-                            <h3>Vinnova (Swedish Innovation Agency)</h3>
-                            <p><strong>Contact:</strong> Program Officers</p>
-                            <p><strong>Email:</strong> <a href="mailto:vinnova@vinnova.se">vinnova@vinnova.se</a></p>
-                            <p><strong>Website:</strong> <a href="https://www.vinnova.se/en/" target="_blank">https://www.vinnova.se/en/</a></p>
-                            <p><strong>Focus:</strong> Innovation in Sweden</p>
-                            <p><strong>Relevance:</strong> Country-specific grants for innovative climate solutions</p>
-                        </div>
+                    <div id="investor-list-grid" class="investor-grid">
+                        <!-- Investor data will be dynamically loaded here -->
                     </div>
                 </div>
                 
@@ -357,5 +170,6 @@
     </footer>
 
     <script src="../js/script.js" type="module"></script>
+    <script src="admin-script.js" type="module"></script>
 </body>
 </html>
