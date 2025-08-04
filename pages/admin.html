@@ -59,7 +59,7 @@
             padding: 20px;
             border: 1px solid #888;
             width: 90%;
-            max-width: 1200px;
+            max-width: 800px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
@@ -82,17 +82,9 @@
             text-decoration: none;
             cursor: pointer;
         }
-        .modal-body {
-            display: flex;
-            gap: 1.5rem;
-        }
-        .modal-body .email-editor,
-        .modal-body .chat-editor {
-            flex: 1;
-        }
         .modal-body textarea {
             width: 100%;
-            height: 400px;
+            height: 300px;
             border: 1px solid #ddd;
             padding: 1rem;
             border-radius: 4px;
@@ -118,34 +110,20 @@
         }
         .chat-message {
             margin-bottom: 1rem;
-            display: flex;
-            flex-direction: column;
         }
         .chat-message.user {
-            align-items: flex-end;
-        }
-        .chat-message.ai {
-            align-items: flex-start;
-        }
-        .chat-message .message-bubble {
-            display: inline-block;
-            padding: 0.75rem;
-            border-radius: 1rem;
-            max-width: 80%;
-            text-align: left;
-        }
-        .chat-message.user .message-bubble {
-            background-color: #dbeafe;
-            color: #1e40af;
+            text-align: right;
         }
         .chat-message.ai .message-bubble {
             background-color: #dcfce7;
             color: #15803d;
         }
-        .chat-message.thinking .message-bubble {
-            background-color: #f3f4f6;
-            color: #4b5563;
-            font-style: italic;
+        .chat-message .message-bubble {
+            display: inline-block;
+            padding: 0.75rem;
+            border-radius: 1.5rem;
+            max-width: 80%;
+            text-align: left;
         }
         .chat-input-container {
             display: flex;
@@ -170,7 +148,6 @@
         }
     </style>
 </head>
-    
 <body>
     <header>
         <div class="container">
@@ -189,7 +166,7 @@
                     <li><a href="../index.html">HOME</a></li>
                     <li><a href="our-solutions.html">SOLUTIONS</a></li>
                     <li><a href="about.html">ABOUT US</a></li>
-                    <li><a href="invest.html">INVEST</a></li>
+                    <li><a href="funding.html">FUNDING</a></li>
                     <li><a href="impact.html">IMPACT</a></li>
                     <li><a href="contact.html">CONTACT</a></li>
                     <li><a href="portal.html">CLIENT PORTAL</a></li>
@@ -252,6 +229,43 @@
                     <p>This is a curated list of potential investors, including VCs, angels, and government programs.</p>
                     <div id="investor-list-grid" class="investor-grid">
                         </div>
+                    
+                    <h3 class="text-xl font-bold mt-8 mb-4">Add New Investor</h3>
+                    <form id="add-investor-form" class="bg-gray-100 p-6 rounded-lg space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold mb-1">Contact Name</label>
+                                <input type="text" id="investor-contact" class="w-full border rounded py-2 px-3" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-1">Email</label>
+                                <input type="email" id="investor-email" class="w-full border rounded py-2 px-3" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-1">Website</label>
+                                <input type="url" id="investor-website" class="w-full border rounded py-2 px-3">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-1">Focus</label>
+                                <input type="text" id="investor-focus" class="w-full border rounded py-2 px-3">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-1">Relevance</label>
+                                <input type="text" id="investor-relevance" class="w-full border rounded py-2 px-3">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-1">Category</label>
+                                <select id="investor-category" class="w-full border rounded py-2 px-3" required>
+                                    <option value="" disabled selected>Select a category</option>
+                                    <option value="Venture Capital Firms">Venture Capital Firms</option>
+                                    <option value="Angel Investors and Syndicates">Angel Investors and Syndicates</option>
+                                    <option value="Corporate Venture Capital (CVC)">Corporate Venture Capital (CVC)</option>
+                                    <option value="Government Grants and Sustainable Funding Programs">Government Grants and Sustainable Funding Programs</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200">Add Investor</button>
+                    </form>
                 </div>
                 
                 <div id="inquiries-tab-content" class="tab-content hidden">
@@ -309,7 +323,7 @@
                     <h3>Quick Links</h3>
                     <ul>
                         <li><a href="about.html">ABOUT US</a></li>
-                        <li><a href="invest.html">INVEST</a></li>
+                        <li><a href="funding.html">FUNDING</a></li>
                         <li><a href="contact.html">CONTACT</a></li>
                     </ul>
                 </div>
@@ -332,22 +346,12 @@
                 <span class="close-button" onclick="closeModal()">×</span>
             </div>
             <div class="modal-body">
-                <div class="email-editor">
-                    <h3 class="text-lg font-semibold mb-2">Email Draft</h3>
-                    <textarea id="email-draft-body"></textarea>
-                </div>
-                <div class="chat-editor">
-                    <h3 class="text-lg font-semibold mb-2">Chat with AI Assistant</h3>
-                    <div class="chat-container">
-                        <div id="chat-history" class="chat-history">
-                            <div class="chat-message ai">
-                                <div class="message-bubble">Hello! I can help you tailor this email. What would you like to change or add?</div>
-                            </div>
+                <div class="chat-container">
+                    <div id="chat-history" class="chat-history">
                         </div>
-                        <div class="chat-input-container">
-                            <input type="text" id="chat-input" class="chat-input" placeholder="Type your message...">
-                            <button id="chat-send-button" class="send-button">Send</button>
-                        </div>
+                    <div class="chat-input-container">
+                        <input type="text" id="chat-input" class="chat-input" placeholder="Type your message to the AI...">
+                        <button id="send-chat-button" class="send-button">Send</button>
                     </div>
                 </div>
             </div>
