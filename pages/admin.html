@@ -229,43 +229,6 @@
                     <p>This is a curated list of potential investors, including VCs, angels, and government programs.</p>
                     <div id="investor-list-grid" class="investor-grid">
                         </div>
-                    
-                    <h3 class="text-xl font-bold mt-8 mb-4">Add New Investor</h3>
-                    <form id="add-investor-form" class="bg-gray-100 p-6 rounded-lg space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-bold mb-1">Contact Name</label>
-                                <input type="text" id="investor-contact" class="w-full border rounded py-2 px-3" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold mb-1">Email</label>
-                                <input type="email" id="investor-email" class="w-full border rounded py-2 px-3" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold mb-1">Website</label>
-                                <input type="url" id="investor-website" class="w-full border rounded py-2 px-3">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold mb-1">Focus</label>
-                                <input type="text" id="investor-focus" class="w-full border rounded py-2 px-3">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold mb-1">Relevance</label>
-                                <input type="text" id="investor-relevance" class="w-full border rounded py-2 px-3">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold mb-1">Category</label>
-                                <select id="investor-category" class="w-full border rounded py-2 px-3" required>
-                                    <option value="" disabled selected>Select a category</option>
-                                    <option value="Venture Capital Firms">Venture Capital Firms</option>
-                                    <option value="Angel Investors and Syndicates">Angel Investors and Syndicates</option>
-                                    <option value="Corporate Venture Capital (CVC)">Corporate Venture Capital (CVC)</option>
-                                    <option value="Government Grants and Sustainable Funding Programs">Government Grants and Sustainable Funding Programs</option>
-                                </select>
-                            </div>
-                        </div>
-                        <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200">Add Investor</button>
-                    </form>
                 </div>
                 
                 <div id="inquiries-tab-content" class="tab-content hidden">
@@ -292,7 +255,7 @@
                     <p>Upload files for investors to download. These files will only be visible to registered users who have checked the "Are you an investor?" box.</p>
                     <form id="file-upload-form" class="file-upload-form">
                         <input type="file" id="investor-file-upload" required>
-                        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200">Upload File</button>
+                        <button type="submit">Upload File</button>
                     </form>
                     <div id="uploaded-files-list" class="data-list" style="box-shadow: none; padding: 0;">
                         <h3>Uploaded Files</h3>
@@ -346,7 +309,14 @@
                 <span class="close-button" onclick="closeModal()">×</span>
             </div>
             <div class="modal-body">
-                <textarea id="email-draft-body" class="w-full h-96"></textarea>
+                <div class="chat-container">
+                    <div id="chat-history" class="chat-history">
+                        </div>
+                    <div class="chat-input-container">
+                        <input type="text" id="chat-input" class="chat-input" placeholder="Type your message to the AI...">
+                        <button id="send-chat-button" class="send-button">Send</button>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <a id="send-email-link" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Send Email</a>
