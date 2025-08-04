@@ -115,6 +115,9 @@ function handleAuthForms() {
             const lastName = registerForm.querySelector('#register-last-name').value;
             const companyName = registerForm.querySelector('#register-company-name').value;
             const roleInCompany = registerForm.querySelector('#register-role').value;
+            const continent = registerForm.querySelector('#register-continent').value;
+            const country = registerForm.querySelector('#register-country').value;
+            const wechatPhone = registerForm.querySelector('#register-wechat-phone').value;
             const linkedinProfile = registerForm.querySelector('#register-linkedin').value;
             const squareMeterInFactory = registerForm.querySelector('#register-sqm').value;
             const isInvestor = registerForm.querySelector('#register-investor').checked;
@@ -124,10 +127,14 @@ function handleAuthForms() {
                 const userProfileRef = doc(db, `/artifacts/${appId}/users/${newUser.uid}/user_profiles`, 'profile');
                 const isAdmin = email === 'ernst@hatake.eu';
                 await setDoc(userProfileRef, {
+                    email,
                     firstName,
                     lastName,
                     companyName,
                     roleInCompany,
+                    continent: continent || 'N/A',
+                    country: country || 'N/A',
+                    wechatPhone: wechatPhone || 'N/A',
                     linkedinProfile,
                     squareMeterInFactory: squareMeterInFactory || 'N/A',
                     isInvestor,
