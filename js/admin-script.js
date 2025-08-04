@@ -212,7 +212,7 @@ function showMessage(msg, isError = false) {
 }
 
 // Tab switching logic
-function switchTab(tabName) {
+window.switchTab = (tabName) => {
     const tabs = document.querySelectorAll('.tabs button');
     tabs.forEach(tab => tab.classList.remove('active'));
     document.querySelector(`#tab-button-${tabName}`).classList.add('active');
@@ -288,50 +288,51 @@ async function handleAdminPage() {
                     }
 
                     // Handle file upload
-                    fileUploadForm.addEventListener('submit', async (e) => {
-                        e.preventDefault();
-                        const fileInput = document.getElementById('investor-file-upload');
-                        const file = fileInput.files[0];
-                        if (!file) {
-                            showMessage("Please select a file to upload.", true);
-                            return;
-                        }
-
-                        const storageRef = ref(storage, `investor_files/${file.name}`);
-                        try {
-                            await uploadBytes(storageRef, file);
-                            const downloadURL = await getDownloadURL(storageRef);
-                            await addDoc(collection(db, `/artifacts/${appId}/public/investor_files`), {
-                                fileName: file.name,
-                                downloadURL: downloadURL,
-                                uploadedAt: serverTimestamp()
-                            });
-                            showMessage("File uploaded successfully!");
-                            fileInput.value = ''; // Clear the input
-                        } catch (error) {
-                            console.error("File upload failed:", error);
-                            showMessage(`File upload failed: ${error.message}`, true);
-                        }
-                    });
+                    if (fileUploadForm) {
+                         fileUploadForm.addEventListener('submit', async (e) => {
+                             e.preventDefault();
+                             const fileInput = document.getElementById('investor-file-upload');
+                             const file = fileInput.files[0];
+                             if (!file) {
+                                 showMessage("Please select a file to upload.", true);
+                                 return;
+                             }
+                             const storageRef = ref(storage, `investor_files/${file.name}`);
+                             try {
+                                 await uploadBytes(storageRef, file);
+                                 const downloadURL = await getDownloadURL(storageRef);
+                                 await addDoc(collection(db, `/artifacts/${appId}/public/investor_files`), {
+                                     fileName: file.name,
+                                     downloadURL: downloadURL,
+                                     uploadedAt: serverTimestamp()
+                                 });
+                                 showMessage("File uploaded successfully!");
+                                 fileInput.value = '';
+                             } catch (error) {
+                                 console.error("File upload failed:", error);
+                                 showMessage(`File upload failed: ${error.message}`, true);
+                             }
+                         });
+                    }
 
                     // Fetch and display uploaded files
                     const filesCollectionRef = collection(db, `/artifacts/${appId}/public/investor_files`);
-                    onSnapshot(filesCollectionRef, (snapshot) => {
-                        if (uploadedFilesTableBody) {
-                             uploadedFilesTableBody.innerHTML = ''; // Clear table
-                            snapshot.forEach(doc => {
-                                const fileData = doc.data();
-                                const date = fileData.uploadedAt ? new Date(fileData.uploadedAt.seconds * 1000).toLocaleDateString() : 'N/A';
-                                const tr = document.createElement('tr');
-                                tr.innerHTML = `
-                                    <td>${fileData.fileName}</td>
-                                    <td>${date}</td>
-                                    <td><a href="${fileData.downloadURL}" target="_blank" class="text-green-500 hover:underline">Download</a></td>
-                                `;
-                                uploadedFilesTableBody.appendChild(tr);
-                            });
-                        }
-                    });
+                    if(uploadedFilesTableBody) {
+                      onSnapshot(filesCollectionRef, (snapshot) => {
+                          uploadedFilesTableBody.innerHTML = '';
+                          snapshot.forEach(doc => {
+                              const fileData = doc.data();
+                              const date = fileData.uploadedAt ? new Date(fileData.uploadedAt.seconds * 1000).toLocaleDateString() : 'N/A';
+                              const tr = document.createElement('tr');
+                              tr.innerHTML = `
+                                  <td>${fileData.fileName}</td>
+                                  <td>${date}</td>
+                                  <td><a href="${fileData.downloadURL}" target="_blank" class="text-green-500 hover:underline">Download</a></td>
+                              `;
+                              uploadedFilesTableBody.appendChild(tr);
+                          });
+                      });
+                    }
 
                     // Dummy inquiry data for now
                     if (inquiryListTableBody) {
@@ -355,7 +356,7 @@ async function handleAdminPage() {
                     }
                     
                     if (loadingSpinner) loadingSpinner.classList.add('hidden');
-                    document.querySelector('.admin-dashboard').classList.remove('hidden');
+                    if (adminDashboardSection) adminDashboardSection.classList.remove('hidden');
 
                 } else {
                     window.location.href = 'dashboard.html';
@@ -385,10 +386,4 @@ async function handleAdminPage() {
 
 document.addEventListener('DOMContentLoaded', () => {
     handleAdminPage();
-
-    // Attach tab click event listeners
-    document.getElementById('tab-button-users').addEventListener('click', () => switchTab('users'));
-    document.getElementById('tab-button-investors').addEventListener('click', () => switchTab('investors'));
-    document.getElementById('tab-button-inquiries').addEventListener('click', () => switchTab('inquiries'));
-    document.getElementById('tab-button-files').addEventListener('click', () => switchTab('files'));
 });
