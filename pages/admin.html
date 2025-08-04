@@ -91,10 +91,10 @@
                 </div>
 
                 <div class="tabs">
-                    <button id="tab-button-users" class="active">Registered Users</button>
-                    <button id="tab-button-investors">Investor Mail List</button>
-                    <button id="tab-button-inquiries">Recent Inquiries</button>
-                    <button id="tab-button-files">File Management</button>
+                    <button id="tab-button-users" class="active" onclick="switchTab('users')">Registered Users</button>
+                    <button id="tab-button-investors" onclick="switchTab('investors')">Investor Mail List</button>
+                    <button id="tab-button-inquiries" onclick="switchTab('inquiries')">Recent Inquiries</button>
+                    <button id="tab-button-files" onclick="switchTab('files')">File Management</button>
                 </div>
 
                 <div id="users-tab-content" class="tab-content">
@@ -104,6 +104,8 @@
                             <thead>
                                 <tr>
                                     <th>Company</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
                                     <th>Email</th>
                                     <th>Role</th>
                                     <th>Factory SQM</th>
