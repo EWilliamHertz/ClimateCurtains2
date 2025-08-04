@@ -19,9 +19,6 @@ import {
     query,
     getDocs
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
-import {
-    getAnalytics
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
 
 // Firebase configuration from the user
 const firebaseConfig = {
@@ -201,7 +198,7 @@ async function handleDashboardPage() {
     onAuthStateChanged(auth, async (user) => {
         if (user && !user.isAnonymous) {
             const docRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles`, 'profile');
-            const unsubscribe = onSnapshot(docRef, (docSnap) => {
+            const unsubscribe = onSnapshot(docRef, async (docSnap) => {
                 if (docSnap.exists()) {
                     const profile = docSnap.data();
                     if (welcomeMessage) welcomeMessage.textContent = `Welcome, ${profile.companyName}!`;
@@ -215,23 +212,25 @@ async function handleDashboardPage() {
                     }
                     if (document.getElementById('dashboard-uid')) document.getElementById('dashboard-uid').textContent = user.uid;
                     if (dashboardView) dashboardView.classList.remove('hidden');
-
+                    
                     // Show investor resources if the user is an investor
                     if (profile.isInvestor && investorResourcesSection) {
                         investorResourcesSection.classList.remove('hidden');
                         const filesCollectionRef = collection(db, `/artifacts/${appId}/public/investor_files`);
                         const filesSnapshot = await getDocs(filesCollectionRef);
-                        investorFilesList.innerHTML = '';
-                        filesSnapshot.forEach(fileDoc => {
-                            const fileData = fileDoc.data();
-                            const fileItem = document.createElement('div');
-                            fileItem.className = 'flex justify-between items-center bg-white p-4 rounded-lg shadow-sm';
-                            fileItem.innerHTML = `
-                                <span class="font-semibold">${fileData.fileName}</span>
-                                <a href="${fileData.downloadURL}" target="_blank" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Download</a>
-                            `;
-                            investorFilesList.appendChild(fileItem);
-                        });
+                        if (investorFilesList) {
+                            investorFilesList.innerHTML = '';
+                            filesSnapshot.forEach(fileDoc => {
+                                const fileData = fileDoc.data();
+                                const fileItem = document.createElement('div');
+                                fileItem.className = 'flex justify-between items-center bg-white p-4 rounded-lg shadow-sm';
+                                fileItem.innerHTML = `
+                                    <span class="font-semibold">${fileData.fileName}</span>
+                                    <a href="${fileData.downloadURL}" target="_blank" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Download</a>
+                                `;
+                                investorFilesList.appendChild(fileItem);
+                            });
+                        }
                     }
                 } else {
                     showMessage("User profile not found. Please contact support.", true);
@@ -275,9 +274,8 @@ document.addEventListener('DOMContentLoaded', () => {
         handleAuthForms();
     } else if (window.location.pathname.includes('dashboard.html')) {
         handleDashboardPage();
-    } else if (window.location.pathname.includes('admin.html')) {
-        // admin page logic moved to admin-script.js
     }
+    // The admin page now has its own script.
 });
 
 // Mobile Navigation Toggle
