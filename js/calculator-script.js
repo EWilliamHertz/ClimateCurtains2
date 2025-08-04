@@ -1,3 +1,4 @@
+
 // Data for pre-populated fields and calculations
 const presetData = {
     'cold-storage': {
