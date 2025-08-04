@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Saving Calculator - ClimateCurtainsAB</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .calculator-container { max-width: 800px; margin: 2rem auto; padding: 2rem; background-color: #fff; border-radius: 8px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); }
+        .calculator-form .form-group { margin-bottom: 1.5rem; }
+        .calculator-form label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+        .calculator-form input, .calculator-form select { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 1rem; }
+        .results-section { margin-top: 2rem; padding: 2rem; border-top: 1px solid #eee; }
+        .results-section h3 { margin-bottom: 1rem; }
+        .results-section p { font-size: 1.1rem; }
+        .order-button { margin-top: 1.5rem; text-align: center; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <a href="../index.html">
+                    <img src="../images/logo.png" alt="ClimateCurtainsAB Logo">
+                </a>
+            </div>
+            <nav>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="../index.html">HOME</a></li>
+                    <li><a href="our-solutions.html">SOLUTIONS</a></li>
+                    <li><a href="about.html">ABOUT US</a></li>
+                    <li><a href="funding.html">FUNDING</a></li>
+                    <li><a href="contact.html">CONTACT</a></li>
+                    <li><a href="portal.html">CLIENT LOGIN</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="contact-hero">
+            <div class="container">
+                <div class="contact-content">
+                    <h1>Energy Saving Calculator</h1>
+                    <p>Estimate your potential energy and cost savings with ClimateCurtainsAB's industrial thermal curtains. This calculator is for industrial facilities exceeding 10,000 square meters.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="contact-section">
+            <div class="container">
+                <div class="calculator-container">
+                    <h3>Input your facility details:</h3>
+                    <form id="calculator-form" class="calculator-form">
+                        <div class="form-group">
+                            <label for="facility-area">Total Facility Area (SQM) *</label>
+                            <input type="number" id="facility-area" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="curtain-area">Estimated Curtain Area (SQM) *</label>
+                            <input type="number" id="curtain-area" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="r-value">Curtain R-Value *</label>
+                            <select id="r-value" required>
+                                <option value="" disabled selected>Select an R-value</option>
+                                <option value="3">R3</option>
+                                <option value="6">R6</option>
+                                <option value="9">R9</option>
+                                <option value="10">R10</option>
+                                <option value="15">R15 (Stationary)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="temp-diff">Average Temperature Differential (°C) *</label>
+                            <input type="number" id="temp-diff" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="operating-hours">Annual Operating Hours *</label>
+                            <input type="number" id="operating-hours" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="energy-cost">Local Energy Cost ($/kWh) *</label>
+                            <input type="number" id="energy-cost" step="0.01" required>
+                        </div>
+                        <button type="submit" class="form-submit">Calculate Savings</button>
+                    </form>
+
+                    <div id="results" class="results-section" style="display:none;">
+                        <h3>Estimated Annual Savings Report</h3>
+                        <p><strong>Estimated Annual Energy Savings:</strong> <span id="energy-savings"></span> kWh</p>
+                        <p><strong>Estimated Annual Cost Savings:</strong> <span id="cost-savings"></span></p>
+                        <p><strong>Estimated Payback Period:</strong> <span id="payback-period"></span> Years</p>
+                        <div class="order-button">
+                            <button class="cta-button" onclick="draftOrder()">Draft Your Order</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="../images/logo.png" alt="ClimateCurtainsAB Logo">
+                    <p>© 2025 ClimateCurtainsAB</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="about.html">ABOUT US</a></li>
+                        <li><a href="funding.html">FUNDING</a></li>
+                        <li><a href="contact.html">CONTACT</a></li>
+                    </ul>
+                </div>
+                <div class="footer-social">
+                    <h3>Connect With Us</h3>
+                    <div class="social-icons">
+                        <a href="https://twitter.com/ClimateCurtains" target="_blank"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.youtube.com/@peterhertz4789" target="_blank"><i class="fab fa-youtube"></i></a>
+                        <a href="https://www.linkedin.com/company/climate-curtains-ab/" target="_blank"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/script.js"></script>
+    <script>
+        document.getElementById('calculator-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const curtainArea = document.getElementById('curtain-area').value;
+            const rValue = document.getElementById('r-value').value;
+            const tempDiff = document.getElementById('temp-diff').value;
+            const operatingHours = document.getElementById('operating-hours').value;
+            const energyCost = document.getElementById('energy-cost').value;
+
+            // Simplified calculation logic (placeholder for actual engineering formula)
+            // Heat Transfer (Q) = (Area * Temp Diff * Time) / R-value
+            const heatTransfer = (curtainArea * tempDiff * operatingHours) / rValue;
+            const energySavingsKWh = heatTransfer; // A more complex formula would be needed
+            const costSavings = energySavingsKWh * energyCost;
+            const curtainCost = 0; // Placeholder for a cost estimation
+            const paybackPeriod = curtainCost / costSavings;
+
+            document.getElementById('energy-savings').textContent = energySavingsKWh.toFixed(2);
+            document.getElementById('cost-savings').textContent = costSavings.toFixed(2);
+            document.getElementById('payback-period').textContent = paybackPeriod.toFixed(2);
+            document.getElementById('results').style.display = 'block';
+        });
+
+        function draftOrder() {
+            // Redirect to a specific order form or contact page with pre-filled details
+            alert('Redirecting to order form...');
+        }
+    </script>
+</body>
+</html>
