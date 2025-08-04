@@ -506,8 +506,9 @@ async function handleAdminPage() {
             try {
                 const docSnap = await getDoc(userProfileRef);
                 if (docSnap.exists() && docSnap.data().isAdmin) {
-                    if (loadingSpinner) loadingSpinner.classList.add('hidden');
-                    if (adminDashboardSection) adminDashboardSection.classList.remove('hidden');
+                    // User is an admin, show the dashboard.
+                    loadingSpinner.classList.add('hidden');
+                    adminDashboardSection.classList.remove('hidden');
 
                     const profile = docSnap.data();
                     if (adminNameSpan) adminNameSpan.textContent = profile.companyName;
@@ -585,14 +586,21 @@ async function handleAdminPage() {
                     }
 
                 } else {
-                    window.location.href = 'portal.html';
+                     // User is logged in, but not an admin. Redirect to user dashboard.
+                    showMessage("Access Denied. You are not an administrator.", true);
+                    if (!window.location.pathname.includes('dashboard.html')) {
+                        setTimeout(() => { window.location.href = 'dashboard.html'; }, 2000);
+                    }
                 }
             } catch (error) {
                 console.error("Error checking admin status:", error);
-                window.location.href = 'portal.html';
+                signOut(auth); // Sign out on error and redirect
             }
         } else {
-            window.location.href = 'portal.html';
+            // No user is signed in, redirect to the portal.
+            if (!window.location.pathname.includes('portal.html')) {
+                window.location.href = 'portal.html';
+            }
         }
     });
 
@@ -600,10 +608,7 @@ async function handleAdminPage() {
         logoutButton.addEventListener('click', async () => {
             try {
                 await signOut(auth);
-                localStorage.removeItem('userLoggedIn');
-                localStorage.removeItem('userIsAdmin');
-                showMessage("Logged out successfully.");
-                window.location.href = 'portal.html';
+                // The onAuthStateChanged listener will handle the redirect.
             } catch (error) {
                 console.error("Logout failed:", error);
                 showMessage(`Logout failed: ${error.message}`, true);
