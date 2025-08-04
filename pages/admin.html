@@ -13,11 +13,11 @@
         .dashboard-card { background-color: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); text-align: center; }
         .dashboard-card h3 { margin-bottom: 0.5rem; color: var(--primary-color); }
         .dashboard-card p { font-size: 2rem; font-weight: 700; color: var(--dark-color); }
-        .inquiry-list { margin-top: 2rem; background-color: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); }
-        .inquiry-list table { width: 100%; border-collapse: collapse; }
-        .inquiry-list th, .inquiry-list td { padding: 1rem; text-align: left; border-bottom: 1px solid #eee; }
-        .inquiry-list th { background-color: var(--primary-color); color: #fff; }
-        .inquiry-list a { color: var(--primary-color); }
+        .inquiry-list, .investor-list { margin-top: 2rem; background-color: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); }
+        .inquiry-list table, .investor-list table { width: 100%; border-collapse: collapse; }
+        .inquiry-list th, .inquiry-list td, .investor-list th, .investor-list td { padding: 1rem; text-align: left; border-bottom: 1px solid #eee; }
+        .inquiry-list th, .investor-list th { background-color: var(--primary-color); color: #fff; }
+        .inquiry-list a, .investor-list a { color: var(--primary-color); }
     </style>
 </head>
 <body>
@@ -40,7 +40,7 @@
                     <li><a href="about.html">ABOUT US</a></li>
                     <li><a href="funding.html">FUNDING</a></li>
                     <li><a href="contact.html">CONTACT</a></li>
-                    <li><a href="portal.html">CLIENT LOGIN</a></li>
+                    <li><a href="portal.html">CLIENT PORTAL</a></li>
                 </ul>
             </nav>
         </div>
@@ -107,6 +107,53 @@
                         </tbody>
                     </table>
                 </div>
+
+                <div class="investor-list">
+                    <h2>Investor Mail List</h2>
+                    <p>This is a curated list of potential investors, including VCs, angels, and government programs.</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Firm / Fund</th>
+                                <th>Contact</th>
+                                <th>Email</th>
+                                <th>Focus</th>
+                                <th>Relevance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2150</td>
+                                <td>Christian Hernandez</td>
+                                <td><a href="mailto:info@2150.vc">info@2150.vc</a></td>
+                                <td>Climate tech (urban solutions)</td>
+                                <td>Focuses on how cities are designed, constructed, and operated.</td>
+                            </tr>
+                            <tr>
+                                <td>4impact</td>
+                                <td>Pauline Wink</td>
+                                <td><a href="mailto:info@4impact.vc">info@4impact.vc</a></td>
+                                <td>Digital tech for social/environmental impact</td>
+                                <td>Backs European tech4good companies tackling environmental challenges.</td>
+                            </tr>
+                            <tr>
+                                <td>World Fund</td>
+                                <td>Danijel Višević</td>
+                                <td><a href="mailto:hello@worldfund.vc">hello@worldfund.vc</a></td>
+                                <td>Energy, building materials, manufacturing</td>
+                                <td>Backs climate tech that can save significant CO2e emissions.</td>
+                            </tr>
+                            <tr>
+                                <td>Eneco Ventures</td>
+                                <td>Jordy Klaassen</td>
+                                <td><a href="mailto:ventures@eneco.com">ventures@eneco.com</a></td>
+                                <td>Energy efficiency, sustainability</td>
+                                <td>Helps startups test propositions and scale through customer base.</td>
+                            </tr>
+                            <!-- Add more rows for other investors from the provided list -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </section>
     </main>
@@ -116,7 +163,6 @@
             <div class="footer-content">
                 <div class="footer-logo">
                     <img src="../images/logo.png" alt="ClimateCurtainsAB Logo">
-                    <p>© 2025 ClimateCurtainsAB</p>
                 </div>
                 <div class="footer-links">
                     <h3>Quick Links</h3>
