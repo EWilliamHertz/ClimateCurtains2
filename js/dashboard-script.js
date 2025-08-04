@@ -9,10 +9,11 @@ import {
 import {
     getFirestore,
     doc,
-    onSnapshot
+    onSnapshot,
+    collection,
+    getDocs
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
 
-// Firebase configuration from the user
 const firebaseConfig = {
     apiKey: "AIzaSyB7_Tdz7SGtcj-qN8Ro7uAmoVrPyuR5cqc",
     authDomain: "climatecurtainsab.firebaseapp.com",
@@ -27,67 +28,53 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// DOM elements
-const messageBox = document.getElementById('message-box');
 const loadingSpinner = document.getElementById('loading');
 const dashboardView = document.getElementById('dashboard-view');
 const welcomeMessage = document.getElementById('welcome-message');
 const logoutButton = document.getElementById('logout-button');
+const investorResourcesSection = document.getElementById('investor-resources');
+const investorFilesList = document.getElementById('investor-files-list');
 
-// Helper function to show messages
-function showMessage(msg, isError = false) {
-    if (!messageBox) return;
-    messageBox.textContent = msg;
-    messageBox.classList.remove('hidden', 'bg-green-500', 'bg-red-500');
-    messageBox.classList.add(isError ? 'bg-red-500' : 'bg-green-500');
-    setTimeout(() => {
-        messageBox.classList.add('hidden');
-    }, 5000);
-}
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        const docRef = doc(db, "users", user.uid);
+        onSnapshot(docRef, (docSnap) => {
+            if (docSnap.exists()) {
+                loadingSpinner.classList.add('hidden');
+                dashboardView.classList.remove('hidden');
+                const profile = docSnap.data();
+                welcomeMessage.textContent = `Welcome, ${profile.companyName}!`;
+                document.getElementById('dashboard-company-name').textContent = profile.companyName;
+                document.getElementById('dashboard-role').textContent = profile.roleInCompany;
+                document.getElementById('dashboard-sqm').textContent = profile.squareMeterInFactory;
+                document.getElementById('dashboard-investor').textContent = profile.isInvestor ? 'Yes' : 'No';
+                document.getElementById('dashboard-linkedin').href = profile.linkedinProfile;
+                document.getElementById('dashboard-linkedin').textContent = profile.linkedinProfile;
+                document.getElementById('dashboard-uid').textContent = user.uid;
 
-// Function to handle auth state on dashboard page
-async function handleDashboardPage() {
-    onAuthStateChanged(auth, async (user) => {
-        if (user && !user.isAnonymous) {
-            const docRef = doc(db, 'users', user.uid);
-            const unsubscribe = onSnapshot(docRef, async (docSnap) => {
-                if (docSnap.exists()) {
-                    if (loadingSpinner) loadingSpinner.classList.add('hidden');
-                    dashboardView.classList.remove('hidden');
-
-                    const profile = docSnap.data();
-                    if (welcomeMessage) welcomeMessage.textContent = `Welcome, ${profile.companyName}!`;
-                    // You can add more dashboard population logic here if needed
-
-                } else {
-                    showMessage("User profile not found. Please contact support.", true);
-                    signOut(auth);
+                if (profile.isInvestor) {
+                    investorResourcesSection.classList.remove('hidden');
+                    getDocs(collection(db, "public/investor_files")).then(snapshot => {
+                        investorFilesList.innerHTML = '';
+                        snapshot.forEach(fileDoc => {
+                            const fileData = fileDoc.data();
+                            const fileItem = document.createElement('div');
+                            fileItem.className = 'flex justify-between items-center bg-white p-4 rounded-lg shadow-sm';
+                            fileItem.innerHTML = `<span class="font-semibold">${fileData.fileName}</span><a href="${fileData.downloadURL}" target="_blank" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Download</a>`;
+                            investorFilesList.appendChild(fileItem);
+                        });
+                    });
                 }
-            }, (error) => {
-                console.error("Error fetching user profile:", error);
-                if (loadingSpinner) loadingSpinner.classList.add('hidden');
-                showMessage(`Error: ${error.message}`, true);
-            });
-            window.addEventListener('beforeunload', () => unsubscribe());
-        } else {
-            if (!window.location.pathname.includes('portal.html')) {
-                window.location.href = 'portal.html';
+            } else {
+                console.log("No such document!");
+                signOut(auth);
             }
-        }
-    });
-}
+        });
+    } else {
+        window.location.href = 'portal.html';
+    }
+});
 
-if (logoutButton) {
-    logoutButton.addEventListener('click', async () => {
-        try {
-            await signOut(auth);
-        } catch (error) {
-            console.error("Logout failed:", error);
-            showMessage(`Logout failed: ${error.message}`, true);
-        }
-    });
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    handleDashboardPage();
+logoutButton.addEventListener('click', () => {
+    signOut(auth);
 });
