@@ -459,14 +459,14 @@ async function fetchInquiries() {
 
 async function fetchUsers() {
     try {
-        const usersCollectionRef = collection(db, `/artifacts/${appId}/users`);
+        const usersCollectionRef = collection(db, `users`);
         const usersSnapshot = await getDocs(usersCollectionRef);
         let totalUsers = 0;
         const companyNames = new Set();
         if (userListTableBody) userListTableBody.innerHTML = '';
         
         for (const userDoc of usersSnapshot.docs) {
-            const profileDocRef = doc(db, `/artifacts/${appId}/users/${userDoc.id}/user_profiles`, 'profile');
+            const profileDocRef = doc(db, `users/${userDoc.id}/user_profiles`, 'profile');
             const profileDocSnap = await getDoc(profileDocRef);
             
             if (profileDocSnap.exists()) {
@@ -502,7 +502,7 @@ async function fetchUsers() {
 async function handleAdminPage() {
     onAuthStateChanged(auth, async (user) => {
         if (user && !user.isAnonymous) {
-            const userProfileRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles`, 'profile');
+            const userProfileRef = doc(db, `users/${user.uid}/user_profiles`, 'profile');
             try {
                 const docSnap = await getDoc(userProfileRef);
                 if (docSnap.exists() && docSnap.data().isAdmin) {
@@ -553,7 +553,7 @@ async function handleAdminPage() {
                              try {
                                  await uploadBytes(storageRef, file);
                                  const downloadURL = await getDownloadURL(storageRef);
-                                 await addDoc(collection(db, `/artifacts/${appId}/public/investor_files`), {
+                                 await addDoc(collection(db, `public/investor_files`), {
                                      fileName: file.name,
                                      downloadURL: downloadURL,
                                      uploadedAt: serverTimestamp()
@@ -567,7 +567,7 @@ async function handleAdminPage() {
                          });
                     }
 
-                    const filesCollectionRef = collection(db, `/artifacts/${appId}/public/investor_files`);
+                    const filesCollectionRef = collection(db, `public/investor_files`);
                     if(uploadedFilesTableBody) {
                       onSnapshot(filesCollectionRef, (snapshot) => {
                           uploadedFilesTableBody.innerHTML = '';
