@@ -29,7 +29,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const appId = firebaseConfig.projectId;
 
 // DOM elements
 const messageBox = document.getElementById('message-box');
@@ -109,7 +108,8 @@ function handleAuthForms() {
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const newUser = userCredential.user;
-                const userProfileRef = doc(db, `/artifacts/${appId}/users/${newUser.uid}/user_profiles`, 'profile');
+                // *** FIXED: Simplified the path for the user profile document ***
+                const userProfileRef = doc(db, 'users', newUser.uid); 
                 const isAdmin = email === 'ernst@hatake.eu';
                 await setDoc(userProfileRef, {
                     email,
@@ -145,7 +145,8 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     if (user) {
-        const docRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles`, 'profile');
+        // *** FIXED: Simplified the path to check for the user profile document ***
+        const docRef = doc(db, 'users', user.uid);
         try {
             const docSnap = await getDoc(docRef);
             if (docSnap.exists() && !user.isAnonymous) {
