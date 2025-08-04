@@ -68,9 +68,14 @@ function toggleView(isRegisterView) {
     }
 }
 
-function showAuthUI() {
-    loadingSpinner.classList.add('hidden');
-    authView.classList.remove('hidden');
+function showAuthUI(show) {
+    if (show) {
+        loadingSpinner.classList.add('hidden');
+        authView.classList.remove('hidden');
+    } else {
+        loadingSpinner.classList.remove('hidden');
+        authView.classList.add('hidden');
+    }
 }
 
 // --- Event Handlers ---
@@ -78,14 +83,15 @@ function setupEventListeners() {
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            showAuthUI(); // Ensure UI is visible
+            showAuthUI(false); // Show spinner
             const email = loginForm['login-email'].value;
             const password = loginForm['login-password'].value;
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                // onAuthStateChanged will handle the redirect
+                // onAuthStateChanged will handle successful redirect
             } catch (error) {
                 showMessage(`Login failed: ${error.message}`, true);
+                showAuthUI(true); // Show form again on error
             }
         });
     }
@@ -93,7 +99,7 @@ function setupEventListeners() {
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            showAuthUI(); // Ensure UI is visible
+            showAuthUI(false); // Show spinner
 
             const email = registerForm['register-email'].value;
             const password = registerForm['register-password'].value;
@@ -115,14 +121,14 @@ function setupEventListeners() {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const newUser = userCredential.user;
                 await setDoc(doc(db, 'users', newUser.uid), userDetails);
-                // onAuthStateChanged will handle the redirect
+                // onAuthStateChanged will handle successful redirect
             } catch (error) {
                 showMessage(`Registration failed: ${error.message}`, true);
+                showAuthUI(true); // Show form again on error
             }
         });
     }
     
-    // Initial setup for the toggle link
     const toggleSpan = toggleAuthLink.querySelector('span');
     if (toggleSpan) {
         toggleSpan.addEventListener('click', () => toggleView(true));
@@ -131,8 +137,12 @@ function setupEventListeners() {
 
 // --- Main Authentication Flow ---
 function initializePortal() {
+    // Setup button listeners immediately when the page content is loaded
+    setupEventListeners();
+
     onAuthStateChanged(auth, async (user) => {
         if (user) {
+            // A user is logged in, check their profile and redirect
             const userProfileRef = doc(db, 'users', user.uid);
             try {
                 const docSnap = await getDoc(userProfileRef);
@@ -140,19 +150,19 @@ function initializePortal() {
                     const isAdmin = docSnap.data().isAdmin;
                     window.location.href = isAdmin ? 'admin.html' : 'dashboard.html';
                 } else {
+                     // This can happen if profile creation fails after auth succeeds
                      showMessage("Your user profile was not found. Please contact support.", true);
                      await signOut(auth);
-                     showAuthUI();
+                     showAuthUI(true);
                 }
             } catch (error) {
                 showMessage("Error checking your user profile. Please try again.", true);
                 await signOut(auth);
-                showAuthUI();
+                showAuthUI(true);
             }
         } else {
-            // No user is logged in, show the auth form and set up listeners
-            showAuthUI();
-            setupEventListeners();
+            // No user is logged in, just show the login form
+            showAuthUI(true);
         }
     });
 }
