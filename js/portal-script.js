@@ -91,9 +91,9 @@ function handleAuthForms() {
                 localStorage.setItem('userIsAdmin', isAdmin);
                 showMessage("Login successful!");
                 if (isAdmin) {
-                     window.location.href = 'admin.html';
+                    window.location.href = 'admin.html';
                 } else {
-                     window.location.href = 'dashboard.html';
+                    window.location.href = 'dashboard.html';
                 }
             } catch (error) {
                 console.error("Login failed:", error);
