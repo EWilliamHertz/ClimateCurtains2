@@ -154,7 +154,7 @@
 
             document.getElementById('energy-savings').textContent = energySavingsKWh.toFixed(2);
             document.getElementById('cost-savings').textContent = costSavings.toFixed(2);
-            document.getElementById('payback-period').textContent = paybackPeriod.toFixed(2);
+            document.getElementById('payback-period').textContent = isFinite(paybackPeriod) ? paybackPeriod.toFixed(2) : 'N/A';
             document.getElementById('results').style.display = 'block';
         });
 
