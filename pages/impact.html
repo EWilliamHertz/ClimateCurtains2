@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Impact - ClimateCurtainsAB</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .impact-hero { padding: 4rem 0; text-align: center; background-color: #f9f9f9; }
+        .impact-section { padding: 4rem 0; }
+        .impact-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; }
+        .metric-card {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        .metric-card h3 { color: var(--primary-color); font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .metric-card p { font-size: 2rem; font-weight: 700; color: var(--dark-color); }
+        .data-list { margin-top: 2rem; background-color: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); }
+        .data-list table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .data-list th, .data-list td { padding: 1rem; text-align: left; border-bottom: 1px solid #eee; word-wrap: break-word; }
+        .data-list th { background-color: var(--primary-color); color: #fff; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <a href="../index.html">
+                    <img src="../images/logo.png" alt="ClimateCurtainsAB Logo">
+                </a>
+            </div>
+            <nav>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="../index.html">HOME</a></li>
+                    <li><a href="our-solutions.html">SOLUTIONS</a></li>
+                    <li><a href="about.html">ABOUT US</a></li>
+                    <li><a href="funding.html">FUNDING</a></li>
+                    <li><a href="impact.html" class="active">IMPACT</a></li>
+                    <li><a href="contact.html">CONTACT</a></li>
+                    <li><a href="portal.html">CLIENT PORTAL</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content">
+        <section class="impact-hero">
+            <div class="container">
+                <h1>Our Quantifiable Impact</h1>
+                <p>We provide data-driven solutions that deliver real environmental and financial results.</p>
+            </div>
+        </section>
+
+        <section class="impact-section">
+            <div class="container">
+                <h2>Key Metrics</h2>
+                <div class="impact-metrics">
+                    <div class="metric-card">
+                        <h3>Total CO2e Saved</h3>
+                        <p>1,250 tons</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Total Energy Saved</h3>
+                        <p>2,500,000 kWh</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Average Payback Period</h3>
+                        <p>18 months</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="impact-section" style="background-color: #f9f9f9;">
+            <div class="container">
+                <h2>Energy Savings by R-Value</h2>
+                <p>Visualize how our thermal curtains' R-value directly correlates with energy savings. Higher R-values provide greater insulation and efficiency.</p>
+                <div style="width: 80%; margin: 2rem auto;">
+                    <canvas id="energy-savings-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="impact-section">
+            <div class="container">
+                <h2>Detailed Savings Table</h2>
+                <p>This table demonstrates the estimated annual energy savings based on different curtain specifications and environmental factors.</p>
+                <div class="data-list" style="box-shadow: none; padding: 0;">
+                    <table id="savings-table">
+                        <thead>
+                            <tr>
+                                <th>R-Value</th>
+                                <th>Temperature Differential</th>
+                                <th>Curtain Area</th>
+                                <th>Estimated Annual kWh Saved</th>
+                                <th>Estimated Annual CO2e Reduced</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>R-6</td>
+                                <td>$15^{\circ}C$</td>
+                                <td>$50 m^2$</td>
+                                <td>15,000 kWh</td>
+                                <td>~1.5 tons</td>
+                            </tr>
+                            <tr>
+                                <td>R-10</td>
+                                <td>$20^{\circ}C$</td>
+                                <td>$75 m^2$</td>
+                                <td>35,000 kWh</td>
+                                <td>~3.5 tons</td>
+                            </tr>
+                            <tr>
+                                <td>R-15</td>
+                                <td>$25^{\circ}C$</td>
+                                <td>$100 m^2$</td>
+                                <td>75,000 kWh</td>
+                                <td>~7.5 tons</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <div class="container">
+                <h2>Ready to Make an Impact?</h2>
+                <p>Contact us to learn how ClimateCurtains can help your business save energy and reduce its carbon footprint.</p>
+                <a href="contact.html" class="cta-button">Contact Us Today</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="../images/logo.png" alt="ClimateCurtainsAB Logo">
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="about.html">ABOUT US</a></li>
+                        <li><a href="funding.html">FUNDING</a></li>
+                        <li><a href="contact.html">CONTACT</a></li>
+                    </ul>
+                </div>
+                <div class="footer-social">
+                    <h3>Connect With Us</h3>
+                    <div class="social-icons">
+                        <a href="https://twitter.com/ClimateCurtains" target="_blank"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.youtube.com/@peterhertz4789" target="_blank"><i class="fab fa-youtube"></i></a>
+                        <a href="https://www.linkedin.com/company/climate-curtains-ab/" target="_blank"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/script.js" type="module"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('energy-savings-chart').getContext('2d');
+            const energySavingsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['R-6', 'R-10', 'R-15'],
+                    datasets: [{
+                        label: 'Estimated Annual kWh Saved',
+                        data: [15000, 35000, 75000],
+                        borderColor: '#4CAF50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Energy Savings by R-Value',
+                            font: {
+                                size: 18,
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Annual kWh Saved'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Curtain R-Value'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
