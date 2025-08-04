@@ -345,6 +345,9 @@ async function handleAdminPage() {
             const userProfileRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles`, 'profile');
             onSnapshot(userProfileRef, async (docSnap) => {
                 if (docSnap.exists() && docSnap.data().isAdmin) {
+                    if (loadingSpinner) loadingSpinner.classList.add('hidden');
+                    if (adminDashboardSection) adminDashboardSection.classList.remove('hidden');
+
                     const profile = docSnap.data();
                     if (adminNameSpan) adminNameSpan.textContent = profile.companyName;
 
@@ -472,9 +475,6 @@ async function handleAdminPage() {
                         `;
                         if (totalInquiriesElem) totalInquiriesElem.textContent = 2; // Placeholder
                     }
-                    
-                    if (loadingSpinner) loadingSpinner.classList.add('hidden');
-                    if (adminDashboardSection) adminDashboardSection.classList.remove('hidden');
 
                 } else {
                     window.location.href = 'dashboard.html';
