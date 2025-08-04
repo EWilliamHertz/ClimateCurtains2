@@ -72,18 +72,17 @@ function handleAuthForms() {
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (loadingSpinner) loadingSpinner.classList.remove('hidden');
-            if (authView) authView.classList.add('hidden');
+            loadingSpinner.classList.remove('hidden');
+            authView.classList.add('hidden');
             const email = loginForm.querySelector('#login-email').value;
             const password = loginForm.querySelector('#login-password').value;
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                // The onAuthStateChanged listener will handle the redirect
             } catch (error) {
                 console.error("Login failed:", error);
                 showMessage(`Login failed: ${error.message}`, true);
-                if (loadingSpinner) loadingSpinner.classList.add('hidden');
-                if (authView) authView.classList.remove('hidden');
+                loadingSpinner.classList.add('hidden');
+                authView.classList.remove('hidden');
             }
         });
     }
@@ -91,24 +90,20 @@ function handleAuthForms() {
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (loadingSpinner) loadingSpinner.classList.remove('hidden');
-            if (authView) authView.classList.add('hidden');
+            loadingSpinner.classList.remove('hidden');
+            authView.classList.add('hidden');
             const email = registerForm.querySelector('#register-email').value;
             const password = registerForm.querySelector('#register-password').value;
             const firstName = registerForm.querySelector('#register-first-name').value;
             const lastName = registerForm.querySelector('#register-last-name').value;
             const companyName = registerForm.querySelector('#register-company-name').value;
             const roleInCompany = registerForm.querySelector('#register-role').value;
-            const continent = registerForm.querySelector('#register-continent').value;
-            const country = registerForm.querySelector('#register-country').value;
-            const wechatPhone = registerForm.querySelector('#register-wechat-phone').value;
             const linkedinProfile = registerForm.querySelector('#register-linkedin').value;
             const squareMeterInFactory = registerForm.querySelector('#register-sqm').value;
             const isInvestor = registerForm.querySelector('#register-investor').checked;
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const newUser = userCredential.user;
-                // Correct, simplified path for the user profile document
                 const userProfileRef = doc(db, 'users', newUser.uid);
                 const isAdmin = email === 'ernst@hatake.eu';
                 await setDoc(userProfileRef, {
@@ -117,21 +112,17 @@ function handleAuthForms() {
                     lastName,
                     companyName,
                     roleInCompany,
-                    continent: continent || 'N/A',
-                    country: country || 'N/A',
-                    wechatPhone: wechatPhone || 'N/A',
                     linkedinProfile,
                     squareMeterInFactory: squareMeterInFactory || 'N/A',
                     isInvestor,
                     registeredAt: serverTimestamp(),
                     isAdmin
                 });
-                // The onAuthStateChanged listener will handle the redirect
             } catch (error) {
                 console.error("Registration failed:", error);
                 showMessage(`Registration failed: ${error.message}`, true);
-                if (loadingSpinner) loadingSpinner.classList.add('hidden');
-                if (authView) authView.classList.remove('hidden');
+                loadingSpinner.classList.add('hidden');
+                authView.classList.remove('hidden');
             }
         });
     }
@@ -139,46 +130,36 @@ function handleAuthForms() {
 
 // Centralized authentication handler
 onAuthStateChanged(auth, async (user) => {
-    if (window.location.pathname.includes('dashboard.html') || window.location.pathname.includes('admin.html')) {
-        return;
-    }
-
     if (user) {
         const docRef = doc(db, 'users', user.uid);
-        try {
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists() && !user.isAnonymous) {
-                if (docSnap.data().isAdmin) {
-                    if (!window.location.pathname.includes('admin.html')) {
-                        window.location.href = 'admin.html';
-                    }
-                } else {
-                    if (!window.location.pathname.includes('dashboard.html')) {
-                        window.location.href = 'dashboard.html';
-                    }
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            const isAdmin = docSnap.data().isAdmin;
+            if (isAdmin) {
+                if (!window.location.pathname.includes('admin.html')) {
+                    window.location.href = 'admin.html';
                 }
             } else {
-                 if (loadingSpinner) loadingSpinner.classList.add('hidden');
-                 if (authView) authView.classList.remove('hidden');
+                if (!window.location.pathname.includes('dashboard.html')) {
+                    window.location.href = 'dashboard.html';
+                }
             }
-        } catch (error) {
-            console.error("Redirect check failed:", error);
-            if (loadingSpinner) loadingSpinner.classList.add('hidden');
-            if (authView) authView.classList.remove('hidden');
+        } else {
+            // New user, profile not yet created, stay on portal
+            loadingSpinner.classList.add('hidden');
+            authView.classList.remove('hidden');
         }
     } else {
-        // No user, ensure login/register forms are visible
-        if (loadingSpinner) loadingSpinner.classList.add('hidden');
-        if (authView) authView.classList.remove('hidden');
-        const toggleRegisterLink = document.getElementById('toggle-register-link');
-        if (toggleRegisterLink) toggleRegisterLink.addEventListener('click', () => window.toggleView('register'));
+        // No user, show login/register
+        loadingSpinner.classList.add('hidden');
+        authView.classList.remove('hidden');
     }
 });
 
-
-// Initialize the correct page logic
 document.addEventListener('DOMContentLoaded', () => {
     handleAuthForms();
     const toggleRegisterLink = document.getElementById('toggle-register-link');
-    if (toggleRegisterLink) toggleRegisterLink.addEventListener('click', () => window.toggleView('register'));
+    if (toggleRegisterLink) {
+        toggleRegisterLink.addEventListener('click', () => window.toggleView('register'));
+    }
 });
