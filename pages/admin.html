@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - ClimateCurtainsAB</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .admin-dashboard { padding: 4rem 0; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; }
+        .dashboard-card { background-color: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); text-align: center; }
+        .dashboard-card h3 { margin-bottom: 0.5rem; color: var(--primary-color); }
+        .dashboard-card p { font-size: 2rem; font-weight: 700; color: var(--dark-color); }
+        .inquiry-list { margin-top: 2rem; background-color: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); }
+        .inquiry-list table { width: 100%; border-collapse: collapse; }
+        .inquiry-list th, .inquiry-list td { padding: 1rem; text-align: left; border-bottom: 1px solid #eee; }
+        .inquiry-list th { background-color: var(--primary-color); color: #fff; }
+        .inquiry-list a { color: var(--primary-color); }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <a href="../index.html">
+                    <img src="../images/logo.png" alt="ClimateCurtainsAB Logo">
+                </a>
+            </div>
+            <nav>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="../index.html">HOME</a></li>
+                    <li><a href="our-solutions.html">SOLUTIONS</a></li>
+                    <li><a href="about.html">ABOUT US</a></li>
+                    <li><a href="funding.html">FUNDING</a></li>
+                    <li><a href="contact.html">CONTACT</a></li>
+                    <li><a href="portal.html">CLIENT LOGIN</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="admin-dashboard">
+            <div class="container">
+                <h1>Admin Dashboard</h1>
+                <p>Welcome, Admin. Here is a summary of your website's activity.</p>
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <h3>New Inquiries</h3>
+                        <p>12</p>
+                    </div>
+                    <div class="dashboard-card">
+                        <h3>Registered Companies</h3>
+                        <p>45</p>
+                    </div>
+                    <div class="dashboard-card">
+                        <h3>Pending Tasks</h3>
+                        <p>6</p>
+                    </div>
+                </div>
+
+                <div class="inquiry-list">
+                    <h2>Recent Inquiries</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Company</th>
+                                <th>Subject</th>
+                                <th>Status</th>
+                                <th>Assigned To</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2025-08-03</td>
+                                <td>Northvolt</td>
+                                <td>Quote Request from Calculator</td>
+                                <td>New</td>
+                                <td>N/A</td>
+                                <td><a href="#">View</a></td>
+                            </tr>
+                            <tr>
+                                <td>2025-08-02</td>
+                                <td>Dongguan Zhuohaoyang PKG Co., Ltd</td>
+                                <td>General Inquiry</td>
+                                <td>In Progress</td>
+                                <td>Phoebe Wong</td>
+                                <td><a href="#">View</a></td>
+                            </tr>
+                            <tr>
+                                <td>2025-07-30</td>
+                                <td>Client A</td>
+                                <td>Follow-up on Order #12345</td>
+                                <td>Closed</td>
+                                <td>Peter Hertz</td>
+                                <td><a href="#">View</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="../images/logo.png" alt="ClimateCurtainsAB Logo">
+                    <p>© 2025 ClimateCurtainsAB</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="about.html">ABOUT US</a></li>
+                        <li><a href="funding.html">FUNDING</a></li>
+                        <li><a href="contact.html">CONTACT</a></li>
+                    </ul>
+                </div>
+                <div class="footer-social">
+                    <h3>Connect With Us</h3>
+                    <div class="social-icons">
+                        <a href="https://twitter.com/ClimateCurtains" target="_blank"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.youtube.com/@peterhertz4789" target="_blank"><i class="fab fa-youtube"></i></a>
+                        <a href="https://www.linkedin.com/company/climate-curtains-ab/" target="_blank"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>
