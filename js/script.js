@@ -16,6 +16,7 @@ import {
     onSnapshot,
     serverTimestamp,
     collection,
+    query,
     getDocs,
     addDoc
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
@@ -321,50 +322,6 @@ function handleAuthForms() {
     }
 }
 
-// Core app initialization logic
-document.addEventListener('DOMContentLoaded', () => {
-    // Mobile navigation toggle
-    const hamburger = document.querySelector('.hamburger');
-    const navLinks = document.querySelector('.nav-links');
-    if (hamburger) {
-        hamburger.addEventListener('click', function() {
-            hamburger.classList.toggle('active');
-            navLinks.classList.toggle('active');
-        });
-    }
-    const navItems = document.querySelectorAll('.nav-links a');
-    navItems.forEach(item => {
-        item.addEventListener('click', function() {
-            hamburger.classList.remove('active');
-            navLinks.classList.remove('active');
-        });
-    });
-
-    const currentLocation = window.location.pathname;
-    const navLinkItems = document.querySelectorAll('.nav-links a');
-    navLinkItems.forEach(item => {
-        const linkPath = item.getAttribute('href');
-        const currentPath = currentLocation.substring(currentLocation.lastIndexOf('/') + 1);
-        if (linkPath === currentPath || (linkPath === '../index.html' && (currentPath === '' || currentPath === 'index.html'))) {
-            item.classList.add('active');
-        }
-    });
-
-    if (window.location.pathname.includes('portal.html')) {
-        handlePortalPage();
-        handleAuthForms();
-    } else if (window.location.pathname.includes('dashboard.html')) {
-        handleDashboardPage();
-    } else if (window.location.pathname.includes('admin.html')) {
-        handleAdminPage();
-    } else if (window.location.pathname.includes('calculator.html')) {
-        handleCalculatorPage();
-    } else if (window.location.pathname.includes('impact.html')) {
-        handleImpactPage();
-    }
-});
-
-
 // Logic for portal.html
 function handlePortalPage() {
     onAuthStateChanged(auth, async (user) => {
@@ -448,20 +405,6 @@ function handleDashboardPage() {
                 showMessage(`Error fetching user profile: ${error.message}`, true);
                 if (loadingSpinner) loadingSpinner.classList.add('hidden');
             });
-            if (logoutButton) {
-                 logoutButton.addEventListener('click', async () => {
-                     try {
-                         await signOut(auth);
-                         localStorage.removeItem('userLoggedIn');
-                         localStorage.removeItem('userIsAdmin');
-                         showMessage("Logged out successfully.");
-                         window.location.href = 'portal.html';
-                     } catch (error) {
-                         console.error("Logout failed:", error);
-                         showMessage(`Logout failed: ${error.message}`, true);
-                     }
-                 });
-            }
             window.addEventListener('beforeunload', () => unsubscribe());
         } else {
             window.location.href = 'portal.html';
