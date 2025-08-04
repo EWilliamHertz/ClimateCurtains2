@@ -14,6 +14,7 @@ import {
     getDocs
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
 
+// --- Firebase Configuration ---
 const firebaseConfig = {
     apiKey: "AIzaSyB7_Tdz7SGtcj-qN8Ro7uAmoVrPyuR5cqc",
     authDomain: "climatecurtainsab.firebaseapp.com",
@@ -24,10 +25,12 @@ const firebaseConfig = {
     measurementId: "G-3GNNYNJKM7"
 };
 
+// --- Initialize Firebase ---
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// --- DOM Elements ---
 const loadingSpinner = document.getElementById('loading');
 const dashboardView = document.getElementById('dashboard-view');
 const welcomeMessage = document.getElementById('welcome-message');
@@ -35,46 +38,77 @@ const logoutButton = document.getElementById('logout-button');
 const investorResourcesSection = document.getElementById('investor-resources');
 const investorFilesList = document.getElementById('investor-files-list');
 
+// --- Main Authentication Flow ---
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        const docRef = doc(db, "users", user.uid);
-        onSnapshot(docRef, (docSnap) => {
+        // User is signed in, listen for their profile data
+        const userProfileRef = doc(db, "users", user.uid);
+        onSnapshot(userProfileRef, (docSnap) => {
             if (docSnap.exists()) {
                 loadingSpinner.classList.add('hidden');
                 dashboardView.classList.remove('hidden');
+                
                 const profile = docSnap.data();
-                welcomeMessage.textContent = `Welcome, ${profile.companyName}!`;
-                document.getElementById('dashboard-company-name').textContent = profile.companyName;
-                document.getElementById('dashboard-role').textContent = profile.roleInCompany;
-                document.getElementById('dashboard-sqm').textContent = profile.squareMeterInFactory;
+                
+                // Populate dashboard with user data
+                welcomeMessage.textContent = `Welcome, ${profile.companyName || profile.firstName}!`;
+                document.getElementById('dashboard-company-name').textContent = profile.companyName || 'N/A';
+                document.getElementById('dashboard-role').textContent = profile.roleInCompany || 'N/A';
+                document.getElementById('dashboard-sqm').textContent = profile.squareMeterInFactory || 'N/A';
                 document.getElementById('dashboard-investor').textContent = profile.isInvestor ? 'Yes' : 'No';
-                document.getElementById('dashboard-linkedin').href = profile.linkedinProfile;
-                document.getElementById('dashboard-linkedin').textContent = profile.linkedinProfile;
+                const linkedinLink = document.getElementById('dashboard-linkedin');
+                linkedinLink.href = profile.linkedinProfile || '#';
+                linkedinLink.textContent = profile.linkedinProfile || 'Not Provided';
                 document.getElementById('dashboard-uid').textContent = user.uid;
 
+                // Show investor resources if applicable
                 if (profile.isInvestor) {
                     investorResourcesSection.classList.remove('hidden');
-                    getDocs(collection(db, "public/investor_files")).then(snapshot => {
-                        investorFilesList.innerHTML = '';
-                        snapshot.forEach(fileDoc => {
-                            const fileData = fileDoc.data();
-                            const fileItem = document.createElement('div');
-                            fileItem.className = 'flex justify-between items-center bg-white p-4 rounded-lg shadow-sm';
-                            fileItem.innerHTML = `<span class="font-semibold">${fileData.fileName}</span><a href="${fileData.downloadURL}" target="_blank" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Download</a>`;
-                            investorFilesList.appendChild(fileItem);
-                        });
-                    });
+                    loadInvestorFiles();
+                } else {
+                    investorResourcesSection.classList.add('hidden');
                 }
+
             } else {
-                console.log("No such document!");
-                signOut(auth);
+                // This shouldn't happen if registration was successful
+                console.error("User profile document not found!");
+                signOut(auth); // Log out to prevent being stuck
             }
         });
     } else {
+        // User is signed out, redirect to portal
         window.location.href = 'portal.html';
     }
 });
 
-logoutButton.addEventListener('click', () => {
-    signOut(auth);
-});
+// --- Data Fetching ---
+async function loadInvestorFiles() {
+    try {
+        const filesSnapshot = await getDocs(collection(db, "public/investor_files"));
+        investorFilesList.innerHTML = ''; // Clear existing list
+        if (filesSnapshot.empty) {
+            investorFilesList.innerHTML = '<p>No files have been uploaded yet.</p>';
+            return;
+        }
+        filesSnapshot.forEach(fileDoc => {
+            const fileData = fileDoc.data();
+            const fileItem = document.createElement('div');
+            fileItem.className = 'flex justify-between items-center bg-white p-4 rounded-lg shadow-sm';
+            fileItem.innerHTML = `
+                <span class="font-semibold">${fileData.fileName}</span>
+                <a href="${fileData.downloadURL}" target="_blank" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Download</a>
+            `;
+            investorFilesList.appendChild(fileItem);
+        });
+    } catch (error) {
+        console.error("Error loading investor files:", error);
+        investorFilesList.innerHTML = '<p>Could not load files.</p>';
+    }
+}
+
+// --- Event Listeners ---
+if (logoutButton) {
+    logoutButton.addEventListener('click', () => {
+        signOut(auth);
+    });
+}
