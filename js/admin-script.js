@@ -339,6 +339,27 @@ window.switchTab = (tabName) => {
     document.getElementById(`${tabName}-tab-content`).classList.remove('hidden');
 };
 
+async function fetchInquiries() {
+    const inquiriesCollectionRef = collection(db, `/artifacts/${appId}/inquiries`);
+    const inquiriesSnapshot = await getDocs(inquiriesCollectionRef);
+    if (inquiryListTableBody) inquiryListTableBody.innerHTML = '';
+    let inquiryCount = 0;
+    for (const inquiryDoc of inquiriesSnapshot.docs) {
+        const inquiryData = inquiryDoc.data();
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${inquiryData.timestamp ? new Date(inquiryData.timestamp.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
+            <td>${inquiryData.company || 'N/A'}</td>
+            <td>${inquiryData.subject || 'N/A'}</td>
+            <td>${inquiryData.status || 'New'}</td>
+            <td><a href="#">View</a></td>
+        `;
+        inquiryListTableBody.appendChild(tr);
+        inquiryCount++;
+    }
+    if (totalInquiriesElem) totalInquiriesElem.textContent = inquiryCount;
+}
+
 async function handleAdminPage() {
     onAuthStateChanged(auth, async (user) => {
         if (user && !user.isAnonymous) {
@@ -407,6 +428,8 @@ async function handleAdminPage() {
                             });
                         }
                     }
+                    
+                    await fetchInquiries();
 
                     // Handle file upload
                     if (fileUploadForm) {
@@ -454,28 +477,6 @@ async function handleAdminPage() {
                           });
                       });
                     }
-
-                    // Dummy inquiry data for now
-                    if (inquiryListTableBody) {
-                        inquiryListTableBody.innerHTML = `
-                            <tr>
-                                <td>2025-08-03</td>
-                                <td>Northvolt</td>
-                                <td>Quote Request from Calculator</td>
-                                <td>New</td>
-                                <td><a href="#">View</a></td>
-                            </tr>
-                            <tr>
-                                <td>2025-08-02</td>
-                                <td>Dongguan Zhuohaoyang PKG Co., Ltd</td>
-                                <td>General Inquiry</td>
-                                <td>In Progress</td>
-                                <td><a href="#">View</a></td>
-                            </tr>
-                        `;
-                        if (totalInquiriesElem) totalInquiriesElem.textContent = 2; // Placeholder
-                    }
-
                 } else {
                     window.location.href = 'dashboard.html';
                 }
