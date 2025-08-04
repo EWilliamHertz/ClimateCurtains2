@@ -14,7 +14,9 @@ import {
     setDoc,
     getDoc,
     onSnapshot,
-    serverTimestamp
+    serverTimestamp,
+    collection,
+    getDocs
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
 
 // Firebase configuration from the user
@@ -45,7 +47,6 @@ const toggleRegisterLink = document.getElementById('toggle-register-link');
 const dashboardView = document.getElementById('dashboard-view');
 const welcomeMessage = document.getElementById('welcome-message');
 const logoutButton = document.getElementById('logout-button');
-const mainContent = document.getElementById('main-content');
 
 // Helper function to show messages
 function showMessage(msg, isError = false) {
@@ -89,12 +90,10 @@ function handleAuthForms() {
                 const user = userCredential.user;
                 const docRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles`, 'profile');
                 const docSnap = await getDoc(docRef);
-
                 let isAdmin = false;
                 if (docSnap.exists()) {
                     isAdmin = docSnap.data().isAdmin || false;
                 }
-                
                 localStorage.setItem('userLoggedIn', 'true');
                 localStorage.setItem('userIsAdmin', isAdmin);
                 showMessage("Login successful!");
@@ -128,9 +127,7 @@ function handleAuthForms() {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const newUser = userCredential.user;
                 const userProfileRef = doc(db, `/artifacts/${appId}/users/${newUser.uid}/user_profiles`, 'profile');
-                
-                const isAdmin = email === 'ernst@hatake.eu'; // Set admin flag for specific email
-                
+                const isAdmin = email === 'ernst@hatake.eu'; 
                 await setDoc(userProfileRef, {
                     companyName,
                     roleInCompany,
@@ -138,9 +135,8 @@ function handleAuthForms() {
                     squareMeterInFactory: squareMeterInFactory || 'N/A',
                     isInvestor,
                     registeredAt: serverTimestamp(),
-                    isAdmin // Set admin flag
+                    isAdmin
                 });
-                
                 localStorage.setItem('userLoggedIn', 'true');
                 localStorage.setItem('userIsAdmin', isAdmin);
                 showMessage("Registration successful!");
@@ -194,6 +190,11 @@ function handleDashboardPage() {
         return;
     }
 
+    if (window.location.pathname.includes('admin.html') && !userIsAdmin) {
+        window.location.href = 'dashboard.html';
+        return;
+    }
+    
     if (loadingSpinner) loadingSpinner.classList.remove('hidden');
 
     onAuthStateChanged(auth, async (user) => {
@@ -256,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (window.location.pathname.includes('dashboard.html')) {
         handleDashboardPage();
     } else if (window.location.pathname.includes('admin.html')) {
-        handleAdminPage();
+        // admin page logic moved to admin-script.js
     }
 });
 
