@@ -3,17 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Client Portal Login - ClimateCurtainsAB</title>
+    <title>Client Portal - ClimateCurtainsAB</title>
     <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        .login-container { max-width: 400px; margin: 5rem auto; padding: 2rem; background-color: #fff; border-radius: 8px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); text-align: center; }
-        .login-container h2 { margin-bottom: 1.5rem; }
-        .login-form .form-group { margin-bottom: 1.5rem; text-align: left; }
-        .login-form label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
-        .login-form input { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 1rem; }
-    </style>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"></script>
+    <!-- Add Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
     <header>
@@ -35,28 +31,109 @@
                     <li><a href="about.html">ABOUT US</a></li>
                     <li><a href="funding.html">FUNDING</a></li>
                     <li><a href="contact.html">CONTACT</a></li>
-                    <li><a href="portal.html" class="active">CLIENT LOGIN</a></li>
+                    <li><a href="portal.html" class="active">CLIENT PORTAL</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <main>
-        <div class="login-container">
-            <h2>Enterprise Client Portal</h2>
-            <p>Please log in to manage your inquiries, track orders, and communicate with our team.</p>
-            <form action="#" method="POST" class="login-form">
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" required>
+    <main id="main-content">
+        <div id="app-container" class="min-h-screen bg-gray-100 p-4 flex flex-col items-center justify-center">
+            <!-- Message Box -->
+            <div id="message-box" class="fixed top-4 left-1/2 -translate-x-1/2 bg-green-500 text-white p-4 rounded-lg shadow-xl z-50 hidden"></div>
+            
+            <!-- Loading Spinner -->
+            <div id="loading" class="text-center hidden">
+                <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-500"></div>
+                <p class="mt-4 text-gray-600">Connecting to database...</p>
+            </div>
+
+            <!-- Login/Register View -->
+            <div id="auth-view" class="w-full max-w-xl bg-white p-8 rounded-xl shadow-lg border border-gray-200 hidden">
+                <h1 id="auth-title" class="text-3xl font-bold text-center text-green-700 mb-6">Client Portal Login</h1>
+
+                <!-- Login Form -->
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                        <input type="email" id="login-email" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                        <input type="password" id="login-password" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    </div>
+                    <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200">Login</button>
+                </form>
+
+                <!-- Registration Form (hidden by default) -->
+                <form id="register-form" class="space-y-4 hidden">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                        <input type="email" id="register-email" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                        <input type="password" id="register-password" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Company Name</label>
+                        <input type="text" id="register-company-name" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Role in Company</label>
+                        <input type="text" id="register-role" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">LinkedIn Profile URL</label>
+                        <input type="url" id="register-linkedin" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Factory Square Meters</label>
+                        <input type="number" id="register-sqm" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="register-investor" class="form-checkbox h-5 w-5 text-green-600 rounded">
+                        <label for="register-investor" class="ml-2 text-gray-700 text-sm font-bold">Are you an investor?</label>
+                    </div>
+                    <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200">Register</button>
+                </form>
+
+                <div class="mt-4 text-center">
+                    <p id="toggle-auth">Don't have an account? <span class="text-green-500 cursor-pointer hover:underline" onclick="toggleView('register')">Register here</span></p>
                 </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
+            </div>
+
+            <!-- Dashboard View (hidden by default) -->
+            <div id="dashboard-view" class="w-full max-w-2xl bg-white p-8 rounded-xl shadow-lg border border-gray-200 hidden">
+                <h1 id="welcome-message" class="text-3xl font-bold text-center text-green-700 mb-6"></h1>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="font-semibold text-sm">Company Name</p>
+                        <p id="dashboard-company-name" class="font-bold text-lg"></p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="font-semibold text-sm">Your Role</p>
+                        <p id="dashboard-role" class="font-bold text-lg"></p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="font-semibold text-sm">Factory Size (SQM)</p>
+                        <p id="dashboard-sqm" class="font-bold text-lg"></p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="font-semibold text-sm">Investor Status</p>
+                        <p id="dashboard-investor" class="font-bold text-lg"></p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg col-span-1 md:col-span-2">
+                        <p class="font-semibold text-sm">LinkedIn Profile</p>
+                        <a id="dashboard-linkedin" href="#" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline break-words"></a>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg col-span-1 md:col-span-2">
+                        <p class="font-semibold text-sm">Your Unique User ID</p>
+                        <p id="dashboard-uid" class="font-bold text-lg break-all"></p>
+                    </div>
                 </div>
-                <button type="submit" class="cta-button">Log In</button>
-            </form>
-            <p style="margin-top: 1rem;"><a href="#">Forgot Password?</a> | <a href="#">Register</a></p>
+                <button id="logout-button" class="w-full mt-8 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200">Logout</button>
+            </div>
         </div>
     </main>
 
