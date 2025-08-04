@@ -23,11 +23,7 @@ import {
     getDownloadURL
 } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js';
 
-// --- Gemini API Configuration ---
-const GEMINI_API_KEY = "AIzaSyBQeLMNbrjf8RPO01wipxS0JrWNyTv9az0"; // This should be kept secure in a real application
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
-
-// Firebase configuration from the user
+// --- Firebase Configuration ---
 const firebaseConfig = {
     apiKey: "AIzaSyB7_Tdz7SGtcj-qN8Ro7uAmoVrPyuR5cqc",
     authDomain: "climatecurtainsab.firebaseapp.com",
@@ -38,13 +34,13 @@ const firebaseConfig = {
     measurementId: "G-3GNNYNJKM7"
 };
 
+// --- Initialize Firebase ---
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-// DOM elements
-const messageBox = document.getElementById('message-box');
+// --- DOM Elements ---
 const loadingSpinner = document.getElementById('loading');
 const adminDashboardSection = document.querySelector('.admin-dashboard');
 const adminNameSpan = document.getElementById('admin-name');
@@ -61,310 +57,90 @@ const emailModal = document.getElementById('email-modal');
 const investorNameModal = document.getElementById('investor-name-modal');
 const emailDraftBody = document.getElementById('email-draft-body');
 const sendEmailLink = document.getElementById('send-email-link');
-const chatHistory = document.getElementById('chat-history');
-const chatInput = document.getElementById('chat-input');
-const chatSendButton = document.getElementById('chat-send-button');
 
-// --- Hardcoded Investor Data and Templates ---
+// --- Hardcoded Data ---
 const investorData = {
     'Venture Capital Firms': [{
-        contact: 'Christian Hernandez, Partner',
-        email: 'info@2150.vc',
-        website: 'https://www.2150.vc',
-        focus: 'Climate tech (environment and urban solutions)',
-        relevance: 'Focuses on technologies that reimagine how cities are designed, constructed, and operated'
-    }, {
-        contact: 'Pauline Wink, Managing Partner',
-        email: 'info@4impact.vc',
-        website: 'https://www.4impact.vc',
-        focus: 'Digital tech solutions driving positive social and environmental impact',
-        relevance: 'Backs European tech4good companies tackling environmental challenges'
-    }, {
-        contact: 'Danijel Višević, General Partner',
-        email: 'hello@worldfund.vc',
-        website: 'https://www.worldfund.vc',
-        focus: 'Energy, building materials, manufacturing',
-        relevance: 'Backs entrepreneurs building climate tech that can save significant CO2e emissions'
-    }, {
-        contact: 'Investment Team',
-        email: 'info@blumeequity.com',
-        website: 'https://www.blumeequity.com',
-        focus: 'Climate tech with proven traction',
-        relevance: 'Backs European companies addressing climate and sustainability challenges'
-    }, {
-        contact: 'Peet Denny, Founding Partner',
-        email: 'hello@climate.vc',
-        website: 'https://www.climate.vc',
-        focus: 'Climate tech startups with gigaton-level impact potential',
-        relevance: 'Focuses on businesses that can reduce significant CO2e per year'
-    }, {
-        contact: 'Rokas Peciulaitis, Managing Partner',
-        email: 'info@cventures.vc',
-        website: 'https://www.cventures.vc',
-        focus: 'Climate tech (excluding food and agri)',
-        relevance: 'Invests in early-stage European climate tech startups'
-    }, {
-        contact: 'Investment Team',
-        email: 'capital@systemiq.earth',
-        website: 'https://www.systemiqcapital.com',
-        focus: 'Circular economy, energy transition',
-        relevance: 'Focuses on energy transition technologies'
-    }, {
-        contact: 'Investment Team',
-        email: 'hello@aenu.com',
-        website: 'https://www.aenu.com',
-        focus: 'Climate tech and social impact startups',
-        relevance: 'Invests in solutions addressing climate challenges'
-    }, {
-        contact: 'Max ter Horst, Managing Partner',
-        email: 'energy@rockstart.com',
-        website: 'https://www.rockstart.com/energy',
-        focus: 'Energy transition and emerging tech',
-        relevance: 'Specializes in energy transition technologies'
-    }, {
-        contact: 'Investment Team',
-        email: 'hello@faber.vc',
-        website: 'https://www.faber.vc',
-        focus: 'Climate tech, digital transformation, sustainability',
-        relevance: 'Invests in climate tech solutions with digital components'
+        contact: 'Christian Hernandez, Partner', email: 'info@2150.vc', website: 'https://www.2150.vc', 
+        focus: 'Climate tech', relevance: 'Focuses on urban solutions'
     }],
-    'Angel Investors and Syndicates': [{
-        contact: 'Investment Team',
-        email: 'climate@coreangels.com',
-        website: 'https://www.coreangels.com/coreangelsclimate',
-        focus: 'Climate innovation',
-        relevance: 'Pan-European group of business angels focused on climate tech'
-    }, {
-        contact: 'Nick Lyth, Founder & CEO',
-        email: 'enquiries@greenangelsyndicate.com',
-        website: 'https://greenangelsyndicate.com',
-        focus: 'Investments that reduce carbon emissions',
-        relevance: 'UK\'s only angel syndicate specializing in the fight against climate change'
-    }, {
-        contact: 'Investment Team',
-        email: 'info@greenangelventures.com',
-        website: 'https://greenangelventures.com',
-        focus: 'Emerging climate tech start-ups',
-        relevance: 'Specializes in early-stage climate startups'
-    }],
-    'Corporate Venture Capital (CVC)': [{
-        contact: 'Jordy Klaassen, Investment Manager',
-        email: 'ventures@eneco.com',
-        website: 'https://www.eneco.com/ventures',
-        focus: 'Energy efficiency, sustainability solutions',
-        relevance: 'Helps startups test propositions and scale through customer base'
-    }, {
-        contact: 'Frederico Gonçalves, Partner & Managing Director',
-        email: 'edpventures@edp.com',
-        website: 'https://www.edpventures.com',
-        focus: 'Energy efficiency and sustainability solutions',
-        relevance: 'Focuses on strategic collaborations and industry expertise'
-    }, {
-        contact: 'Kendra Rauschenberger, General Partner',
-        email: 'ventures@siemens-energy.com',
-        website: 'https://www.siemens-energy.com/ventures',
-        focus: 'Energy technologies',
-        relevance: 'Supports "hard tech" companies with technical expertise'
-    }, {
-        contact: 'Investment Team',
-        email: 'ventures@abb.com',
-        website: 'https://new.abb.com/about/technology/ventures',
-        focus: 'Energy efficiency and industrial applications',
-        relevance: 'Provides market credibility and expertise in scaling products'
-    }, {
-        contact: 'Investment Team',
-        email: 'info@futureenergyventures.com',
-        website: 'https://www.futureenergyventures.com',
-        focus: 'Energy efficiency and sustainability solutions',
-        relevance: 'Brings together corporate partners and startups'
-    }],
-    'Government Grants and Sustainable Funding Programs': [{
-        contact: 'EIC Program Officers',
-        email: 'EISMEA-EIC-ACCELERATOR-ENQUIRIES@ec.europa.eu',
-        website: 'https://eic.ec.europa.eu/eic-funding-opportunities/eic-accelerator_en',
-        focus: 'SMEs developing game-changing innovations',
-        relevance: 'Supports sustainability and climate solutions'
-    }, {
-        contact: 'Program Officers',
-        email: 'EC-HORIZON-EUROPE-HELPDESK@ec.europa.eu',
-        website: 'https://research-and-innovation.ec.europa.eu/funding/funding-opportunities/funding-programmes-and-open-calls/horizon-europe_en',
-        focus: 'Research and innovation',
-        relevance: 'Significant portion dedicated to climate action'
-    }, {
-        contact: 'LIFE Program Officers',
-        email: 'LIFE@ec.europa.eu',
-        website: 'https://cinea.ec.europa.eu/programmes/life_en',
-        focus: 'Environment and climate action',
-        relevance: 'Provides grants for innovative climate solutions'
-    }, {
-        contact: 'EIT Climate-KIC',
-        email: 'info@climate-kic.org',
-        website: 'https://eit.europa.eu/our-communities/eit-climate-kic',
-        focus: 'Climate, energy, sustainability',
-        relevance: 'Funding and acceleration for climate tech startups'
-    }, {
-        contact: 'Program Officers',
-        email: 'vinnova@vinnova.se',
-        website: 'https://www.vinnova.se/en/',
-        focus: 'Innovation in Sweden',
-        relevance: 'Country-specific grants for innovative climate solutions'
+    'Angel Investors': [{
+        contact: 'Climate Angels', email: 'climate@coreangels.com', website: 'https://www.coreangels.com/coreangelsclimate', 
+        focus: 'Climate innovation', relevance: 'Pan-European angel group'
     }]
 };
-
 const emailTemplates = {
-    'Venture Capital Firms': {
-        subject: "Investment Opportunity: ClimateCurtainsAB - Revolutionizing Industrial Energy Efficiency",
-        body: `Dear [Investor Name],\n\nI am writing to you from ClimateCurtainsAB, a Swedish company at the forefront of industrial energy efficiency. We have developed a patented thermal curtain technology that delivers significant energy and cost savings to large-scale industrial clients.\n\nGiven [VC Firm Name]'s focus on [VC Focus], we believe our solution aligns perfectly with your investment thesis. Our technology has a proven track record, a strong ROI for clients, and a massive addressable market.\n\nWe are currently seeking investment to scale our production and expand our market reach. We would be delighted to share our investor deck and financial model with you.\n\nWould you be available for a brief call next week to discuss this further?\n\nBest regards,\n\nPeter Hertz\nCEO, ClimateCurtainsAB`
-    },
-    'Angel Investors and Syndicates': {
-        subject: "Angel Investment Opportunity: ClimateCurtainsAB - Sustainable Impact & Strong Returns",
-        body: `Dear [Investor Name],\n\nI am Peter Hertz, the founder of ClimateCurtainsAB. We are on a mission to combat industrial energy waste with our innovative thermal curtain technology. Our solution not only saves our clients money but also makes a tangible impact on CO2 emissions.\n\nAs a [syndicate/angel investor] with a focus on sustainable technology, we believe our venture presents a compelling opportunity. We have a solid business model, a patented product, and are poised for significant growth.\n\nWe are looking for angel investors who share our vision and want to be part of a company with both strong financial returns and a positive environmental impact.\n\nI would welcome the opportunity to discuss our plans with you. Please let me know if you would be open to a brief conversation.\n\nSincerely,\n\nPeter Hertz\nCEO, ClimateCurtainsAB`
-    },
-    'Corporate Venture Capital (CVC)': {
-        subject: "Strategic Partnership & Investment: ClimateCurtainsAB & [VC Firm Name]",
-        body: `Dear [Investor Name],\n\nI am writing to you from ClimateCurtainsAB to explore a potential strategic partnership and investment opportunity with [VC Firm Name]. Our patented industrial thermal curtains offer a unique solution to reduce energy consumption in large facilities, a challenge that is highly relevant to your industry.\n\nWe see a strong synergy between our technology and your company's sustainability goals. A partnership could provide us with invaluable market access and industry expertise, while our solution could enhance your operational efficiency and sustainability credentials.\n\nWe are confident that our technology can deliver significant value to your business and would be eager to discuss a pilot project or a strategic investment.\n\nI look forward to hearing from you.\n\nBest regards,\n\nPeter Hertz\nCEO, ClimateCurtainsAB`
-    },
-    'Government Grants and Sustainable Funding Programs': {
-        subject: "Application for [specific grant program]: ClimateCurtainsAB - Innovative Energy-Saving Technology",
-        body: `Dear Sir/Madam,\n\nOn behalf of ClimateCurtainsAB, I am writing to express our strong interest in the [specific grant program]. As a Swedish company dedicated to climate solutions, our mission aligns perfectly with the goals of this program.\n\nOur patented industrial thermal curtains are a game-changing innovation that addresses the urgent need for energy efficiency in the industrial sector. Our technology helps businesses significantly reduce their energy consumption and CO2 footprint, contributing directly to [specific policy goal, e.g., "energy efficiency targets" or "carbon reduction commitments"].\n\nWe have a scalable business model and a clear plan for market expansion. Funding from this program would be instrumental in accelerating our growth and maximizing our environmental impact.\n\nWe have attached our full proposal for your review and would be honored to be considered for this grant.\n\nThank you for your time and consideration.\n\nSincerely,\n\nPeter Hertz\nCEO, ClimateCurtainsAB`
-    }
+    'Venture Capital Firms': { subject: "Investment: ClimateCurtainsAB", body: "Dear [Investor Name],\n\n..." },
+    'Angel Investors': { subject: "Angel Opportunity: ClimateCurtainsAB", body: "Dear [Investor Name],\n\n..." }
 };
 
-// --- Helper Functions ---
-function showMessage(msg, isError = false) {
-    if (!messageBox) return;
-    messageBox.textContent = msg;
-    messageBox.classList.remove('hidden', 'bg-green-500', 'bg-red-500');
-    messageBox.classList.add(isError ? 'bg-red-500' : 'bg-green-500');
-    setTimeout(() => {
-        messageBox.classList.add('hidden');
-    }, 5000);
-}
-
-// --- Gemini Chat Functions ---
-async function handleChatSubmit() {
-    const userInput = chatInput.value.trim();
-    if (!userInput) return;
-
-    appendMessage(userInput, 'user');
-    chatInput.value = '';
-    chatSendButton.disabled = true;
-
-    const thinkingBubble = appendMessage("Thinking...", 'ai', true);
-    const currentEmail = emailDraftBody.value;
-    const prompt = `You are an expert business communication assistant. Your task is to refine an email draft based on user instructions.\n\nCurrent Email Draft:\n---\n${currentEmail}\n---\n\nUser's instruction: "${userInput}"\n\nBased on the instruction, please provide a revised version of the email. Only output the full, revised email text, without any additional comments or explanations.`;
-
-    try {
-        const response = await fetch(GEMINI_API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-        });
-        chatHistory.removeChild(thinkingBubble);
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error.message || `API request failed with status ${response.status}`);
-        }
-        const data = await response.json();
-        if (data.candidates && data.candidates.length > 0) {
-            const revisedEmail = data.candidates[0].content.parts[0].text;
-            emailDraftBody.value = revisedEmail;
-            appendMessage("I've updated the email draft for you based on your instructions. How does it look?", 'ai');
+// --- Main Auth Flow ---
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        const userProfileRef = doc(db, 'users', user.uid);
+        const docSnap = await getDoc(userProfileRef);
+        if (docSnap.exists() && docSnap.data().isAdmin) {
+            // User is an admin, initialize the page
+            loadingSpinner.classList.add('hidden');
+            adminDashboardSection.classList.remove('hidden');
+            adminNameSpan.textContent = docSnap.data().companyName || docSnap.data().firstName;
+            initializeAdminDashboard();
         } else {
-            throw new Error("No response from AI. The content may have been blocked.");
+            // Not an admin, redirect
+            alert("Access Denied. You are not an administrator.");
+            window.location.href = 'portal.html';
         }
-    } catch (error) {
-        console.error('Error with Gemini API:', error);
-        if (thinkingBubble.parentNode) chatHistory.removeChild(thinkingBubble);
-        appendMessage(`Sorry, an error occurred: ${error.message}. Please check your API key and network, then try again.`, 'ai');
-    } finally {
-        chatSendButton.disabled = false;
-        chatInput.focus();
+    } else {
+        // Not logged in, redirect
+        window.location.href = 'portal.html';
     }
-}
+});
 
-function appendMessage(text, sender, isThinking = false) {
-    const messageElement = document.createElement('div');
-    messageElement.className = `chat-message ${sender}`;
-    if (isThinking) messageElement.classList.add('thinking');
-    
-    const bubbleElement = document.createElement('div');
-    bubbleElement.className = 'message-bubble';
-    bubbleElement.textContent = text;
-    
-    messageElement.appendChild(bubbleElement);
-    chatHistory.appendChild(messageElement);
-    chatHistory.scrollTop = chatHistory.scrollHeight;
-    return messageElement;
-}
-
-// --- Core Admin Functions ---
-window.openModal = function(category, investor) {
-    const template = emailTemplates[category];
-    if (!template) return showMessage("No template found for this category.", true);
-    
-    const recipientName = investor.contact.split(',')[0].trim();
-    const companyName = category.includes('Venture Capital') ? category : investor.contact.split(',')[1] ? investor.contact.split(',')[1].trim() : category;
-    const subject = template.subject.replace(/\[VC Firm Name\]/g, companyName).replace(/\[Investor Name\]/g, recipientName);
-    const body = template.body.replace(/\[Investor Name\]/g, recipientName)
-                             .replace(/\[VC Firm Name\]/g, companyName)
-                             .replace(/\[VC Focus\]/g, investor.focus)
-                             .replace(/\[syndicate\/angel investor\]/g, category.includes('Syndicates') ? 'syndicate' : 'angel investor')
-                             .replace(/\[specific grant program\]/g, 'EIC Accelerator')
-                             .replace(/\[specific policy goal, e.g., "energy efficiency targets" or "carbon reduction commitments"\]/g, 'energy efficiency targets');
-
-    investorNameModal.textContent = recipientName;
-    emailDraftBody.value = body;
-    sendEmailLink.href = `mailto:${investor.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    
-    chatHistory.innerHTML = `<div class="chat-message ai"><div class="message-bubble">Hello! I can help you tailor this email to ${recipientName}. What would you like to change or add?</div></div>`;
-    emailModal.style.display = "block";
-};
-
-window.closeModal = function() {
-    emailModal.style.display = "none";
-};
-
-window.switchTab = (tabName) => {
-    document.querySelectorAll('.tabs button').forEach(tab => tab.classList.remove('active'));
-    document.querySelector(`#tab-button-${tabName}`).classList.add('active');
-    document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
-    document.getElementById(`${tabName}-tab-content`).classList.remove('hidden');
-};
-
-async function fetchInquiries() {
-    try {
-        const inquiriesSnapshot = await getDocs(collection(db, 'inquiries'));
-        inquiryListTableBody.innerHTML = '';
-        totalInquiriesElem.textContent = inquiriesSnapshot.size;
-        inquiriesSnapshot.forEach(doc => {
-            const data = doc.data();
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleDateString() : 'N/A'}</td><td>${data.company || data.name}</td><td>${data.subject}</td><td>${data.status || 'New'}</td><td><a href="#">View</a></td>`;
-            inquiryListTableBody.appendChild(tr);
-        });
-    } catch (error) {
-        console.error("Error fetching inquiries:", error);
-    }
+// --- Admin Dashboard Initialization ---
+function initializeAdminDashboard() {
+    fetchUsers();
+    fetchInquiries();
+    populateInvestorList();
+    setupEventListeners();
 }
 
 async function fetchUsers() {
-    try {
-        const usersSnapshot = await getDocs(collection(db, 'users'));
-        userListTableBody.innerHTML = '';
-        const companyNames = new Set();
-        totalUsersElem.textContent = usersSnapshot.size;
-        usersSnapshot.forEach(doc => {
-            const data = doc.data();
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${data.companyName}</td><td>${data.firstName}</td><td>${data.lastName}</td><td>${data.email}</td><td>${data.roleInCompany}</td><td>${data.squareMeterInFactory}</td><td>${data.isInvestor ? 'Yes' : 'No'}</td><td>${doc.id}</td>`;
-            userListTableBody.appendChild(tr);
-            if (data.companyName) companyNames.add(data.companyName);
-        });
-        registeredCompaniesElem.textContent = companyNames.size;
-    } catch (error) {
-        console.error("Error fetching users:", error);
-    }
+    const usersSnapshot = await getDocs(collection(db, 'users'));
+    userListTableBody.innerHTML = '';
+    const companyNames = new Set();
+    usersSnapshot.forEach(doc => {
+        const data = doc.data();
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${data.companyName || 'N/A'}</td>
+            <td>${data.firstName}</td>
+            <td>${data.lastName}</td>
+            <td>${data.email}</td>
+            <td>${data.isInvestor ? 'Yes' : 'No'}</td>
+            <td>${doc.id}</td>
+        `;
+        userListTableBody.appendChild(tr);
+        if(data.companyName) companyNames.add(data.companyName);
+    });
+    totalUsersElem.textContent = usersSnapshot.size;
+    registeredCompaniesElem.textContent = companyNames.size;
+}
+
+async function fetchInquiries() {
+    const inquiriesSnapshot = await getDocs(collection(db, 'inquiries'));
+    inquiryListTableBody.innerHTML = '';
+    totalInquiriesElem.textContent = inquiriesSnapshot.size;
+    inquiriesSnapshot.forEach(doc => {
+        const data = doc.data();
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
+            <td>${data.name}</td>
+            <td>${data.subject}</td>
+            <td><a href="#">View</a></td>
+        `;
+        inquiryListTableBody.appendChild(tr);
+    });
 }
 
 function populateInvestorList() {
@@ -378,12 +154,8 @@ function populateInvestorList() {
             const card = document.createElement('div');
             card.className = 'investor-card bg-white p-4 rounded-lg shadow';
             card.innerHTML = `
-                <h3 class="font-bold text-green-600">${investor.contact.split(',')[0]}</h3>
-                <p><strong>Contact:</strong> ${investor.contact}</p>
+                <h3 class="font-bold text-green-600">${investor.contact}</h3>
                 <p><strong>Email:</strong> <a href="mailto:${investor.email}" class="text-blue-500 hover:underline">${investor.email}</a></p>
-                <p><strong>Website:</strong> <a href="${investor.website}" target="_blank" class="text-blue-500 hover:underline">${investor.website}</a></p>
-                <p><strong>Focus:</strong> ${investor.focus}</p>
-                <p><strong>Relevance:</strong> ${investor.relevance}</p>
                 <button onclick="openModal('${category}', ${JSON.stringify(investor).replace(/"/g, "'")})" class="mt-2 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Draft Email</button>
             `;
             investorListGrid.appendChild(card);
@@ -391,63 +163,48 @@ function populateInvestorList() {
     }
 }
 
-// Main logic for admin page
-function handleAdminPage() {
-    onAuthStateChanged(auth, async (user) => {
-        if (user && !user.isAnonymous) {
-            const docRef = doc(db, 'users', user.uid);
-            const docSnap = await getDoc(docRef);
+function setupEventListeners() {
+    logoutButton.addEventListener('click', () => signOut(auth));
+    
+    fileUploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fileInput = document.getElementById('investor-file-upload');
+        const file = fileInput.files[0];
+        if (!file) { alert("Please select a file."); return; }
 
-            if (docSnap.exists() && docSnap.data().isAdmin) {
-                loadingSpinner.classList.add('hidden');
-                adminDashboardSection.classList.remove('hidden');
-                adminNameSpan.textContent = docSnap.data().companyName;
-
-                fetchUsers();
-                fetchInquiries();
-                populateInvestorList();
-
-            } else {
-                showMessage("Access Denied. You are not an administrator.", true);
-                setTimeout(() => { window.location.href = 'portal.html'; }, 2000);
-            }
-        } else {
-            window.location.href = 'portal.html';
+        const storageRef = ref(storage, `investor_files/${file.name}`);
+        try {
+            await uploadBytes(storageRef, file);
+            const downloadURL = await getDownloadURL(storageRef);
+            await addDoc(collection(db, 'public/investor_files'), {
+                fileName: file.name,
+                downloadURL: downloadURL,
+                uploadedAt: serverTimestamp()
+            });
+            alert("File uploaded successfully!");
+            fileInput.value = '';
+        } catch (error) {
+            alert(`Upload failed: ${error.message}`);
         }
     });
-
-    if (logoutButton) {
-        logoutButton.addEventListener('click', () => signOut(auth));
-    }
-
-    if (fileUploadForm) {
-        fileUploadForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const fileInput = document.getElementById('investor-file-upload');
-            const file = fileInput.files[0];
-            if (!file) return showMessage("Please select a file.", true);
-
-            const storageRef = ref(storage, `investor_files/${file.name}`);
-            try {
-                await uploadBytes(storageRef, file);
-                const downloadURL = await getDownloadURL(storageRef);
-                await addDoc(collection(db, 'public/investor_files'), {
-                    fileName: file.name,
-                    downloadURL: downloadURL,
-                    uploadedAt: serverTimestamp()
-                });
-                showMessage("File uploaded successfully!");
-                fileInput.value = '';
-            } catch (error) {
-                showMessage(`File upload failed: ${error.message}`, true);
-            }
-        });
-    }
-    
-    if (chatSendButton) chatSendButton.addEventListener('click', handleChatSubmit);
-    if (chatInput) chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleChatSubmit(); });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    handleAdminPage();
-});
+// Make modal functions globally accessible
+window.openModal = function(category, investor) {
+    const template = emailTemplates[category];
+    investorNameModal.textContent = investor.contact.split(',')[0];
+    emailDraftBody.value = template.body.replace('[Investor Name]', investor.contact.split(',')[0]);
+    sendEmailLink.href = `mailto:${investor.email}?subject=${encodeURIComponent(template.subject)}`;
+    emailModal.style.display = 'block';
+};
+
+window.closeModal = function() {
+    emailModal.style.display = 'none';
+};
+
+window.switchTab = (tabName) => {
+    document.querySelectorAll('.tabs button').forEach(tab => tab.classList.remove('active'));
+    document.querySelector(`#tab-button-${tabName}`).classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+    document.getElementById(`${tabName}-tab-content`).classList.remove('hidden');
+};
