@@ -139,22 +139,36 @@ function handleAuthForms() {
 
 // Centralized authentication handler
 onAuthStateChanged(auth, async (user) => {
+    // If the current URL is already dashboard.html or admin.html, do nothing.
+    if (window.location.pathname.includes('dashboard.html') || window.location.pathname.includes('admin.html')) {
+        return;
+    }
+
     if (user) {
         const docRef = doc(db, `/artifacts/${appId}/users/${user.uid}/user_profiles`, 'profile');
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists() && !user.isAnonymous) {
-            if (docSnap.data().isAdmin) {
-                window.location.href = 'admin.html';
+        try {
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists() && !user.isAnonymous) {
+                if (docSnap.data().isAdmin) {
+                    if (!window.location.pathname.includes('admin.html')) {
+                        window.location.href = 'admin.html';
+                    }
+                } else {
+                    if (!window.location.pathname.includes('dashboard.html')) {
+                        window.location.href = 'dashboard.html';
+                    }
+                }
             } else {
-                window.location.href = 'dashboard.html';
+                 if (loadingSpinner) loadingSpinner.classList.add('hidden');
+                 if (authView) authView.classList.remove('hidden');
             }
-        } else {
-             // If profile doesn't exist yet, stay on this page to complete it
-             if (loadingSpinner) loadingSpinner.classList.add('hidden');
-             if (authView) authView.classList.remove('hidden');
+        } catch (error) {
+            console.error("Redirect check failed:", error);
+            if (loadingSpinner) loadingSpinner.classList.add('hidden');
+            if (authView) authView.classList.remove('hidden');
         }
     } else {
-        // No user, show login/register forms
+        // No user, ensure login/register forms are visible
         if (loadingSpinner) loadingSpinner.classList.add('hidden');
         if (authView) authView.classList.remove('hidden');
         const toggleRegisterLink = document.getElementById('toggle-register-link');
