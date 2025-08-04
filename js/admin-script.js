@@ -58,6 +58,7 @@ const emailModal = document.getElementById('email-modal');
 const investorNameModal = document.getElementById('investor-name-modal');
 const emailDraftBody = document.getElementById('email-draft-body');
 const sendEmailLink = document.getElementById('send-email-link');
+const addInvestorForm = document.getElementById('add-investor-form');
 
 // Investor data (hardcoded for now)
 const investorData = {
@@ -314,6 +315,8 @@ Peter Hertz Founder & CEO ClimateCurtainsAB [Contact Information]`
     }
 };
 
+let currentInvestor = null;
+
 // Function to open the email drafting modal
 function openModal(category, investor) {
     const template = emailTemplates[category];
@@ -326,8 +329,8 @@ function openModal(category, investor) {
     const recipientName = investor.contact.split(',')[0].trim();
     const companyName = category.includes('Venture Capital') ? category : investor.contact.split(',')[1] ? investor.contact.split(',')[1].trim() : category;
     
-    let subject = template.subject.replace(/\[VC Firm Name\]/g, companyName).replace(/\[Investor Name\]/g, recipientName);
-    let body = template.body.replace(/\[Investor Name\]/g, recipientName)
+    const subject = template.subject.replace(/\[VC Firm Name\]/g, companyName).replace(/\[Investor Name\]/g, recipientName);
+    const body = template.body.replace(/\[Investor Name\]/g, recipientName)
                              .replace(/\[VC Firm Name\]/g, companyName)
                              .replace(/\[VC Focus\]/g, investor.focus)
                              .replace(/\[syndicate\/angel investor\]/g, category.includes('Syndicates') ? 'syndicate' : 'angel investor')
@@ -340,6 +343,7 @@ function openModal(category, investor) {
     sendEmailLink.href = `mailto:${investor.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     emailModal.style.display = "block";
 }
+window.openModal = openModal;
 
 // Function to close the modal
 function closeModal() {
@@ -412,10 +416,9 @@ async function handleAdminPage() {
                     if (totalUsersElem) totalUsersElem.textContent = totalUsers;
                     if (registeredCompaniesElem) registeredCompaniesElem.textContent = totalCompanies.size;
 
-                    // Populate investor list with new UI elements
+                    // Populate investor list
                     if (investorListGrid) {
                         investorListGrid.innerHTML = '';
-                        let investorIndex = 1;
                         for (const category in investorData) {
                             const categoryTitle = document.createElement('h3');
                             categoryTitle.className = 'col-span-full text-lg font-bold mt-4 mb-2';
@@ -423,24 +426,16 @@ async function handleAdminPage() {
                             investorListGrid.appendChild(categoryTitle);
                             investorData[category].forEach(investor => {
                                 const card = document.createElement('div');
-                                card.className = 'investor-card relative';
+                                card.className = 'investor-card';
                                 card.innerHTML = `
-                                    <div class="flex items-center">
-                                        <p class="font-bold mr-2">${investorIndex}.</p>
-                                        <h3 class="flex-1">${investor.contact.split(',')[0]}</h3>
-                                        <input type="checkbox" class="form-checkbox h-5 w-5 text-green-600 rounded">
-                                    </div>
+                                    <h3>${investor.contact.split(',')[0]}</h3>
                                     <p><strong>Contact:</strong> ${investor.contact}</p>
                                     <p><strong>Email:</strong> <a href="mailto:${investor.email}">${investor.email}</a></p>
                                     <p><strong>Website:</strong> <a href="${investor.website}" target="_blank">${investor.website}</a></p>
                                     <p><strong>Focus:</strong> ${investor.focus}</p>
                                     <p><strong>Relevance:</strong> ${investor.relevance}</p>
-                                    <div class="mt-4">
-                                        <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg text-sm" onclick="openModal('${category}', ${JSON.stringify(investor).replace(/"/g, "'")})">Draft Email</button>
-                                    </div>
                                 `;
                                 investorListGrid.appendChild(card);
-                                investorIndex++;
                             });
                         }
                     }
@@ -459,7 +454,7 @@ async function handleAdminPage() {
                              try {
                                  await uploadBytes(storageRef, file);
                                  const downloadURL = await getDownloadURL(storageRef);
-                                 await addDoc(collection(db, `/artifacts/${appId}/investor_files`), {
+                                 await addDoc(collection(db, `/artifacts/${appId}/public/investor_files`), {
                                      fileName: file.name,
                                      downloadURL: downloadURL,
                                      uploadedAt: serverTimestamp()
@@ -474,7 +469,7 @@ async function handleAdminPage() {
                     }
 
                     // Fetch and display uploaded files
-                    const filesCollectionRef = collection(db, `/artifacts/${appId}/investor_files`);
+                    const filesCollectionRef = collection(db, `/artifacts/${appId}/public/investor_files`);
                     if(uploadedFilesTableBody) {
                       onSnapshot(filesCollectionRef, (snapshot) => {
                           uploadedFilesTableBody.innerHTML = '';
