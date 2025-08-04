@@ -111,6 +111,8 @@ function handleAuthForms() {
             if (authView) authView.classList.add('hidden');
             const email = registerForm.querySelector('#register-email').value;
             const password = registerForm.querySelector('#register-password').value;
+            const firstName = registerForm.querySelector('#register-first-name').value;
+            const lastName = registerForm.querySelector('#register-last-name').value;
             const companyName = registerForm.querySelector('#register-company-name').value;
             const roleInCompany = registerForm.querySelector('#register-role').value;
             const linkedinProfile = registerForm.querySelector('#register-linkedin').value;
@@ -122,6 +124,8 @@ function handleAuthForms() {
                 const userProfileRef = doc(db, `/artifacts/${appId}/users/${newUser.uid}/user_profiles`, 'profile');
                 const isAdmin = email === 'ernst@hatake.eu';
                 await setDoc(userProfileRef, {
+                    firstName,
+                    lastName,
                     companyName,
                     roleInCompany,
                     linkedinProfile,
