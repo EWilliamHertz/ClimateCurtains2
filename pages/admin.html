@@ -6,17 +6,16 @@
     <title>Admin Dashboard - ClimateCurtainsAB</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap">
+    <style>
+        .tab-button.active { border-color: #4CAF50; color: #4CAF50; }
+    </style>
 </head>
 <body class="bg-gray-100 font-sans">
 
     <!-- Header -->
-    <header class="bg-white shadow-md">
+    <header class="bg-white shadow-md sticky top-0 z-40">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="logo">
-                <a href="../index.html">
-                    <img src="../images/logo.png" alt="ClimateCurtainsAB Logo" class="h-12">
-                </a>
-            </div>
+            <img src="../images/logo.png" alt="ClimateCurtainsAB Logo" class="h-12">
             <div class="flex items-center">
                 <span id="admin-name" class="text-gray-700 font-semibold mr-4"></span>
                 <button id="logout-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">Logout</button>
@@ -28,95 +27,76 @@
     <main class="container mx-auto p-6">
         <h1 class="text-3xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
 
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-gray-600">Total Users</h3>
-                <p id="total-users" class="text-3xl font-bold text-gray-800">0</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-gray-600">Registered Companies</h3>
-                <p id="registered-companies" class="text-3xl font-bold text-gray-800">0</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-gray-600">New Inquiries</h3>
-                <p id="total-inquiries" class="text-3xl font-bold text-gray-800">0</p>
-            </div>
+        <!-- Tab Navigation -->
+        <div class="mb-8 border-b border-gray-300">
+            <nav class="flex space-x-8">
+                <button id="tab-site-management" class="tab-button py-4 px-1 text-lg font-semibold text-gray-500 border-b-2 border-transparent hover:border-gray-400">Site Management</button>
+                <button id="tab-investor-outreach" class="tab-button py-4 px-1 text-lg font-semibold text-gray-500 border-b-2 border-transparent hover:border-gray-400 active">Investor Outreach</button>
+            </nav>
         </div>
 
-        <!-- Main Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Site Management Content (Initially Hidden) -->
+        <div id="content-site-management" class="hidden">
+             <!-- Stats, Users, Inquiries, File Uploads -->
+        </div>
 
-            <!-- Left Column: User & Inquiry Lists -->
-            <div class="lg:col-span-2 space-y-8">
-                <!-- User List -->
-                <div class="bg-white p-6 rounded-lg shadow-lg">
-                    <h2 class="text-2xl font-bold mb-4">Registered Users</h2>
-                    <div class="overflow-x-auto">
-                        <table id="user-list-table" class="w-full text-left">
-                            <thead>
-                                <tr class="bg-gray-200">
-                                    <th class="p-3">Company</th>
-                                    <th class="p-3">Email</th>
-                                    <th class="p-3">Role</th>
-                                    <th class="p-3">Investor</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- User rows will be inserted here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Inquiry List -->
-                <div class="bg-white p-6 rounded-lg shadow-lg">
-                    <h2 class="text-2xl font-bold mb-4">Contact Inquiries</h2>
-                    <div id="inquiry-list" class="space-y-4">
-                        <!-- Inquiry cards will be inserted here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Column: Investor Tools -->
-            <div class="space-y-8">
-                <!-- Investor Document Upload -->
-                <div class="bg-white p-6 rounded-lg shadow-lg">
-                    <h2 class="text-2xl font-bold mb-4">Upload Investor Document</h2>
-                    <form id="file-upload-form" class="space-y-4">
-                        <input type="file" id="investor-file-upload" required class="w-full border p-2 rounded-lg">
-                        <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Upload File</button>
-                    </form>
-                    <div id="upload-status" class="mt-4"></div>
-                    <h3 class="text-xl font-bold mt-6 mb-2">Uploaded Files</h3>
-                    <ul id="uploaded-files-list" class="list-disc pl-5 space-y-2">
-                        <!-- List of uploaded files -->
-                    </ul>
-                </div>
-                
-                <!-- Investor Prospect Management -->
-                <div class="bg-white p-6 rounded-lg shadow-lg">
+        <!-- Investor Outreach Content (Initially Active) -->
+        <div id="content-investor-outreach">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column: Add Investor Form -->
+                <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow-lg h-fit">
                     <h2 class="text-2xl font-bold mb-4">Add Investor Prospect</h2>
-                    <form id="investor-prospect-form" class="space-y-4">
-                         <input type="text" id="investor-name" placeholder="Investor/Firm Name" required class="w-full border p-2 rounded-lg">
-                         <select id="investor-category" class="w-full border p-2 rounded-lg">
-                             <option value="VC">Venture Capital</option>
-                             <option value="Angel">Angel Investor</option>
-                             <option value="CVC">Corporate Venture</option>
-                             <option value="Grant">Government Grant</option>
+                    <form id="investor-form" class="space-y-4">
+                        <input type="text" name="firmName" placeholder="Firm Name *" required class="w-full border p-2 rounded-lg">
+                        <input type="text" name="contactName" placeholder="Contact Name (e.g., John Doe, Partner)" required class="w-full border p-2 rounded-lg">
+                        <input type="email" name="email" placeholder="Email Address *" required class="w-full border p-2 rounded-lg">
+                        <input type="url" name="website" placeholder="Website URL *" required class="w-full border p-2 rounded-lg">
+                        <select name="category" required class="w-full border p-2 rounded-lg">
+                             <option value="" disabled selected>Select Category</option>
+                             <option value="Venture Capital Firms">Venture Capital</option>
+                             <option value="Angel Investors and Syndicates">Angel Investor / Syndicate</option>
+                             <option value="Corporate Venture Capital (CVC)">Corporate Venture Capital</option>
+                             <option value="Government Grants and Sustainable Funding Programs">Government Grant</option>
                          </select>
-                         <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Add Prospect</button>
+                        <textarea name="focus" placeholder="Primary Focus (e.g., Climate tech, SaaS)" class="w-full border p-2 rounded-lg h-24"></textarea>
+                        <textarea name="relevance" placeholder="Relevance to ClimateCurtains" class="w-full border p-2 rounded-lg h-24"></textarea>
+                        <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg">Add Investor</button>
                     </form>
-                     <h3 class="text-xl font-bold mt-6 mb-2">Prospect List</h3>
-                     <div id="investor-prospect-list" class="space-y-3">
-                         <!-- Prospect cards will be inserted here -->
-                     </div>
+                </div>
+
+                <!-- Right Column: Investor List -->
+                <div class="lg:col-span-2 space-y-6">
+                    <h2 class="text-2xl font-bold">Investor Prospect List</h2>
+                    <div id="investor-list-container">
+                        <!-- Investor cards will be dynamically inserted here by category -->
+                    </div>
                 </div>
             </div>
         </div>
     </main>
-    
-    <!-- Include the new admin script -->
+
+    <!-- AI Email Drafter Modal -->
+    <div id="ai-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-3xl h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h2 class="text-xl font-bold">AI Email Assistant</h2>
+                <button id="close-modal-button" class="text-gray-500 hover:text-gray-800">&times;</button>
+            </div>
+            <div id="modal-chat-window" class="flex-grow p-4 overflow-y-auto space-y-4">
+                <!-- Chat messages will be appended here -->
+            </div>
+            <div class="p-4 border-t">
+                <div id="modal-loading" class="hidden text-center mb-2">
+                    <p class="text-sm text-gray-500">AI is thinking...</p>
+                </div>
+                <form id="modal-input-form" class="flex space-x-2">
+                    <input type="text" id="modal-user-input" placeholder="Type your message or instructions..." class="flex-grow border p-2 rounded-lg">
+                    <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="../js/admin-script.js" type="module"></script>
 </body>
 </html>
