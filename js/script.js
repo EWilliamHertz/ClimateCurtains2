@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js';
 import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js';
-import { getFirestore, collection, getDocs, doc, getDoc, query, where } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
+import { getFirestore, collection, getDocs, doc, getDoc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
 
 // --- Firebase Configuration ---
 const firebaseConfig = {
@@ -31,50 +31,59 @@ function setupHamburgerMenu() {
 }
 
 // --- Dashboard Page Logic ---
-function handleDashboardPage() {
+async function handleDashboardPage() {
     const loadingView = document.getElementById('loading');
     const dashboardContent = document.getElementById('dashboard-content');
     const logoutButton = document.getElementById('logout-button');
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            // User is signed in, show the dashboard
-            loadingView.classList.add('hidden');
-            dashboardContent.classList.remove('hidden');
-
+            // User is signed in, fetch profile
             const profileRef = doc(db, 'users', user.uid);
             const profileSnap = await getDoc(profileRef);
+
+            loadingView.classList.add('hidden');
+            dashboardContent.classList.remove('hidden');
 
             if (profileSnap.exists()) {
                 const profile = profileSnap.data();
                 document.getElementById('welcome-message').textContent = `Welcome, ${profile.companyName || 'Valued Client'}!`;
                 document.getElementById('dashboard-company-name').textContent = profile.companyName || 'N/A';
                 document.getElementById('dashboard-role').textContent = profile.roleInCompany || 'N/A';
-                document.getElementById('dashboard-uid').textContent = user.uid;
+                document.getElementById('dashboard-email').textContent = user.email;
                 document.getElementById('dashboard-investor').textContent = profile.isInvestor ? 'Yes' : 'No';
 
-                // If user is an investor, show the resources section and fetch files
+                // If user is an investor, show resources and fetch files
                 if (profile.isInvestor) {
                     const investorResources = document.getElementById('investor-resources');
                     const investorFilesList = document.getElementById('investor-files-list');
                     investorResources.classList.remove('hidden');
 
-                    const filesSnapshot = await getDocs(collection(db, 'investor_files'));
+                    const filesQuery = query(collection(db, 'investor_files'), orderBy('uploadedAt', 'desc'));
+                    const filesSnapshot = await getDocs(filesQuery);
+                    
                     investorFilesList.innerHTML = '';
-                    filesSnapshot.forEach(fileDoc => {
-                        const fileData = fileDoc.data();
-                        const fileItem = document.createElement('div');
-                        fileItem.className = 'flex justify-between items-center bg-gray-100 p-3 rounded-lg';
-                        fileItem.innerHTML = `
-                            <span class="font-semibold">${fileData.fileName}</span>
-                            <a href="${fileData.downloadURL}" target="_blank" class="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-lg text-sm">Download</a>
-                        `;
-                        investorFilesList.appendChild(fileItem);
-                    });
+                    if (filesSnapshot.empty) {
+                        investorFilesList.innerHTML = '<p class="text-gray-500">No documents are currently available.</p>';
+                    } else {
+                        filesSnapshot.forEach(fileDoc => {
+                            const fileData = fileDoc.data();
+                            const fileItem = document.createElement('div');
+                            fileItem.className = 'flex justify-between items-center bg-gray-100 p-3 rounded-lg';
+                            fileItem.innerHTML = `
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-file-alt text-gray-500"></i>
+                                    <span class="font-semibold">${fileData.fileName}</span>
+                                </div>
+                                <a href="${fileData.downloadURL}" target="_blank" class="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-lg text-sm">Download</a>
+                            `;
+                            investorFilesList.appendChild(fileItem);
+                        });
+                    }
                 }
             }
 
-            // Fetch installations
+            // Fetch installations (remains the same)
             const installationsList = document.getElementById('installations-list');
             const noInstallationsMessage = document.getElementById('no-installations-message');
             const q = query(collection(db, "installations"), where("customerId", "==", user.uid));
@@ -121,5 +130,4 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentPage === 'dashboard.html') {
         handleDashboardPage();
     }
-    // Note: The logic for portal.html and admin.html is self-contained in those files.
 });
