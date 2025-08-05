@@ -16,28 +16,31 @@
         .calculator-form-section { flex: 1; }
         .visual-container { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
         .visual-before, .visual-after { width: 100%; height: 300px; border-radius: 8px; position: relative; overflow: hidden; border: 2px solid #e2e8f0; }
-        .visual-before { background: linear-gradient(to right, #60a5fa, #bfdbfe); }
-        .visual-after { background: linear-gradient(to right, #60a5fa, #bfdbfe); }
+        .visual-before { background: linear-gradient(to right, #fca5a5, #fecaca); } /* Warmer colors */
+        .visual-after { background: linear-gradient(to right, #60a5fa, #bfdbfe); } /* Cooler colors */
         .curtain {
             position: absolute;
             top: 0;
             left: 50%;
             width: 0;
             height: 100%;
-            background-color: #10b981;
+            background-color: var(--primary-color);
             transition: width 1s ease-in-out;
             z-index: 10;
         }
         .curtain.active { width: 50%; }
-        .temp-text { position: absolute; top: 1rem; color: white; font-weight: bold; font-size: 1.5rem; }
+        .temp-text { position: absolute; top: 1rem; color: white; font-weight: bold; font-size: 1.5rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
         .temp-text.left { left: 1rem; }
         .temp-text.right { right: 1rem; }
         .calculator-form .form-group { margin-bottom: 1.5rem; }
         .calculator-form label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
         .calculator-form input, .calculator-form select { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 1rem; }
-        .results-section { margin-top: 2rem; padding: 2rem; border-top: 1px solid #eee; }
-        .results-section h3 { margin-bottom: 1rem; }
-        .results-section p { font-size: 1.1rem; }
+        .results-section { margin-top: 2rem; padding: 2rem; border-top: 1px solid #eee; text-align: center; }
+        .results-section h3 { margin-bottom: 1.5rem; font-size: 1.8rem; }
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; text-align: center; margin-bottom: 2rem; }
+        .result-item { background-color: #f9f9f9; padding: 1rem; border-radius: 8px; }
+        .result-item strong { display: block; font-size: 1rem; color: #555; margin-bottom: 0.5rem; }
+        .result-item span { font-size: 1.5rem; font-weight: 700; color: var(--primary-color); }
         .order-button { margin-top: 1.5rem; text-align: center; }
     </style>
 </head>
@@ -82,7 +85,7 @@
             <div class="container">
                 <div class="calculator-container">
                     <div class="calculator-form-section">
-                        <h3>Input your facility details:</h3>
+                        <h3>Input Your Facility Details:</h3>
                         <form id="calculator-form" class="calculator-form">
                             <div class="form-group">
                                 <label for="preset-industry">Choose a Preset Industry (Optional)</label>
@@ -90,12 +93,12 @@
                                     <option value="" disabled selected>Select an industry</option>
                                     <option value="cold-storage">Cold Storage Warehouse</option>
                                     <option value="industrial">Industrial Production Facility</option>
-                                    <option value="hospitality">Hotel Lobby</option>
+                                    <option value="hospitality">Large Public Space (e.g., Hotel Lobby)</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="curtain-area">Estimated Curtain Area ($m^2$) *</label>
-                                <input type="number" id="curtain-area" required>
+                                <label for="curtain-area">Estimated Curtain Area (m²) *</label>
+                                <input type="number" id="curtain-area" required placeholder="e.g., 150">
                             </div>
                             <div class="form-group">
                                 <label for="r-value">Curtain R-Value *</label>
@@ -111,15 +114,15 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="temp-diff">Average Temperature Differential ($^\circ C$) *</label>
-                                <input type="number" id="temp-diff" required>
+                                <label for="temp-diff">Average Temperature Differential (°C) *</label>
+                                <input type="number" id="temp-diff" required placeholder="e.g., 15">
                             </div>
                             <div class="form-group">
                                 <label for="energy-cost">Local Energy Cost ($/kWh) *</label>
                                 <input type="number" id="energy-cost" step="0.01" value="0.15" required>
                             </div>
                             <div class="form-group">
-                                <label for="curtain-cost-per-sqm">Estimated Curtain Cost ($/m^2$)</label>
+                                <label for="curtain-cost-per-sqm">Estimated Curtain Cost ($/m²)</label>
                                 <input type="number" id="curtain-cost-per-sqm" step="0.01" value="50" required>
                             </div>
                             <button type="submit" class="form-submit">Calculate Savings</button>
@@ -128,25 +131,40 @@
 
                     <div class="visual-container">
                         <div class="visual-before" id="visual-before">
-                            <h4 id="temp-text-before-left" class="temp-text left">Warm: +20°C</h4>
-                            <h4 id="temp-text-before-right" class="temp-text right">Cold: +5°C</h4>
+                            <div class="temp-text left">Warm: +20°C</div>
+                            <div class="temp-text right">Cold: +5°C</div>
                         </div>
                         <div class="visual-after hidden" id="visual-after">
                             <div class="curtain" id="curtain-visual"></div>
-                            <h4 id="temp-text-after-left" class="temp-text left">Warm: +20°C</h4>
-                            <h4 id="temp-text-after-right" class="temp-text right">Cold: +5°C</h4>
+                            <div class="temp-text left">Warm: +20°C</div>
+                            <div class="temp-text right">Cold: +5°C</div>
                         </div>
                     </div>
                 </div>
 
                 <div id="results" class="results-section hidden">
-                    <h3>Estimated Annual Savings Report</h3>
-                    <p><strong>Estimated Total Curtain Cost:</strong> $<span id="total-cost"></span></p>
-                    <p><strong>Estimated Annual Energy Savings:</strong> <span id="energy-savings"></span> kWh</p>
-                    <p><strong>Estimated Annual Cost Savings:</strong> $<span id="cost-savings"></span></p>
-                    <p><strong>Estimated Payback Period:</strong> <span id="payback-period"></span> months</p>
+                    <h3>Your Estimated Annual Savings</h3>
+                    <div class="results-grid">
+                        <div class="result-item">
+                            <strong>Estimated Total Curtain Cost</strong>
+                            <span>$<span id="total-cost">0.00</span></span>
+                        </div>
+                        <div class="result-item">
+                            <strong>Annual Energy Savings</strong>
+                            <span><span id="energy-savings">0</span> kWh</span>
+                        </div>
+                        <div class="result-item">
+                            <strong>Annual Cost Savings</strong>
+                            <span>$<span id="cost-savings">0.00</span></span>
+                        </div>
+                        <div class="result-item">
+                            <strong>Estimated Payback Period</strong>
+                            <span><span id="payback-period">0</span> months</span>
+                        </div>
+                    </div>
                     <div class="order-button">
-                        <button class="cta-button" onclick="draftOrder()">Draft Your Order</button>
+                        <p class="mb-4">Ready to take the next step? Get a formal quote based on your results.</p>
+                        <button class="cta-button" onclick="draftOrder()">Request a Formal Quote</button>
                     </div>
                 </div>
             </div>
@@ -179,7 +197,7 @@
         </div>
     </footer>
 
-    <script src="../js/script.js" type="module"></script>
-    <script src="calculator-script.js" type="module"></script>
+    <script src="../js/script.js"></script>
+    <script src="../js/calculator-script.js"></script>
 </body>
 </html>
