@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Portal - ClimateCurtainsAB</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <a href="../index.html">
+                    <img src="../images/logo.png" alt="ClimateCurtainsAB Logo">
+                </a>
+            </div>
+            <nav>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="../index.html">HOME</a></li>
+                    <li><a href="our-solutions.html">SOLUTIONS</a></li>
+                    <li><a href="about.html">ABOUT US</a></li>
+                    <li><a href="invest.html">INVEST</a></li>
+                    <li><a href="impact.html">IMPACT</a></li>
+                    <li><a href="contact.html">CONTACT</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" style="min-height: calc(100vh - 160px);">
+        <div class="max-w-md w-full space-y-8">
+            <div id="loading" class="hidden text-center">
+                <p>Loading...</p>
+            </div>
+            <div id="auth-view">
+                <div>
+                    <h2 id="auth-title" class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                        Client Portal Login
+                    </h2>
+                </div>
+                <form id="login-form" class="mt-8 space-y-6" action="#" method="POST">
+                    <input type="hidden" name="remember" value="true">
+                    <div class="rounded-md shadow-sm -space-y-px">
+                        <div>
+                            <label for="login-email" class="sr-only">Email address</label>
+                            <input id="login-email" name="email" type="email" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm" placeholder="Email address">
+                        </div>
+                        <div>
+                            <label for="login-password" class="sr-only">Password</label>
+                            <input id="login-password" name="password" type="password" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm" placeholder="Password">
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            Sign in
+                        </button>
+                    </div>
+                </form>
+
+                <form id="register-form" class="mt-8 space-y-6 hidden" action="#" method="POST">
+                    <input id="register-email" type="email" placeholder="Email" required class="w-full px-3 py-2 border rounded-md">
+                    <input id="register-password" type="password" placeholder="Password" required class="w-full px-3 py-2 border rounded-md">
+                    <input id="register-company-name" type="text" placeholder="Company Name" class="w-full px-3 py-2 border rounded-md">
+                    <input id="register-role" type="text" placeholder="Role in Company" class="w-full px-3 py-2 border rounded-md">
+                     <input id="register-linkedin" type="url" placeholder="LinkedIn Profile URL" class="w-full px-3 py-2 border rounded-md">
+                    <input id="register-sqm" type="number" placeholder="Factory Square Meters" class="w-full px-3 py-2 border rounded-md">
+                    <div class="flex items-center">
+                        <input id="register-investor" type="checkbox" class="h-4 w-4 text-green-600 border-gray-300 rounded">
+                        <label for="register-investor" class="ml-2 block text-sm text-gray-900">I am an investor</label>
+                    </div>
+                    <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+                        Register
+                    </button>
+                </form>
+
+                <p id="toggle-auth" class="mt-2 text-center text-sm text-gray-600">
+                    Don't have an account? <span id="toggle-register-link" class="text-green-500 cursor-pointer hover:underline">Register here</span>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/script.js" type="module"></script>
+    <script type="module">
+        handleAuthForms();
+        handlePortalPage();
+        const toggleRegisterLink = document.getElementById('toggle-register-link');
+        if (toggleRegisterLink) {
+            toggleRegisterLink.addEventListener('click', () => window.toggleView('register'));
+        }
+    </script>
+</body>
+</html>
