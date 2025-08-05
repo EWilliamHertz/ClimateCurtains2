@@ -53,6 +53,7 @@ async function handleDashboardPage() {
                 document.getElementById('dashboard-email').textContent = user.email;
                 document.getElementById('dashboard-investor').textContent = profile.isInvestor ? 'Yes' : 'No';
 
+                // === THIS IS THE NEWLY ADDED LOGIC ===
                 // If user is an investor, show resources and fetch files
                 if (profile.isInvestor) {
                     const investorResources = document.getElementById('investor-resources');
@@ -62,7 +63,7 @@ async function handleDashboardPage() {
                     const filesQuery = query(collection(db, 'investor_files'), orderBy('uploadedAt', 'desc'));
                     const filesSnapshot = await getDocs(filesQuery);
                     
-                    investorFilesList.innerHTML = '';
+                    investorFilesList.innerHTML = ''; // Clear previous list
                     if (filesSnapshot.empty) {
                         investorFilesList.innerHTML = '<p class="text-gray-500">No documents are currently available.</p>';
                     } else {
@@ -81,6 +82,7 @@ async function handleDashboardPage() {
                         });
                     }
                 }
+                // === END OF NEW LOGIC ===
             }
 
             // Fetch installations (remains the same)
