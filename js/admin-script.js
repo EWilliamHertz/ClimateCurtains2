@@ -1,7 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js';
 import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js';
-import { getFirestore, collection, getDocs, addDoc, serverTimestamp, doc, getDoc, updateDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js';
+import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc, onSnapshot, query, orderBy } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
 
 // --- Firebase Configuration ---
 const firebaseConfig = {
@@ -10,214 +9,234 @@ const firebaseConfig = {
     projectId: "climatecurtainsab",
     storageBucket: "climatecurtainsab.appspot.com",
     messagingSenderId: "534408595576",
-    appId: "1:534408595576:web:c73c886ab1ea1abd9e858d",
-    measurementId: "G-3GNNYNJKM7"
+    appId: "1:534408595576:web:c73c886ab1ea1abd9e858d"
 };
 
 // --- Initialize Firebase ---
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
+
+// --- Global Admin State ---
+let adminProfile = {};
+let chatHistory = [];
 
 // --- DOM Elements ---
 const adminNameSpan = document.getElementById('admin-name');
 const logoutButton = document.getElementById('logout-button');
-const totalUsersElem = document.getElementById('total-users');
-const registeredCompaniesElem = document.getElementById('registered-companies');
-const totalInquiriesElem = document.getElementById('total-inquiries');
-const userListTableBody = document.querySelector('#user-list-table tbody');
-const inquiryListDiv = document.getElementById('inquiry-list');
-const fileUploadForm = document.getElementById('file-upload-form');
-const uploadStatusDiv = document.getElementById('upload-status');
-const uploadedFilesList = document.getElementById('uploaded-files-list');
-const investorProspectForm = document.getElementById('investor-prospect-form');
-const investorProspectListDiv = document.getElementById('investor-prospect-list');
+const tabSiteManagement = document.getElementById('tab-site-management');
+const tabInvestorOutreach = document.getElementById('tab-investor-outreach');
+const contentSiteManagement = document.getElementById('content-site-management');
+const contentInvestorOutreach = document.getElementById('content-investor-outreach');
+const investorForm = document.getElementById('investor-form');
+const investorListContainer = document.getElementById('investor-list-container');
+const aiModal = document.getElementById('ai-modal');
+const closeModalButton = document.getElementById('close-modal-button');
+const modalChatWindow = document.getElementById('modal-chat-window');
+const modalInputForm = document.getElementById('modal-input-form');
+const modalUserInput = document.getElementById('modal-user-input');
+const modalLoading = document.getElementById('modal-loading');
 
+// --- Email Templates ---
+const emailTemplates = {
+    "Venture Capital Firms": `Subject: ClimateCurtainsAB: Award-Winning Energy Efficiency Technology Seeking Investment Partnership\n\nDear [Investor Name],\n\nI hope this email finds you well. I am reaching out because [Investor Firm Name]'s focus on [Investor Focus] aligns perfectly with our mission at ClimateCurtainsAB...\n\nBest regards,\n[Admin Name]\n[Admin Role]\nClimateCurtainsAB`,
+    "Angel Investors and Syndicates": `Subject: Energy-Saving Innovation with Proven Results - ClimateCurtainsAB Investment Opportunity\n\nDear [Investor Name],\n\nAs a syndicate focused on climate solutions, I wanted to introduce you to ClimateCurtainsAB, an award-winning Swedish company...\n\nWarm regards,\n[Admin Name]\n[Admin Role]\nClimateCurtainsAB`,
+    "Corporate Venture Capital (CVC)": `Subject: Strategic Partnership Opportunity: ClimateCurtainsAB's Energy-Saving Window Technology\n\nDear [Investor Name],\n\nI'm reaching out because I see significant potential for strategic alignment between [Investor Firm Name]'s commitment to sustainability and ClimateCurtainsAB's innovative window solutions...\n\nBest regards,\n[Admin Name]\n[Admin Role]\nClimateCurtainsAB`,
+    "Government Grants and Sustainable Funding Programs": `Subject: ClimateCurtainsAB Grant Application: Proven Energy Efficiency Technology Aligned with [Investor Firm Name] Objectives\n\nDear [Investor Name],\n\nI am writing to express ClimateCurtainsAB's interest in the [Investor Firm Name] and to inquire about the application process...\n\nSincerely,\n[Admin Name]\n[Admin Role]\nClimateCurtainsAB`
+};
 
-// --- Main Admin Logic ---
-
-// Authentication Guard: Redirect if not an admin
+// --- Authentication ---
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         const userDocRef = doc(db, 'users', user.uid);
         const docSnap = await getDoc(userDocRef);
         if (docSnap.exists() && docSnap.data().isAdmin) {
-            // User is an admin, proceed to load dashboard
-            adminNameSpan.textContent = `Welcome, ${docSnap.data().companyName || 'Admin'}`;
-            loadDashboardData();
+            adminProfile = docSnap.data();
+            adminNameSpan.textContent = `Welcome, ${adminProfile.companyName || 'Admin'}`;
+            initializeAdminPanel();
         } else {
-            // Not an admin, redirect to client dashboard
             window.location.replace('dashboard.html');
         }
     } else {
-        // Not logged in, redirect to portal
         window.location.replace('portal.html');
     }
 });
 
-// Load all data for the dashboard
-function loadDashboardData() {
-    fetchUsersAndCompanies();
-    fetchInquiries();
-    listenForUploadedFiles();
-    listenForInvestorProspects();
+function initializeAdminPanel() {
+    setupTabs();
+    listenForInvestors();
+    investorForm.addEventListener('submit', handleAddInvestor);
+    logoutButton.addEventListener('click', () => signOut(auth));
+    closeModalButton.addEventListener('click', () => aiModal.classList.add('hidden'));
+    modalInputForm.addEventListener('submit', handleAiChatSubmit);
 }
 
-// Fetch and display all registered users
-async function fetchUsersAndCompanies() {
-    const usersSnapshot = await getDocs(collection(db, 'users'));
-    const companyNames = new Set();
-    userListTableBody.innerHTML = ''; // Clear existing list
-
-    usersSnapshot.forEach(userDoc => {
-        const userData = userDoc.data();
-        if (userData.companyName) {
-            companyNames.add(userData.companyName);
-        }
-        const row = userListTableBody.insertRow();
-        row.innerHTML = `
-            <td class="p-3">${userData.companyName || 'N/A'}</td>
-            <td class="p-3">${userData.email}</td>
-            <td class="p-3">${userData.roleInCompany || 'N/A'}</td>
-            <td class="p-3">${userData.isInvestor ? 'Yes' : 'No'}</td>
-        `;
+// --- Tab Management ---
+function setupTabs() {
+    tabInvestorOutreach.addEventListener('click', () => {
+        contentSiteManagement.classList.add('hidden');
+        contentInvestorOutreach.classList.remove('hidden');
+        tabSiteManagement.classList.remove('active');
+        tabInvestorOutreach.classList.add('active');
     });
-
-    totalUsersElem.textContent = usersSnapshot.size;
-    registeredCompaniesElem.textContent = companyNames.size;
-}
-
-// Fetch and display contact inquiries
-async function fetchInquiries() {
-    const inquiriesSnapshot = await getDocs(collection(db, 'inquiries'));
-    inquiryListDiv.innerHTML = ''; // Clear existing list
-
-    totalInquiriesElem.textContent = inquiriesSnapshot.size;
-
-    inquiriesSnapshot.forEach(inqDoc => {
-        const inquiry = inqDoc.data();
-        const card = document.createElement('div');
-        card.className = 'border border-gray-200 p-4 rounded-lg';
-        card.innerHTML = `
-            <h4 class="font-bold">${inquiry.subject}</h4>
-            <p class="text-sm text-gray-600">From: ${inquiry.name} (${inquiry.email})</p>
-            <p class="mt-2">${inquiry.message}</p>
-        `;
-        inquiryListDiv.appendChild(card);
+    tabSiteManagement.addEventListener('click', () => {
+        contentInvestorOutreach.classList.add('hidden');
+        contentSiteManagement.classList.remove('hidden');
+        tabInvestorOutreach.classList.remove('active');
+        tabSiteManagement.classList.add('active');
     });
 }
 
-// Handle Investor Document Uploads
-fileUploadForm.addEventListener('submit', async (e) => {
+// --- Investor CRM Logic ---
+async function handleAddInvestor(e) {
     e.preventDefault();
-    const fileInput = document.getElementById('investor-file-upload');
-    const file = fileInput.files[0];
-    if (!file) return;
-
-    uploadStatusDiv.textContent = 'Uploading...';
-    const storageRef = ref(storage, `investor_documents/${file.name}`);
+    const formData = new FormData(investorForm);
+    const investorData = Object.fromEntries(formData.entries());
+    investorData.createdAt = serverTimestamp();
     
     try {
-        await uploadBytes(storageRef, file);
-        const downloadURL = await getDownloadURL(storageRef);
-        
-        // Save file reference to Firestore
-        await addDoc(collection(db, 'investor_files'), {
-            fileName: file.name,
-            downloadURL: downloadURL,
-            uploadedAt: serverTimestamp()
-        });
-        
-        uploadStatusDiv.textContent = 'Upload successful!';
-        fileUploadForm.reset();
+        await addDoc(collection(db, 'investors'), investorData);
+        investorForm.reset();
     } catch (error) {
-        console.error("Upload failed:", error);
-        uploadStatusDiv.textContent = `Upload failed: ${error.message}`;
+        console.error("Error adding investor:", error);
+        alert("Failed to add investor.");
     }
-});
+}
 
-// Listen for real-time updates to uploaded files
-function listenForUploadedFiles() {
-    const filesRef = collection(db, 'investor_files');
-    onSnapshot(filesRef, (snapshot) => {
-        uploadedFilesList.innerHTML = '';
+function listenForInvestors() {
+    const q = query(collection(db, 'investors'), orderBy('createdAt', 'desc'));
+    onSnapshot(q, (snapshot) => {
+        const investorsByCategory = {};
         snapshot.forEach(doc => {
-            const fileData = doc.data();
-            const li = document.createElement('li');
-            li.innerHTML = `<a href="${fileData.downloadURL}" target="_blank" class="text-blue-500 hover:underline">${fileData.fileName}</a>`;
-            uploadedFilesList.appendChild(li);
+            const investor = { id: doc.id, ...doc.data() };
+            if (!investorsByCategory[investor.category]) {
+                investorsByCategory[investor.category] = [];
+            }
+            investorsByCategory[investor.category].push(investor);
         });
+        renderInvestorList(investorsByCategory);
     });
 }
 
-// Handle Investor Prospect Form
-investorProspectForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const name = document.getElementById('investor-name').value;
-    const category = document.getElementById('investor-category').value;
-
-    await addDoc(collection(db, 'investor_prospects'), {
-        name,
-        category,
-        contacted: false,
-        notes: ''
-    });
-    investorProspectForm.reset();
-});
-
-// Listen for real-time updates to investor prospects
-function listenForInvestorProspects() {
-    const prospectsRef = collection(db, 'investor_prospects');
-    onSnapshot(prospectsRef, (snapshot) => {
-        investorProspectListDiv.innerHTML = '';
-        snapshot.forEach(doc => {
-            const prospect = doc.data();
-            const id = doc.id;
+function renderInvestorList(investorsByCategory) {
+    investorListContainer.innerHTML = '';
+    for (const category in investorsByCategory) {
+        const categoryWrapper = document.createElement('div');
+        categoryWrapper.innerHTML = `<h3 class="text-xl font-bold text-gray-700 mb-4">${category}</h3>`;
+        const grid = document.createElement('div');
+        grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-6';
+        
+        investorsByCategory[category].forEach(investor => {
             const card = document.createElement('div');
-            card.className = 'border p-3 rounded-lg flex flex-col space-y-2';
+            card.className = 'bg-white p-4 rounded-lg shadow-md flex flex-col';
             card.innerHTML = `
-                <div class="flex justify-between items-center">
-                    <span class="font-semibold">${prospect.name} <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">${prospect.category}</span></span>
-                    <div class="flex items-center">
-                        <label for="contacted-${id}" class="text-sm mr-2">Contacted:</label>
-                        <input type="checkbox" id="contacted-${id}" ${prospect.contacted ? 'checked' : ''} data-id="${id}">
-                    </div>
+                <h4 class="text-lg font-bold">${investor.firmName}</h4>
+                <p class="text-sm text-gray-600">${investor.contactName}</p>
+                <a href="${investor.website}" target="_blank" class="text-blue-500 text-sm hover:underline">${investor.website}</a>
+                <div class="mt-2 text-sm space-y-1">
+                    <p><strong>Focus:</strong> ${investor.focus || 'N/A'}</p>
+                    <p><strong>Relevance:</strong> ${investor.relevance || 'N/A'}</p>
                 </div>
-                <textarea data-id="${id}" class="w-full border p-2 rounded-lg text-sm" placeholder="Add notes...">${prospect.notes}</textarea>
-                <button class="save-note-btn bg-gray-200 hover:bg-gray-300 text-xs py-1 px-2 rounded-lg self-end" data-id="${id}">Save Note</button>
+                <button data-investor='${JSON.stringify(investor)}' class="draft-email-btn mt-auto bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-3 rounded-lg w-full mt-4">Draft Email with AI</button>
             `;
-            investorProspectListDiv.appendChild(card);
+            grid.appendChild(card);
         });
-    });
+        
+        categoryWrapper.appendChild(grid);
+        investorListContainer.appendChild(categoryWrapper);
+    }
 }
 
-// Event delegation for saving notes and updating checkboxes
-investorProspectListDiv.addEventListener('click', async (e) => {
-    const target = e.target;
-    const id = target.dataset.id;
-    if (!id) return;
-
-    if (target.matches('input[type="checkbox"]')) {
-        const prospectRef = doc(db, 'investor_prospects', id);
-        await updateDoc(prospectRef, { contacted: target.checked });
+// --- AI Email Drafter Logic ---
+investorListContainer.addEventListener('click', (e) => {
+    if (e.target.classList.contains('draft-email-btn')) {
+        const investorData = JSON.parse(e.target.dataset.investor);
+        openAiModal(investorData);
     }
+});
+
+function openAiModal(investor) {
+    modalChatWindow.innerHTML = '';
+    chatHistory = [];
+    aiModal.classList.remove('hidden');
+
+    let template = emailTemplates[investor.category] || "Please write a professional outreach email.";
+    template = template.replace('[Investor Name]', investor.contactName)
+                       .replace(/\[Investor Firm Name\]/g, investor.firmName)
+                       .replace('[Investor Focus]', investor.focus)
+                       .replace(/\[Admin Name\]/g, adminProfile.companyName) // Assuming companyName is user's name
+                       .replace(/\[Admin Role\]/g, adminProfile.roleInCompany);
+
+    const initialPrompt = `Hello, I am ${adminProfile.companyName}, the ${adminProfile.roleInCompany} of ClimateCurtainsAB. I am drafting an email to ${investor.contactName} of ${investor.firmName}, which is a ${investor.category}. Please help me.
+
+Here is a first draft based on a template:
+---
+${template}
+---
+Would you like me to research the investor's website (${investor.website}) and help you tailor this email to them?`;
+
+    addMessageToChat('ai', 'Hello! I am your AI assistant. I have prepared a draft email for you. How would you like to proceed?');
     
-    if (target.matches('.save-note-btn')) {
-        const noteText = document.querySelector(`textarea[data-id="${id}"]`).value;
-        const prospectRef = doc(db, 'investor_prospects', id);
-        await updateDoc(prospectRef, { notes: noteText });
-        alert('Note saved!');
+    // Start the conversation with the initial prompt
+    callGeminiAPI(initialPrompt, true);
+}
+
+async function handleAiChatSubmit(e) {
+    e.preventDefault();
+    const userInput = modalUserInput.value.trim();
+    if (!userInput) return;
+    
+    addMessageToChat('user', userInput);
+    modalUserInput.value = '';
+    
+    await callGeminiAPI(userInput);
+}
+
+async function callGeminiAPI(prompt, isInitial = false) {
+    modalLoading.classList.remove('hidden');
+    
+    // IMPORTANT: Replace with your actual API key
+    const apiKey = "AIzaSyBQeLMNbrjf8RPO01wipxS0JrWNyTv9az0";
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+
+    if (isInitial) {
+        chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+    } else {
+        chatHistory.push({ role: "user", parts: [{ text: prompt }] });
     }
-});
 
-
-// Logout functionality
-logoutButton.addEventListener('click', async () => {
     try {
-        await signOut(auth);
-        window.location.replace('portal.html');
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: chatHistory })
+        });
+
+        if (!response.ok) {
+            throw new Error(`API Error: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        const aiResponse = result.candidates[0].content.parts[0].text;
+        
+        chatHistory.push({ role: "model", parts: [{ text: aiResponse }] });
+        addMessageToChat('ai', aiResponse);
+
     } catch (error) {
-        console.error("Logout failed:", error);
+        console.error("Gemini API Error:", error);
+        addMessageToChat('ai', `Sorry, I encountered an error: ${error.message}`);
+    } finally {
+        modalLoading.classList.add('hidden');
     }
-});
+}
+
+function addMessageToChat(sender, text) {
+    const messageElement = document.createElement('div');
+    messageElement.className = `p-3 rounded-lg max-w-[80%] ${sender === 'user' ? 'bg-blue-100 self-end' : 'bg-gray-200 self-start'}`;
+    // Basic markdown to HTML conversion
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Bold
+    text = text.replace(/\n/g, '<br>'); // Newlines
+    messageElement.innerHTML = text;
+    modalChatWindow.appendChild(messageElement);
+    modalChatWindow.scrollTop = modalChatWindow.scrollHeight;
+}
