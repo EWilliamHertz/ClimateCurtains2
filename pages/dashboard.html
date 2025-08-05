@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Dashboard - ClimateCurtainsAB</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <header>
+        <div class="container">
+            <div class="logo">
+                <a href="../index.html">
+                    <img src="../images/logo.png" alt="ClimateCurtainsAB Logo">
+                </a>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="contact.html">CONTACT</a></li>
+                    <li><button id="logout-button" class="cta-button" style="padding: 0.5rem 1rem; margin-top: 0;">Logout</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main id="dashboard-view" class="container mx-auto py-12 px-4 sm:px-6 lg:px-8 hidden">
+        <div id="loading" class="text-center">
+            <p>Loading Dashboard...</p>
+        </div>
+
+        <div id="dashboard-content" class="hidden">
+            <h1 id="welcome-message" class="text-3xl font-bold text-gray-900 mb-6">Welcome!</h1>
+            
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                <h2 class="text-2xl font-semibold mb-4">Your Profile</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <p><strong>Company:</strong> <span id="dashboard-company-name"></span></p>
+                    <p><strong>Role:</strong> <span id="dashboard-role"></span></p>
+                    <p><strong>User ID:</strong> <span id="dashboard-uid"></span></p>
+                    <p><strong>Investor Status:</strong> <span id="dashboard-investor"></span></p>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                <h2 class="text-2xl font-semibold mb-4">Your Installations</h2>
+                <div id="installations-list" class="space-y-6">
+                    <p id="no-installations-message" class="text-gray-500 hidden">No installation data found for your account.</p>
+                </div>
+            </div>
+
+            <div id="investor-resources" class="bg-white p-6 rounded-lg shadow-md hidden">
+                <h2 class="text-2xl font-semibold mb-4">Investor Resources</h2>
+                <div id="investor-files-list" class="space-y-4">
+                    </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/script.js" type="module"></script>
+    <script type="module">
+        import { handleDashboardPage } from '../js/script.js';
+        handleDashboardPage();
+    </script>
+</body>
+</html>
