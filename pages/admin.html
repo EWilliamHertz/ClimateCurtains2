@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - ClimateCurtainsAB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap">
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- Header -->
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="logo">
+                <a href="../index.html">
+                    <img src="../images/logo.png" alt="ClimateCurtainsAB Logo" class="h-12">
+                </a>
+            </div>
+            <div class="flex items-center">
+                <span id="admin-name" class="text-gray-700 font-semibold mr-4"></span>
+                <button id="logout-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold text-gray-600">Total Users</h3>
+                <p id="total-users" class="text-3xl font-bold text-gray-800">0</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold text-gray-600">Registered Companies</h3>
+                <p id="registered-companies" class="text-3xl font-bold text-gray-800">0</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold text-gray-600">New Inquiries</h3>
+                <p id="total-inquiries" class="text-3xl font-bold text-gray-800">0</p>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Left Column: User & Inquiry Lists -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- User List -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-bold mb-4">Registered Users</h2>
+                    <div class="overflow-x-auto">
+                        <table id="user-list-table" class="w-full text-left">
+                            <thead>
+                                <tr class="bg-gray-200">
+                                    <th class="p-3">Company</th>
+                                    <th class="p-3">Email</th>
+                                    <th class="p-3">Role</th>
+                                    <th class="p-3">Investor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- User rows will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Inquiry List -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-bold mb-4">Contact Inquiries</h2>
+                    <div id="inquiry-list" class="space-y-4">
+                        <!-- Inquiry cards will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Investor Tools -->
+            <div class="space-y-8">
+                <!-- Investor Document Upload -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-bold mb-4">Upload Investor Document</h2>
+                    <form id="file-upload-form" class="space-y-4">
+                        <input type="file" id="investor-file-upload" required class="w-full border p-2 rounded-lg">
+                        <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Upload File</button>
+                    </form>
+                    <div id="upload-status" class="mt-4"></div>
+                    <h3 class="text-xl font-bold mt-6 mb-2">Uploaded Files</h3>
+                    <ul id="uploaded-files-list" class="list-disc pl-5 space-y-2">
+                        <!-- List of uploaded files -->
+                    </ul>
+                </div>
+                
+                <!-- Investor Prospect Management -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-bold mb-4">Add Investor Prospect</h2>
+                    <form id="investor-prospect-form" class="space-y-4">
+                         <input type="text" id="investor-name" placeholder="Investor/Firm Name" required class="w-full border p-2 rounded-lg">
+                         <select id="investor-category" class="w-full border p-2 rounded-lg">
+                             <option value="VC">Venture Capital</option>
+                             <option value="Angel">Angel Investor</option>
+                             <option value="CVC">Corporate Venture</option>
+                             <option value="Grant">Government Grant</option>
+                         </select>
+                         <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Add Prospect</button>
+                    </form>
+                     <h3 class="text-xl font-bold mt-6 mb-2">Prospect List</h3>
+                     <div id="investor-prospect-list" class="space-y-3">
+                         <!-- Prospect cards will be inserted here -->
+                     </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Include the new admin script -->
+    <script src="../js/admin-script.js" type="module"></script>
+</body>
+</html>
