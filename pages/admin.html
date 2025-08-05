@@ -8,10 +8,16 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap">
     <style>
         .tab-button.active { border-color: #4CAF50; color: #4CAF50; }
+        /* Simple toggle switch styles */
+        .toggle-switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #4CAF50; }
+        input:checked + .slider:before { transform: translateX(26px); }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
-    <!-- Header -->
     <header class="bg-white shadow-md sticky top-0 z-40">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <img src="../images/logo.png" alt="ClimateCurtainsAB Logo" class="h-12">
@@ -22,27 +28,47 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="container mx-auto p-6">
         <h1 class="text-3xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
 
-        <!-- Tab Navigation -->
         <div class="mb-8 border-b border-gray-300">
             <nav class="flex space-x-8">
-                <button id="tab-site-management" class="tab-button py-4 px-1 text-lg font-semibold text-gray-500 border-b-2 border-transparent hover:border-gray-400">Site Management</button>
-                <button id="tab-investor-outreach" class="tab-button py-4 px-1 text-lg font-semibold text-gray-500 border-b-2 border-transparent hover:border-gray-400 active">Investor Outreach</button>
+                <button id="tab-site-management" class="tab-button py-4 px-1 text-lg font-semibold text-gray-500 border-b-2 border-transparent hover:border-gray-400 active">Site Management</button>
+                <button id="tab-investor-outreach" class="tab-button py-4 px-1 text-lg font-semibold text-gray-500 border-b-2 border-transparent hover:border-gray-400">Investor Outreach</button>
             </nav>
         </div>
 
-        <!-- Site Management Content (Initially Hidden) -->
-        <div id="content-site-management" class="hidden">
-             <!-- Stats, Users, Inquiries, File Uploads -->
+        <div id="content-site-management">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="space-y-8">
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">User Management</h2>
+                        <div id="user-list-container" class="space-y-4 max-h-96 overflow-y-auto">
+                            </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">Contact Form Inquiries</h2>
+                        <div id="inquiries-list-container" class="space-y-4 max-h-96 overflow-y-auto">
+                            </div>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg h-fit">
+                    <h2 class="text-2xl font-bold mb-4">Upload Investor Documents</h2>
+                    <p class="text-gray-600 mb-4">Upload files here (e.g., Pitch Decks, Financial Reports). They will be available for download on the dashboard for all users marked as 'investors'.</p>
+                    <form id="file-upload-form" class="space-y-4">
+                        <input type="file" id="file-input" required class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"/>
+                        <div id="upload-progress-container" class="w-full bg-gray-200 rounded-full h-2.5 hidden">
+                            <div id="upload-progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <p id="upload-status" class="text-sm text-gray-500"></p>
+                        <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg">Upload File</button>
+                    </form>
+                </div>
+            </div>
         </div>
 
-        <!-- Investor Outreach Content (Initially Active) -->
-        <div id="content-investor-outreach">
+        <div id="content-investor-outreach" class="hidden">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Left Column: Add Investor Form -->
                 <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow-lg h-fit">
                     <h2 class="text-2xl font-bold mb-4">Add Investor Prospect</h2>
                     <form id="investor-form" class="space-y-4">
@@ -63,27 +89,23 @@
                     </form>
                 </div>
 
-                <!-- Right Column: Investor List -->
                 <div class="lg:col-span-2 space-y-6">
                     <h2 class="text-2xl font-bold">Investor Prospect List</h2>
                     <div id="investor-list-container">
-                        <!-- Investor cards will be dynamically inserted here by category -->
-                    </div>
+                        </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- AI Email Drafter Modal -->
     <div id="ai-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-lg shadow-2xl w-full max-w-3xl h-[90vh] flex flex-col">
             <div class="flex justify-between items-center p-4 border-b">
                 <h2 class="text-xl font-bold">AI Email Assistant</h2>
-                <button id="close-modal-button" class="text-gray-500 hover:text-gray-800">&times;</button>
+                <button id="close-modal-button" class="text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
             </div>
             <div id="modal-chat-window" class="flex-grow p-4 overflow-y-auto space-y-4">
-                <!-- Chat messages will be appended here -->
-            </div>
+                </div>
             <div class="p-4 border-t">
                 <div id="modal-loading" class="hidden text-center mb-2">
                     <p class="text-sm text-gray-500">AI is thinking...</p>
