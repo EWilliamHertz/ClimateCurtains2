@@ -244,5 +244,44 @@
             });
         }
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const messageTextarea = document.getElementById('message');
+            const subjectInput = document.getElementById('subject');
+
+            // Check if there are any parameters from the calculator
+            if (params.has('curtainArea')) {
+                const subject = "Draft Order Inquiry from Savings Calculator";
+                const messageBody = `Hello,
+
+I have used the Energy Saving Calculator and would like to inquire about the following draft order:
+
+--- CALCULATION DETAILS ---
+Estimated Curtain Area: ${params.get('curtainArea')} m²
+Selected Curtain R-Value: R-${params.get('rValue')}
+Average Temperature Differential: ${params.get('tempDiff')} °C
+Local Energy Cost: $${params.get('energyCost')}/kWh
+
+--- ESTIMATED RESULTS ---
+Estimated Total Curtain Cost: $${params.get('totalCost')}
+Estimated Annual Cost Savings: $${params.get('annualSavings')}
+Estimated Payback Period: ${params.get('paybackPeriod')} months
+--------------------------
+
+Please provide me with more information on how to proceed.
+
+Thank you,
+[Your Name]`;
+
+                if (subjectInput) {
+                    subjectInput.value = subject;
+                }
+                if (messageTextarea) {
+                    messageTextarea.value = messageBody;
+                }
+            }
+        });
+    </script>
 </body>
 </html>
