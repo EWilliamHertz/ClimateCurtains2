@@ -5,35 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Dashboard - ClimateCurtainsAB</title>
     <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap">
 </head>
 <body class="bg-gray-50">
     <header>
-        <div class="container">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <div class="logo">
                 <a href="../index.html">
-                    <img src="../images/logo.png" alt="ClimateCurtainsAB Logo">
+                    <img src="../images/logo.png" alt="ClimateCurtainsAB Logo" class="h-12">
                 </a>
             </div>
             <nav>
-                <ul class="nav-links">
-                    <li><a href="contact.html">CONTACT</a></li>
-                    <li><button id="logout-button" class="cta-button" style="padding: 0.5rem 1rem; margin-top: 0;">Logout</button></li>
-                </ul>
+                <button id="logout-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">Logout</button>
             </nav>
         </div>
     </header>
 
-    <main id="dashboard-view" class="container mx-auto py-12 px-4 sm:px-6 lg:px-8 hidden">
+    <main class="container mx-auto py-12 px-4">
         <div id="loading" class="text-center">
-            <p>Loading Dashboard...</p>
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
+            <p class="mt-4 text-lg">Loading Dashboard...</p>
         </div>
 
-        <div id="dashboard-content" class="hidden">
-            <h1 id="welcome-message" class="text-3xl font-bold text-gray-900 mb-6">Welcome!</h1>
+        <div id="dashboard-content" class="hidden space-y-8">
+            <h1 id="welcome-message" class="text-3xl font-bold text-gray-900">Welcome!</h1>
             
-            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <!-- Profile Information -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
                 <h2 class="text-2xl font-semibold mb-4">Your Profile</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <p><strong>Company:</strong> <span id="dashboard-company-name"></span></p>
@@ -43,14 +42,15 @@
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <!-- Installations Section -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
                 <h2 class="text-2xl font-semibold mb-4">Your Installations</h2>
                 <div id="installations-list" class="space-y-6">
                     <p id="no-installations-message" class="text-gray-500 hidden">No installation data found for your account.</p>
                 </div>
             </div>
 
-   <!-- THIS IS THE NEW SECTION TO ADD -->
+            <!-- THIS IS THE NEW SECTION TO ADD -->
             <div id="investor-resources" class="bg-white p-6 rounded-lg shadow-md hidden">
                 <h2 class="text-2xl font-semibold mb-4">Investor Resources</h2>
                 <p class="mb-4 text-gray-600">Here you can find exclusive documents and reports.</p>
@@ -60,12 +60,11 @@
             </div>
             <!-- END OF NEW SECTION -->
 
+        </div>
     </main>
 
+    <!-- *** THIS IS THE CORRECTED SCRIPT TAG *** -->
     <script src="../js/script.js" type="module"></script>
-    <script type="module">
-        import { handleDashboardPage } from '../js/script.js';
-        handleDashboardPage();
-    </script>
+
 </body>
 </html>
