@@ -95,7 +95,6 @@ async function handleAddInvestor(e) {
     investorData.createdAt = serverTimestamp();
     
     try {
-        // *** FIX: Changed 'investors' to 'investor_prospects' to match security rules ***
         await addDoc(collection(db, 'investor_prospects'), investorData);
         investorForm.reset();
     } catch (error) {
@@ -105,7 +104,6 @@ async function handleAddInvestor(e) {
 }
 
 function listenForInvestors() {
-    // *** FIX: Changed 'investors' to 'investor_prospects' to match security rules ***
     const q = query(collection(db, 'investor_prospects'), orderBy('createdAt', 'desc'));
     onSnapshot(q, (snapshot) => {
         const investorsByCategory = {};
@@ -179,7 +177,6 @@ Would you like me to research the investor's website (${investor.website}) and h
 
     addMessageToChat('ai', 'Hello! I am your AI assistant. I have prepared a draft email for you. How would you like to proceed?');
     
-    // Start the conversation with the initial prompt
     callGeminiAPI(initialPrompt, true);
 }
 
@@ -197,9 +194,9 @@ async function handleAiChatSubmit(e) {
 async function callGeminiAPI(prompt, isInitial = false) {
     modalLoading.classList.remove('hidden');
     
-    // IMPORTANT: Replace with your actual API key
     const apiKey = "AIzaSyBQeLMNbrjf8RPO01wipxS0JrWNyTv9az0";
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+    // *** FIX: Updated the model name in the API URL ***
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
     if (isInitial) {
         chatHistory.push({ role: "user", parts: [{ text: prompt }] });
@@ -215,7 +212,10 @@ async function callGeminiAPI(prompt, isInitial = false) {
         });
 
         if (!response.ok) {
-            throw new Error(`API Error: ${response.statusText}`);
+            // Attempt to get more detailed error info from the response body
+            const errorBody = await response.json();
+            console.error("API Error Body:", errorBody);
+            throw new Error(`API Error: ${response.statusText} - ${errorBody.error.message}`);
         }
 
         const result = await response.json();
@@ -235,9 +235,8 @@ async function callGeminiAPI(prompt, isInitial = false) {
 function addMessageToChat(sender, text) {
     const messageElement = document.createElement('div');
     messageElement.className = `p-3 rounded-lg max-w-[80%] ${sender === 'user' ? 'bg-blue-100 self-end' : 'bg-gray-200 self-start'}`;
-    // Basic markdown to HTML conversion
-    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Bold
-    text = text.replace(/\n/g, '<br>'); // Newlines
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); 
+    text = text.replace(/\n/g, '<br>');
     messageElement.innerHTML = text;
     modalChatWindow.appendChild(messageElement);
     modalChatWindow.scrollTop = modalChatWindow.scrollHeight;
