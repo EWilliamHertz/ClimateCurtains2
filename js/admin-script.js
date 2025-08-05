@@ -95,16 +95,18 @@ async function handleAddInvestor(e) {
     investorData.createdAt = serverTimestamp();
     
     try {
-        await addDoc(collection(db, 'investors'), investorData);
+        // *** FIX: Changed 'investors' to 'investor_prospects' to match security rules ***
+        await addDoc(collection(db, 'investor_prospects'), investorData);
         investorForm.reset();
     } catch (error) {
         console.error("Error adding investor:", error);
-        alert("Failed to add investor.");
+        alert("Failed to add investor. Check console and security rules.");
     }
 }
 
 function listenForInvestors() {
-    const q = query(collection(db, 'investors'), orderBy('createdAt', 'desc'));
+    // *** FIX: Changed 'investors' to 'investor_prospects' to match security rules ***
+    const q = query(collection(db, 'investor_prospects'), orderBy('createdAt', 'desc'));
     onSnapshot(q, (snapshot) => {
         const investorsByCategory = {};
         snapshot.forEach(doc => {
