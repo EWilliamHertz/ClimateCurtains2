@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+<!-- Main Pages -->
+<url>
+  <loc>https://ewilliamhertz.github.io/ClimateCurtains2/index.html</loc>
+  <lastmod>2025-08-05T18:00:00+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://ewilliamhertz.github.io/ClimateCurtains2/pages/our-solutions.html</loc>
+  <lastmod>2025-08-05T18:00:00+00:00</lastmod>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://ewilliamhertz.github.io/ClimateCurtains2/pages/impact.html</loc>
+  <lastmod>2025-08-05T18:00:00+00:00</lastmod>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://ewilliamhertz.github.io/ClimateCurtains2/pages/about.html</loc>
+  <lastmod>2025-08-05T18:00:00+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://ewilliamhertz.github.io/ClimateCurtains2/pages/invest.html</loc>
+  <lastmod>2025-08-05T18:00:00+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://ewilliamhertz.github.io/ClimateCurtains2/pages/contact.html</loc>
+  <lastmod>2025-08-05T18:00:00+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://ewilliamhertz.github.io/ClimateCurtains2/pages/calculator.html</loc>
+  <lastmod>2025-08-05T18:00:00+00:00</lastmod>
+  <priority>0.70</priority>
+</url>
+<url>
+  <loc>https://ewilliamhertz.github.io/ClimateCurtains2/pages/funding.html</loc>
+  <lastmod>2025-08-05T18:00:00+00:00</lastmod>
+  <priority>0.60</priority>
+</url>
+<url>
+  <loc>https://ewilliamhertz.github.io/ClimateCurtains2/pages/portal.html</loc>
+  <lastmod>2025-08-05T18:00:00+00:00</lastmod>
+  <priority>0.50</priority>
+</url>
+
+</urlset>
