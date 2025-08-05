@@ -4,25 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Portal - ClimateCurtainsAB</title>
-    <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap">
+    <link rel="stylesheet" href="../css/styles.css"> <!-- Assuming this holds basic styles -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap">
 </head>
-<body>
+<body class="bg-gray-50">
     <header>
-        <div class="container">
-            <div class="logo">
-                <a href="../index.html">
-                    <img src="../images/logo.png" alt="ClimateCurtainsAB Logo">
-                </a>
-            </div>
-            <nav>
-                <div class="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="logo">
+                    <a href="../index.html">
+                        <img src="../images/logo.png" alt="ClimateCurtainsAB Logo" style="height: 60px;">
+                    </a>
                 </div>
-                <ul class="nav-links">
+                <nav>
+                          <ul class="nav-links">
                     <li><a href="../index.html">HOME</a></li>
                     <li><a href="our-solutions.html">SOLUTIONS</a></li>
                     <li><a href="about.html">ABOUT US</a></li>
@@ -30,19 +26,25 @@
                     <li><a href="impact.html">IMPACT</a></li>
                     <li><a href="contact.html">CONTACT</a></li>
                 </ul>
-            </nav>
+                </nav>
+            </div>
         </div>
     </header>
 
-    <main class="bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" style="min-height: calc(100vh - 80px);">
+    <main class="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" style="min-height: calc(100vh - 96px);">
         <div class="max-w-md w-full space-y-8">
-            <div id="message-box" class="hidden"></div>
-            <div id="loading" class="hidden text-center">
-                <p class="text-lg font-semibold">Loading...</p>
-                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto mt-2"></div>
+
+            <!-- Loading Spinner -->
+            <div id="loading-view" class="text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
+                <p class="mt-4 text-gray-600">Checking authentication...</p>
             </div>
             
-            <div id="auth-view">
+            <!-- Message Box -->
+            <div id="message-box" class="hidden p-4 rounded-md text-white text-center"></div>
+
+            <!-- Auth Forms Container -->
+            <div id="auth-view" class="hidden">
                 <div>
                     <h2 id="auth-title" class="mt-6 text-center text-3xl font-extrabold text-gray-900">
                         Client Portal Login
@@ -54,15 +56,15 @@
                     <div class="rounded-md shadow-sm -space-y-px">
                         <div>
                             <label for="login-email" class="sr-only">Email address</label>
-                            <input id="login-email" name="email" type="email" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm" placeholder="Email address">
+                            <input id="login-email" name="email" type="email" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm" placeholder="Email address">
                         </div>
                         <div>
                             <label for="login-password" class="sr-only">Password</label>
-                            <input id="login-password" name="password" type="password" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm" placeholder="Password">
+                            <input id="login-password" name="password" type="password" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm" placeholder="Password">
                         </div>
                     </div>
                     <div>
-                        <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                             Sign in
                         </button>
                     </div>
@@ -70,28 +72,164 @@
 
                 <!-- Registration Form -->
                 <form id="register-form" class="mt-8 space-y-6 hidden">
-                    <input id="register-email" type="email" placeholder="Email *" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                    <input id="register-password" type="password" placeholder="Password *" required class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                    <input id="register-company-name" type="text" placeholder="Company Name" class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                    <input id="register-role" type="text" placeholder="Your Role" class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                    <input id="register-linkedin" type="url" placeholder="LinkedIn Profile URL" class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                    <input id="register-sqm" type="number" placeholder="Factory Square Meters (Optional)" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    <input id="register-email" type="email" placeholder="Email *" required class="w-full px-3 py-3 border border-gray-300 rounded-md">
+                    <input id="register-password" type="password" placeholder="Password *" required class="w-full px-3 py-3 border border-gray-300 rounded-md">
+                    <input id="register-company-name" type="text" placeholder="Company Name" class="w-full px-3 py-3 border border-gray-300 rounded-md">
+                    <input id="register-role" type="text" placeholder="Your Role" class="w-full px-3 py-3 border border-gray-300 rounded-md">
+                    <input id="register-linkedin" type="url" placeholder="LinkedIn Profile URL" class="w-full px-3 py-3 border border-gray-300 rounded-md">
+                    <input id="register-sqm" type="number" placeholder="Factory Square Meters (Optional)" class="w-full px-3 py-3 border border-gray-300 rounded-md">
                     <div class="flex items-center">
                         <input id="register-investor" type="checkbox" class="h-4 w-4 text-green-600 border-gray-300 rounded">
                         <label for="register-investor" class="ml-2 block text-sm text-gray-900">I am an investor</label>
                     </div>
-                    <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+                    <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
                         Register
                     </button>
                 </form>
 
-                <p id="toggle-auth" class="mt-4 text-center text-sm text-gray-600">
-                    Don't have an account? <span class="font-medium text-green-600 hover:text-green-500 cursor-pointer">Register here</span>
+                <p id="toggle-auth-container" class="mt-4 text-center text-sm text-gray-600">
+                    Don't have an account? <span id="toggle-auth-link" class="font-medium text-green-600 hover:text-green-500 cursor-pointer">Register here</span>
                 </p>
             </div>
         </div>
     </main>
 
-    <script src="../js/script.js" type="module"></script>
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js';
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js';
+        import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB7_Tdz7SGtcj-qN8Ro7uAmoVrPyuR5cqc",
+            authDomain: "climatecurtainsab.firebaseapp.com",
+            projectId: "climatecurtainsab",
+            storageBucket: "climatecurtainsab.appspot.com",
+            messagingSenderId: "534408595576",
+            appId: "1:534408595576:web:c73c886ab1ea1abd9e858d",
+            measurementId: "G-3GNNYNJKM7"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // DOM Elements
+        const loadingView = document.getElementById('loading-view');
+        const authView = document.getElementById('auth-view');
+        const messageBox = document.getElementById('message-box');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const authTitle = document.getElementById('auth-title');
+        const toggleAuthLink = document.getElementById('toggle-auth-link');
+
+        // --- Helper Functions ---
+        function showMessage(msg, isError = false) {
+            messageBox.textContent = msg;
+            messageBox.className = 'p-4 rounded-md text-white text-center'; // Reset classes
+            messageBox.classList.add(isError ? 'bg-red-500' : 'bg-green-500');
+            setTimeout(() => { messageBox.classList.add('hidden'); }, 5000);
+        }
+
+        function toggleForms(showRegister) {
+            if (showRegister) {
+                authTitle.textContent = 'Client Registration';
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                toggleAuthLink.textContent = 'Login here';
+            } else {
+                authTitle.textContent = 'Client Portal Login';
+                registerForm.classList.add('hidden');
+                loginForm.classList.remove('hidden');
+                toggleAuthLink.textContent = 'Register here';
+            }
+        }
+
+        // --- Event Listeners ---
+        toggleAuthLink.addEventListener('click', () => {
+            const isRegistering = loginForm.classList.contains('hidden');
+            toggleForms(!isRegistering);
+        });
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = loginForm['login-email'].value;
+            const password = loginForm['login-password'].value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                // onAuthStateChanged will handle the redirection
+            } catch (error) {
+                console.error("Login Error:", error);
+                showMessage(error.message, true);
+            }
+        });
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = registerForm['register-email'].value;
+            const password = registerForm['register-password'].value;
+            
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const newUser = userCredential.user;
+                const userProfileRef = doc(db, 'users', newUser.uid);
+
+                // Collect all data from the registration form
+                const profileData = {
+                    email: email,
+                    companyName: registerForm['register-company-name'].value || 'N/A',
+                    roleInCompany: registerForm['register-role'].value || 'N/A',
+                    linkedinProfile: registerForm['register-linkedin'].value || '',
+                    squareMeterInFactory: registerForm['register-sqm'].value || 'N/A',
+                    isInvestor: registerForm['register-investor'].checked,
+                    isAdmin: email.toLowerCase() === 'ernst@hatake.eu', // Admin check
+                    registeredAt: serverTimestamp(),
+                };
+
+                await setDoc(userProfileRef, profileData);
+                // onAuthStateChanged will handle the redirection
+            } catch (error) {
+                console.error("Registration Error:", error);
+                showMessage(error.message, true);
+            }
+        });
+
+        // --- Main Authentication Flow ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User is signed in.
+                try {
+                    const userDocRef = doc(db, 'users', user.uid);
+                    const docSnap = await getDoc(userDocRef);
+
+                    if (docSnap.exists()) {
+                        // Redirect based on admin status
+                        if (docSnap.data().isAdmin) {
+                            window.location.replace('admin.html');
+                        } else {
+                            window.location.replace('dashboard.html');
+                        }
+                    } else {
+                        // This case might happen if user is created but doc fails.
+                        // Forcing them to the dashboard is a safe fallback.
+                         window.location.replace('dashboard.html');
+                    }
+                } catch(error) {
+                    console.error("Redirection Error:", error);
+                    showMessage("Could not verify your profile. Please try again.", true);
+                    // Stay on page to allow retry
+                    loadingView.classList.add('hidden');
+                    authView.classList.remove('hidden');
+                }
+            } else {
+                // User is signed out. Show the login/register forms.
+                loadingView.classList.add('hidden');
+                authView.classList.remove('hidden');
+            }
+        });
+
+    </script>
 </body>
 </html>
