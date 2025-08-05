@@ -1,4 +1,3 @@
-
 // Data for pre-populated fields and calculations
 const presetData = {
     'cold-storage': {
@@ -120,16 +119,22 @@ if (calculatorForm) {
 }
 
 function draftOrder() {
-    // Collect data from the form and navigate to a contact form with pre-filled fields
+    // Collect data from the form
     const data = {
         curtainArea: curtainAreaInput.value,
         rValue: rValueSelect.value,
         tempDiff: tempDiffInput.value,
         energyCost: energyCostInput.value,
         totalCost: totalCostSpan.textContent,
-        annualSavings: costSavingsSpan.textContent
+        annualSavings: costSavingsSpan.textContent,
+        paybackPeriod: paybackPeriodSpan.textContent
     };
-    // In a real application, you would pass this data to a contact page or a modal.
-    alert(`Order drafted with details:\nCurtain Area: ${data.curtainArea}m²\nR-Value: R-${data.rValue}\nEstimated Cost: $${data.totalCost}\nEstimated Savings: $${data.annualSavings}`);
+    
+    // Convert the data object to a URL query string
+    const queryString = new URLSearchParams(data).toString();
+    
+    // Redirect to the contact page with the data
+    window.location.href = `contact.html?${queryString}`;
 }
+
 window.draftOrder = draftOrder; // Make function globally accessible
