@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Contact ClimateCurtainsAB for industrial energy-saving solutions. Get in touch for custom quotes, information, or partnership opportunities.">
-    <meta name="keywords" content="contact ClimateCurtainsAB, energy-saving industrial curtains, quote request, B2B contact">
+    <meta name="description" content="Contact ClimateCurtainsAB for industrial energy-saving solutions. Request a custom quote, inquire about investment, or explore partnership opportunities to start saving.">
+    <meta name="keywords" content="contact ClimateCurtainsAB, energy-saving industrial curtains, quote request, B2B contact, investment inquiry">
     <title>Contact - ClimateCurtainsAB</title>
     <link rel="stylesheet" href="../css/styles.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap">
@@ -12,7 +12,6 @@
     <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js" type="module"></script>
     <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js" type="module"></script>
     <style>
-        /* This style is to accommodate the message box */
         main {
             position: relative;
         }
@@ -52,7 +51,7 @@
             <div class="container">
                 <div class="contact-content">
                     <h1>Get in Touch</h1>
-                    <p>Ready to save energy with ClimateCurtainsAB? Contact us to learn more, request a custom quote, or explore partnership opportunities.</p>
+                    <p>Ready to save energy with ClimateCurtainsAB? Contact our team to learn more about our technology, request a custom quote for your facility, or explore partnership opportunities.</p>
                 </div>
             </div>
         </section>
@@ -125,6 +124,7 @@
                     
                     <div class="contact-form">
                         <h3>Send Us a Message</h3>
+                        <p>Whether you have a question about our technology, need a detailed quote, or are interested in investment, we're ready to help.</p>
                         <form id="inquiry-form">
                             <div class="form-group">
                                 <label for="name">Name *</label>
@@ -252,7 +252,6 @@
             const messageTextarea = document.getElementById('message');
             const subjectInput = document.getElementById('subject');
 
-            // Check if there are any parameters from the calculator
             if (params.has('curtainArea')) {
                 const subject = "Draft Order Inquiry from Savings Calculator";
                 const messageBody = `Hello,
@@ -271,7 +270,7 @@ Estimated Annual Cost Savings: $${params.get('annualSavings')}
 Estimated Payback Period: ${params.get('paybackPeriod')} months
 --------------------------
 
-Please provide me with more information on how to proceed.
+Please provide me with more information on how to proceed with a formal quote and installation plan.
 
 Thank you,
 [Your Name]`;
