@@ -1,29 +1,20 @@
+// --- Correct, full URL imports for browser compatibility ---
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js';
 import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js';
 import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc, onSnapshot, query, orderBy, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js";
 
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// --- Firebase Configuration Provided by You ---
+// Note: I've corrected the storageBucket to the standard '.appspot.com' format for SDK compatibility.
 const firebaseConfig = {
-  apiKey: "AIzaSyB7_Tdz7SGtcj-qN8Ro7uAmoVrPyuR5cqc",
-  authDomain: "climatecurtainsab.firebaseapp.com",
-  projectId: "climatecurtainsab",
-  storageBucket: "climatecurtainsab.firebasestorage.app",
-  messagingSenderId: "534408595576",
-  appId: "1:534408595576:web:c73c886ab1ea1abd9e858d",
-  measurementId: "G-3GNNYNJKM7"
+    apiKey: "AIzaSyB7_Tdz7SGtcj-qN8Ro7uAmoVrPyuR5cqc",
+    authDomain: "climatecurtainsab.firebaseapp.com",
+    projectId: "climatecurtainsab",
+    storageBucket: "climatecurtainsab.appspot.com", // Corrected for SDK
+    messagingSenderId: "534408595576",
+    appId: "1:534408595576:web:c73c886ab1ea1abd9e858d",
+    measurementId: "G-3GNNYNJKM7"
 };
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 
 // --- Initialize Firebase ---
 const app = initializeApp(firebaseConfig);
@@ -72,10 +63,12 @@ onAuthStateChanged(auth, async (user) => {
             adminNameSpan.textContent = `Welcome, ${adminProfile.companyName || 'Admin'}`;
             initializeAdminPanel();
         } else {
+            // If user is not an admin, sign them out and redirect
             await signOut(auth);
             window.location.replace('portal.html');
         }
     } else {
+        // If no user is logged in, redirect
         window.location.replace('portal.html');
     }
 });
@@ -211,7 +204,7 @@ function handleFileUpload(e) {
         }, 
         (error) => {
             console.error("Upload failed:", error);
-            uploadStatus.textContent = `Upload failed. Check console and storage rules.`;
+            uploadStatus.textContent = `Upload failed. Check console and storage rules. Error: ${error.code}`;
         }, 
         async () => {
             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
@@ -350,7 +343,7 @@ function renderInvestorList(investorsByCategory) {
     investorListContainer.innerHTML = '';
     for (const category in investorsByCategory) {
         const categoryWrapper = document.createElement('div');
-        categoryWrapper.innerHTML = `<h3 class="text-xl font-bold text-gray-700 mb-4">${category}</h3>`;
+        categoryWrapper.innerHTML = `<h3 class="text-xl font-bold text-gray-700 mb-4 mt-6">${category}</h3>`;
         const grid = document.createElement('div');
         grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-6';
         
@@ -406,30 +399,37 @@ function handleDraftEmailClick(e) {
     }
 }
 
-const emailTemplates = {
-    "Venture Capital Firms": `Subject: ClimateCurtainsAB: Award-Winning Energy Efficiency Technology Seeking Investment Partnership...`,
-    "Angel Investors and Syndicates": `Subject: Energy-Saving Innovation with Proven Results - ClimateCurtainsAB Investment Opportunity...`,
-    "Corporate Venture Capital (CVC)": `Subject: Strategic Partnership Opportunity: ClimateCurtainsAB's Energy-Saving Window Technology...`,
-    "Government Grants and Sustainable Funding Programs": `Subject: ClimateCurtainsAB Grant Application: Proven Energy Efficiency Technology Aligned with [Program Name] Objectives...`
-};
-
 function openAiModal(investor) {
     modalChatWindow.innerHTML = '';
-    chatHistory = [];
+    chatHistory = []; // Reset history for each new draft
     aiModal.classList.remove('hidden');
 
-    let template = emailTemplates[investor.category] || "Please write a professional outreach email.";
+    const initialPrompt = `
+        You are an expert investment outreach assistant for ClimateCurtainsAB, a Swedish company with a patented, award-winning industrial thermal curtain that saves significant energy.
+        Your task is to draft a compelling, professional, and personalized outreach email to a potential investor.
+
+        **Company Information:**
+        - **Product:** Patented thermal curtains (ClimateCurtain®) for industrial buildings.
+        - **Key Benefits:** Reduces energy costs, non-invasive installation, proven 18-month ROI.
+        - **Achievements:** Winner of the Energy Globe Award for Sweden; key technology in the "Zero Island" project which cut CO2 by 78%.
+        - **Goal:** Seeking USD 5-8 million in Series A funding for expansion into Asian markets.
+
+        **Investor Information:**
+        - **Contact Name:** ${investor.contactName}
+        - **Firm Name:** ${investor.firmName}
+        - **Firm's Focus:** ${investor.focus || 'Not specified'}
+        - **Relevance:** ${investor.relevance || 'Not specified'}
+
+        **Your Task:**
+        1.  Start by generating an initial draft of the email.
+        2.  The tone should be professional, confident, and concise.
+        3.  Personalize the email by referencing the investor's firm and focus area.
+        4.  Clearly state the investment opportunity and the call to action (e.g., a brief meeting).
+        5.  Sign off as Peter Hertz, CEO of ClimateCurtainsAB.
+        6.  After providing the draft, ask me for feedback or what I'd like to change.
+    `;
     
-    template = template.replace(/\[Investor Name\]/g, investor.contactName)
-                       .replace(/\[Investor Firm Name\]/g, investor.firmName)
-                       .replace(/\[Investor Focus\]/g, investor.focus)
-                       .replace(/\[Admin Name\]/g, adminProfile.companyName)
-                       .replace(/\[Admin Role\]/g, adminProfile.roleInCompany)
-                       .replace(/\[Contact Information\]/g, adminProfile.email);
-
-    const initialPrompt = `You are an expert investment outreach assistant for ClimateCurtainsAB...`; // Omitted for brevity
-
-    addMessageToChat('ai', `Hello ${adminProfile.companyName}! I'm drafting a personalized email to ${investor.contactName}. Please wait...`);
+    addMessageToChat('ai', `Hello! I'm preparing a draft email for ${investor.contactName} at ${investor.firmName}. Please give me a moment...`);
     callGeminiAPI(initialPrompt, true);
 }
 
@@ -445,7 +445,8 @@ async function handleAiChatSubmit(e) {
 
 async function callGeminiAPI(prompt, isInitial = false) {
     modalLoading.classList.remove('hidden');
-    const apiKey = "AIzaSyBQeLMNbrjf8RPO01wipxS0JrWNyTv9az0"; // Use your actual API key
+    // IMPORTANT: Replace with your actual Gemini API Key
+    const apiKey = "YOUR_GEMINI_API_KEY"; 
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
     if (isInitial) {
@@ -474,7 +475,7 @@ async function callGeminiAPI(prompt, isInitial = false) {
 
     } catch (error) {
         console.error("Gemini API Error:", error);
-        addMessageToChat('ai', `Sorry, an error occurred: ${error.message}`);
+        addMessageToChat('ai', `Sorry, an error occurred: ${error.message}. Please ensure your API key is correct.`);
     } finally {
         modalLoading.classList.add('hidden');
     }
@@ -482,8 +483,12 @@ async function callGeminiAPI(prompt, isInitial = false) {
 
 function addMessageToChat(sender, text) {
     const messageElement = document.createElement('div');
-    messageElement.className = `p-3 rounded-lg max-w-[80%] w-fit ${sender === 'user' ? 'bg-blue-100 self-end' : 'bg-gray-200 self-start'}`;
-    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+    messageElement.className = `p-3 rounded-lg max-w-[80%] w-fit text-left ${sender === 'user' ? 'bg-blue-100 self-end' : 'bg-gray-200 self-start'}`;
+    // Basic markdown-to-HTML conversion
+    text = text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')       // Italics
+        .replace(/\n/g, '<br>');                      // Newlines
     messageElement.innerHTML = text;
     modalChatWindow.appendChild(messageElement);
     modalChatWindow.scrollTop = modalChatWindow.scrollHeight;
