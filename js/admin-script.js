@@ -445,7 +445,7 @@ async function handleAiChatSubmit(e) {
 async function callGeminiAPI(prompt, isInitial = false) {
     modalLoading.classList.remove('hidden');
     // IMPORTANT: Replace with your actual Gemini API Key
-    const apiKey = "YOUR_GEMINI_API_KEY"; 
+    const apiKey = "AIzaSyBQeLMNbrjf8RPO01wipxS0JrWNyTv9az0"; 
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
     if (isInitial) {
