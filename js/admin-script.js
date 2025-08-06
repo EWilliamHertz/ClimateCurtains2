@@ -9,7 +9,7 @@ const firebaseConfig = {
     apiKey: "AIzaSyB7_Tdz7SGtcj-qN8Ro7uAmoVrPyuR5cqc",
     authDomain: "climatecurtainsab.firebaseapp.com",
     projectId: "climatecurtainsab",
-    storageBucket: "climatecurtainsab.firebasestorage.app", // *** THIS IS THE CORRECTED LINE ***
+    storageBucket: "climatecurtainsab.firebasestorage.app",
     messagingSenderId: "534408595576",
     appId: "1:534408595576:web:c73c886ab1ea1abd9e858d",
     measurementId: "G-3GNNYNJKM7"
@@ -317,7 +317,7 @@ async function handleAddInvestor(e) {
     try {
         await addDoc(collection(db, 'investor_prospects'), investorData);
         investorForm.reset();
-    } catch (error) a{
+    } catch (error) { // *** THIS IS THE CORRECTED LINE ***
         console.error("Error adding investor:", error);
         alert("Failed to add investor.");
     }
