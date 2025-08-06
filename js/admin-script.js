@@ -3,15 +3,27 @@ import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/fi
 import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc, onSnapshot, query, orderBy, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js";
 
-// --- Firebase Configuration ---
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: "AIzaSyB7_Tdz7SGtcj-qN8Ro7uAmoVrPyuR5cqc",
-    authDomain: "climatecurtainsab.firebaseapp.com",
-    projectId: "climatecurtainsab",
-    storageBucket: "climatecurtainsab.appspot.com",
-    messagingSenderId: "534408595576",
-    appId: "1:534408595576:web:c73c886ab1ea1abd9e858d"
+  apiKey: "AIzaSyB7_Tdz7SGtcj-qN8Ro7uAmoVrPyuR5cqc",
+  authDomain: "climatecurtainsab.firebaseapp.com",
+  projectId: "climatecurtainsab",
+  storageBucket: "climatecurtainsab.firebasestorage.app",
+  messagingSenderId: "534408595576",
+  appId: "1:534408595576:web:c73c886ab1ea1abd9e858d",
+  measurementId: "G-3GNNYNJKM7"
 };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
 // --- Initialize Firebase ---
 const app = initializeApp(firebaseConfig);
