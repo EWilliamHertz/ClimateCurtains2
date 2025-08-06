@@ -17,11 +17,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
-
-// --- Global Admin State ---
-let adminProfile = {};
-let chatHistory = [];
+const storage = getStorage(app); // Ensure storage is initialized
 
 // --- DOM Elements ---
 const adminNameSpan = document.getElementById('admin-name');
@@ -187,7 +183,7 @@ function handleFileUpload(e) {
         }, 
         (error) => {
             console.error("Upload failed:", error);
-            uploadStatus.textContent = `Upload failed.`;
+            uploadStatus.textContent = `Upload failed. Check console and storage rules.`;
         }, 
         async () => {
             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
