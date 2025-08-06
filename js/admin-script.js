@@ -4,13 +4,12 @@ import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/fi
 import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc, onSnapshot, query, orderBy, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js";
 
-// --- Firebase Configuration Provided by You ---
-// Note: I've corrected the storageBucket to the standard '.appspot.com' format for SDK compatibility.
+// --- Firebase Configuration with CORRECT storageBucket ---
 const firebaseConfig = {
     apiKey: "AIzaSyB7_Tdz7SGtcj-qN8Ro7uAmoVrPyuR5cqc",
     authDomain: "climatecurtainsab.firebaseapp.com",
     projectId: "climatecurtainsab",
-    storageBucket: "climatecurtainsab.appspot.com", // Corrected for SDK
+    storageBucket: "climatecurtainsab.firebasestorage.app", // *** THIS IS THE CORRECTED LINE ***
     messagingSenderId: "534408595576",
     appId: "1:534408595576:web:c73c886ab1ea1abd9e858d",
     measurementId: "G-3GNNYNJKM7"
@@ -318,7 +317,7 @@ async function handleAddInvestor(e) {
     try {
         await addDoc(collection(db, 'investor_prospects'), investorData);
         investorForm.reset();
-    } catch (error) {
+    } catch (error) a{
         console.error("Error adding investor:", error);
         alert("Failed to add investor.");
     }
